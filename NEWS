@@ -1,3 +1,8 @@
+Changes in 2.x vxxxxxx
+======================
+* FIX: afpd: Byte order detection. Fixes an error where Netatalk on
+       OpenIndiana returned wrong volume size information.
+
 Changes in 2.x v230302
 ======================
 * FIX: CVE-2022-45188: fixes the heap-based buffer overflow in afp_getappl()
