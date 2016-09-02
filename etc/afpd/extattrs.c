@@ -41,8 +41,6 @@ extern int debug;
 static const char *ea_finderinfo = "com.apple.FinderInfo";
 static const char *ea_resourcefork = "com.apple.ResourceFork";
 
-/* This should be big enough to consecutively store the names of all attributes */
-static char attrnamebuf[ATTRNAMEBUFSIZ];
 
 /***************************************
  * AFP funcs
@@ -69,6 +67,7 @@ int afp_listextattr(AFPObj * obj _U_, char *ibuf, size_t ibuflen _U_,
 
 	static int buf_valid = 0;
 	static size_t attrbuflen = 0;
+	char attrnamebuf[ATTRNAMEBUFSIZ];
 
 	*rbuflen = 0;
 	ibuf += 2;
