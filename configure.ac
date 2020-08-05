@@ -193,12 +193,10 @@ netatalk_cv_ddp_enabled=yes
 AC_MSG_CHECKING([whether to enable DDP])
 AC_ARG_ENABLE(ddp,
 	[  --enable-ddp            enable DDP (AppleTalk)],[
-	if test "$enableval" = "yes"; then 
-		AC_MSG_RESULT([yes])
-		netatalk_cv_ddp_enabled=yes
-	else
+	if test "$enableval" = "no"; then 
 		AC_MSG_RESULT([no])
 		AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
+		netatalk_cv_ddp_enabled=no
 	fi
 	],[
 		AC_MSG_RESULT([yes])
