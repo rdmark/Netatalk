@@ -189,7 +189,7 @@ AC_ARG_WITH(cracklib,
 AC_MSG_CHECKING([for cracklib support])
 AC_MSG_RESULT([$netatalk_cv_with_cracklib])
 
-netatalk_cv_ddp_enabled=no
+netatalk_cv_ddp_enabled=yes
 AC_MSG_CHECKING([whether to enable DDP])
 AC_ARG_ENABLE(ddp,
 	[  --enable-ddp            enable DDP (AppleTalk)],[
@@ -197,12 +197,11 @@ AC_ARG_ENABLE(ddp,
 		AC_MSG_RESULT([yes])
 		netatalk_cv_ddp_enabled=yes
 	else
-		AC_MSG_RESULT([yes])
+		AC_MSG_RESULT([no])
 		AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
 	fi
 	],[
-		AC_MSG_RESULT([no])
-		AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
+		AC_MSG_RESULT([yes])
 	]
 )
 
