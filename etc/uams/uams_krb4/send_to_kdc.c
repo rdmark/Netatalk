@@ -18,9 +18,7 @@ static char rcsid_send_to_kdc_c[] =
 "$Id: send_to_kdc.c,v 1.4 2001-06-25 20:13:45 rufustfirefly Exp $";
 #endif /* lint */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #ifdef UAM_AFSKRB
 

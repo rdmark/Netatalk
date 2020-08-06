@@ -5,9 +5,7 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #ifdef CNID_BACKEND_CDB
 #include "cnid_cdb_private.h"

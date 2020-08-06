@@ -32,9 +32,7 @@
  * CNID_START begins at 17.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #ifdef CNID_BACKEND_CDB
 

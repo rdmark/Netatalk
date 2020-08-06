@@ -10,9 +10,7 @@
  * The University of Melbourne.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h> /* to get __GNU_LIBRARY__ */
 

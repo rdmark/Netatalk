@@ -19,9 +19,7 @@
 */
 #define STANDALONE 1
 
-#if HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #if STANDALONE
 #include <stdlib.h>

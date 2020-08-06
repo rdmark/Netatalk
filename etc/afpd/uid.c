@@ -7,9 +7,7 @@
  * across the package).
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 /* don't compile this file at all unless FORCE_UIDGID is set */
 #ifdef FORCE_UIDGID

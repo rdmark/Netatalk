@@ -18,9 +18,7 @@
  * Netatalk utility functions
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <unistd.h>
 #include <fcntl.h>

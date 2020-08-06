@@ -5,9 +5,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #if defined( KRB ) || defined( UAM_AFSKRB )
 #ifdef HAVE_UNISTD_H

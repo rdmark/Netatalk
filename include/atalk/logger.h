@@ -59,9 +59,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 /* logger is used by pam modules */
 #ifndef UAM_MODULE_EXPORT

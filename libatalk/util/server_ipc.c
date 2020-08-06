@@ -4,9 +4,7 @@
  * IPC over socketpair between parent and children.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif 
 
 #include <sys/types.h>
 #ifdef HAVE_UNISTD_H

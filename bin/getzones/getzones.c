@@ -2,9 +2,7 @@
  * $Id: getzones.c,v 1.9 2009-10-14 01:38:28 didg Exp $
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
 #include <sys/socket.h>
