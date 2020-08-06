@@ -45,9 +45,16 @@ char *strchr (), *strrchr ();
 #ifndef PORTMAP
 #define PORTMAP 1
 #endif
+#if defined(__linux__)
+#include <gssrpc/rpc.h>
+#include <gssrpc/pmap_prot.h>
+#include <sys/quota.h>
+#include <linux/quota.h>
+#else
 #include <rpc/rpc.h>
 #include <rpc/pmap_prot.h>
 #include <rpcsvc/rquota.h>
+#endif
 
 
 #include <atalk/afp.h>
