@@ -306,11 +306,8 @@ dnl Check for CNID database backends
 bdb_required=no
 AC_NETATALK_CNID([bdb_required=yes],[bdb_required=no])
 
-# Disable quotas
-#dnl Check for quota support
-#AC_CHECK_QUOTA
-netatalk_cv_quotasupport=no
-AC_DEFINE(NO_QUOTA_SUPPORT, 1, [Define if Quota support should be disabled])
+dnl Check for quota support
+AC_CHECK_QUOTA
 
 dnl Check for optional server location protocol support (used by MacOS X)
 NETATALK_SRVLOC
