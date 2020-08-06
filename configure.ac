@@ -306,8 +306,11 @@ dnl Check for CNID database backends
 bdb_required=no
 AC_NETATALK_CNID([bdb_required=yes],[bdb_required=no])
 
-dnl Check for quota support
-AC_CHECK_QUOTA
+# Disable quotas
+#dnl Check for quota support
+#AC_CHECK_QUOTA
+netatalk_cv_quotasupport=no
+AC_DEFINE(NO_QUOTA_SUPPORT, 1, [Define if Quota support should be disabled])
 
 dnl Check for optional server location protocol support (used by MacOS X)
 NETATALK_SRVLOC
@@ -671,20 +674,21 @@ fi
 #		AC_DEFINE(NEED_QUOTACTL_WRAPPER, 1, [Define if the quotactl wrapper is needed])
 #		AC_MSG_RESULT([enabling quotactl wrapper])
 #	)
+	AC_DEFINE(NO_QUOTA_SUPPORT, 1, [Define if Quota support should be disabled])
 
         # For quotas on Linux XFS filesystems
         
         # For linux > 2.5.56
-        AC_CHECK_HEADERS(linux/dqblk_xfs.h,,
-		[AC_CHECK_HEADERS(linux/xqm.h linux/xfs_fs.h)
-        	AC_CHECK_HEADERS(xfs/libxfs.h xfs/xqm.h xfs/xfs_fs.h)]
-	)
+#        AC_CHECK_HEADERS(linux/dqblk_xfs.h,,
+#		[AC_CHECK_HEADERS(linux/xqm.h linux/xfs_fs.h)
+#        	AC_CHECK_HEADERS(xfs/libxfs.h xfs/xqm.h xfs/xfs_fs.h)]
+#	)
 
 
-	dnl ----- as far as I can tell, dbtob always does the wrong thing
-	dnl ----- on every single version of linux I've ever played with.
-	dnl ----- see etc/afpd/quota.c
-	AC_DEFINE(HAVE_BROKEN_DBTOB, 1, [Define if dbtob is broken])
+#	dnl ----- as far as I can tell, dbtob always does the wrong thing
+#	dnl ----- on every single version of linux I've ever played with.
+#	dnl ----- see etc/afpd/quota.c
+#	AC_DEFINE(HAVE_BROKEN_DBTOB, 1, [Define if dbtob is broken])
 
 
 	dnl ----- Linux/alpha specific -----
@@ -1012,19 +1016,20 @@ if test x"$with_ldap" = x"yes"; then
 fi
 
 dnl --------------------- check for ACL support
+with_acl_support=no
 AC_MSG_CHECKING(whether to support ACLs)
 AC_ARG_WITH(acls,
     [AS_HELP_STRING([--with-acls],
-        [Include ACL support (default=auto)])],
+        [Include ACL support (default=no)])],
     [ case "$withval" in
       yes|no)
           with_acl_support="$withval"
 		  ;;
       *)
-          with_acl_support=auto
+          with_acl_support=no
           ;;
       esac ],
-    [with_acl_support=auto])
+    [with_acl_support=no])
 AC_MSG_RESULT($with_acl_support)
 
 if test x"$with_acl_support" = x"no"; then
