@@ -640,11 +640,7 @@ static void show_version_extended(void )
 #endif
 
 	printf( "        Dropbox kludge:\t" );
-#ifdef DROPKLUDGE
-	puts( "Yes" );
-#else
 	puts( "No" );
-#endif
 
 	printf( "  Force volume uid/gid:\t" );
 #ifdef FORCE_UIDGID
