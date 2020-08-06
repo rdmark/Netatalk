@@ -483,13 +483,13 @@ AC_ARG_ENABLE(timelord,
 )
 AC_MSG_RESULT([$compile_timelord])
 
-dnl ----- a2boot compilation (disabled by default)
+dnl ----- a2boot compilation (enabled by default)
 AC_MSG_CHECKING([whether a2boot should be compiled])
-compile_a2boot=no
+compile_a2boot=yes
 AC_ARG_ENABLE(a2boot,
 	[  --enable-a2boot         enable compilation of Apple2 boot server],
 	[compile_a2boot="$enableval"],
-	[compile_a2boot="no"]
+	[compile_a2boot="yes"]
 )
 AC_MSG_RESULT([$compile_a2boot])
 
