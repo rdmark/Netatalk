@@ -3,9 +3,7 @@
 noinst_LTLIBRARIES = libcompat.la
 
 libcompat_la_SOURCES =	\
+<<<<<<< HEAD
 	misc.c \
-	getusershell.c	\
 	inet_aton.c	\
-	rquota_xdr.c	\
-	pselect.c	\
-	snprintf.c
+	rquota_xdr.c
