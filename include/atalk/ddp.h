@@ -24,7 +24,6 @@
 #ifndef _ATALK_DDP_H
 #define _ATALK_DDP_H 1
 
-#ifndef NO_DDP
 
 #define DDPTYPE_RTMPRD	1
 #define DDPTYPE_NBP	2
@@ -34,5 +33,4 @@
 #define DDPTYPE_ZIP	6
 #define DDPTYPE_ADSP	7
 
-#endif /* NO_DDP */
 #endif

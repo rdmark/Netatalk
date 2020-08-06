@@ -470,13 +470,11 @@ int uam_afp_read(void *handle, char *buf, size_t *buflen,
         return AFPERR_PARAM;
 
     switch (obj->proto) {
-#ifndef NO_DDP
     case AFPPROTO_ASP:
         if ((len = asp_wrtcont(obj->handle, buf, buflen )) < 0)
             goto uam_afp_read_err;
         return action(handle, buf, *buflen);
         break;
-#endif
     case AFPPROTO_DSI:
         len = dsi_writeinit(obj->handle, buf, *buflen);
         if (!len || ((len = action(handle, buf, len)) < 0)) {

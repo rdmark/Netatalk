@@ -24,7 +24,6 @@
 #ifndef _ATALK_PAP_H
 #define _ATALK_PAP_H 1
 
-#ifndef NO_DDP
 
 #define PAP_OPEN	1
 #define PAP_OPENREPLY	2
@@ -39,5 +38,4 @@
 #define PAP_MAXDATA	512
 #define PAP_MAXQUANTUM	8
 
-#endif  /* NO_DDP */
 #endif

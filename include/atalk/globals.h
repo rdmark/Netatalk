@@ -72,9 +72,7 @@ struct afp_options {
     u_int32_t server_quantum;
     int dsireadbuf; /* scale factor for sizefof(dsi->buffer) = server_quantum * dsireadbuf */
     char hostname[MAXHOSTNAMELEN + 1], *server, *ipaddr, *port, *configfile;
-#ifndef NO_DDP
     struct at_addr ddpaddr;
-#endif
     char *uampath, *fqdn;
     char *pidfile;
     char *sigconffile;
@@ -164,9 +162,7 @@ extern const char *AfpErr2name(int err);
 /* directory.c */
 extern struct dir rootParent;
 
-#ifndef NO_DDP
 extern void afp_over_asp (AFPObj *);
-#endif /* NO_DDP */
 extern void afp_over_dsi (AFPObj *);
 extern void afp_over_dsi_sighandlers(AFPObj *obj);
 #endif /* globals.h */

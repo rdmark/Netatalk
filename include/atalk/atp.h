@@ -26,7 +26,6 @@
 #ifndef _ATALK_ATP_H
 #define _ATALK_ATP_H 1
 
-#ifndef NO_DDP
  
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -192,5 +191,4 @@ extern int		atp_rsel  (ATP, struct sockaddr_at *, int);
 extern int		atp_rreq  (ATP, struct atp_block *);
 extern int		atp_sresp (ATP, struct atp_block *);
 
-#endif  /* NO_DDP */
 #endif
