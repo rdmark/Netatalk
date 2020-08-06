@@ -68,7 +68,7 @@ AC_DEFUN([NETATALK_ZEROCONF], [
 	fi
 
 	netatalk_cv_zeroconf=no
-	AC_MSG_CHECKING([whether to enable Zerconf support])
+	AC_MSG_CHECKING([whether to enable Zeroconf support])
 	if test "x$found_zeroconf" = "xyes"; then
 		AC_MSG_RESULT([yes])
 		AC_DEFINE(USE_ZEROCONF, 1, [Define to enable Zeroconf support])
