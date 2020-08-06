@@ -12,7 +12,6 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifndef NO_DDP
 #include <string.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -32,4 +31,3 @@
 #define MAX(a, b)  ((a) < (b) ? (b) : (a))
 #endif /* ! MAX */
 
-#endif /* no ddp */

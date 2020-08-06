@@ -85,9 +85,7 @@ static int status_server(char *data, const char *server, const struct afp_option
 
     /* extract the obj part of the server */
     Obj = (char *) server;
-#ifndef NO_DDP
     nbp_name(server, &Obj, &Type, &Zone);
-#endif
     if ((size_t)-1 == (len = convert_string( 
                            options->unixcharset, options->maccharset, 
                            Obj, -1, buf, sizeof(buf))) ) {
@@ -187,9 +185,7 @@ static u_int16_t status_signature(char *data, int *servoffset,
 }
 
 static size_t status_netaddress(char *data, int *servoffset,
-#ifndef NO_DDP
                                 const ASP asp,
-#endif
                                 const DSI *dsi,
                                 const struct afp_options *options)
 {
@@ -215,9 +211,7 @@ static size_t status_netaddress(char *data, int *servoffset,
        connection, but we don't have the ip address. to get around this,
        we turn off the status flag for tcp/ip. */
     *data++ = ((options->fqdn && dsi)? 1 : 0) + (dsi ? 1 : 0) +
-#ifndef NO_DDP
         (asp ? 1 : 0) +
-#endif
               (((options->flags & OPTION_ANNOUNCESSH) && options->fqdn && dsi)? 1 : 0);
 
     /* ip address */
@@ -291,7 +285,6 @@ static size_t status_netaddress(char *data, int *servoffset,
         }
     }
 
-#ifndef NO_DDP
     if (asp) {
         const struct sockaddr_at *ddpaddr = atp_sockaddr(asp->asp_atp);
 
@@ -306,7 +299,6 @@ static size_t status_netaddress(char *data, int *servoffset,
         memcpy(data, &ddpaddr->sat_port, sizeof(ddpaddr->sat_port));
         data += sizeof(ddpaddr->sat_port);
     }
-#endif /* ! NO_DDP */
 
     /* calculate/store Directory Services Names offset */
     offset = htons(data - begin); 
@@ -394,9 +386,7 @@ static size_t status_utf8servername(char *data, int *nameoffset,
 
     /* extract the obj part of the server */
     Obj = (char *) (options->server ? options->server : options->hostname);
-#ifndef NO_DDP
     nbp_name(options->server ? options->server : options->hostname, &Obj, &Type, &Zone);
-#endif
     if ((size_t) -1 == (len = convert_string (
 					options->unixcharset, CH_UTF8_MAC, 
 					Obj, -1, data+sizeof(namelen), maxstatuslen-offset )) ) {
@@ -449,9 +439,7 @@ static void status_icon(char *data, const unsigned char *icondata,
 void status_init(AFPConfig *aspconfig, AFPConfig *dsiconfig,
                  const struct afp_options *options)
 {
-#ifndef NO_DDP
     ASP asp;
-#endif
     DSI *dsi;
     char *status = NULL;
     size_t statuslen;
@@ -460,14 +448,12 @@ void status_init(AFPConfig *aspconfig, AFPConfig *dsiconfig,
     if (!(aspconfig || dsiconfig) || !options)
         return;
 
-#ifndef NO_DDP
     if (aspconfig) {
         status = aspconfig->status;
         maxstatuslen=sizeof(aspconfig->status);
         asp = aspconfig->obj.handle;
     } else
         asp = NULL;
-#endif
 	
     ipok = 0;
     if (dsiconfig) {
@@ -520,9 +506,7 @@ void status_init(AFPConfig *aspconfig, AFPConfig *dsiconfig,
                       options->hostname, options);
     status_machine(status);
     status_versions(status,
-#ifndef NO_DDP
                     asp,
-#endif
                     dsi);
     status_uams(status, options->uamlist);
     if (options->flags & OPTION_CUSTOMICON)
@@ -534,9 +518,7 @@ void status_init(AFPConfig *aspconfig, AFPConfig *dsiconfig,
     /* c now contains the offset where the netaddress offset lives */
 
     status_netaddress(status, &c,
-#ifndef NO_DDP
                       asp,
-#endif
                       dsi, options);
     /* c now contains the offset where the Directory Names Count offset lives */
 
@@ -546,7 +528,6 @@ void status_init(AFPConfig *aspconfig, AFPConfig *dsiconfig,
     if ( statuslen < maxstatuslen) 
         statuslen = status_utf8servername(status, &c, dsi, options);
 
-#ifndef NO_DDP
     if (aspconfig) {
         if (dsiconfig) /* status is dsiconfig->status */
             memcpy(aspconfig->status, status, statuslen);
@@ -554,7 +535,6 @@ void status_init(AFPConfig *aspconfig, AFPConfig *dsiconfig,
         aspconfig->signature = status + sigoff;
         aspconfig->statuslen = statuslen;
     }
-#endif /* ! NO_DDP */
 
     if (dsiconfig) {
         if ((options->flags & OPTION_CUSTOMICON) == 0) {

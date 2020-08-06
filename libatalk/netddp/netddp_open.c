@@ -25,9 +25,6 @@
 int netddp_open(struct sockaddr_at *addr, struct sockaddr_at *bridge)
 {
 
-#ifdef NO_DDP
-    return -1;
-#else /* !NO_DDP */
 
     int s;
 
@@ -54,5 +51,4 @@ int netddp_open(struct sockaddr_at *addr, struct sockaddr_at *bridge)
     }
 
     return s;
-#endif /* NO_DDP */
 }

@@ -1271,7 +1271,6 @@ static int write_fork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, s
 
     /* this is yucky, but dsi can stream i/o and asp can't */
     switch (obj->proto) {
-#ifndef NO_DDP
     case AFPPROTO_ASP:
         if (asp_wrtcont(obj->handle, rbuf, rbuflen) < 0) {
             *rbuflen = 0;
@@ -1293,7 +1292,6 @@ static int write_fork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, s
         }
         offset += cc;
         break;
-#endif /* no afp/asp */
 
     case AFPPROTO_DSI:
         {

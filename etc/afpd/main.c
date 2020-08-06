@@ -118,9 +118,7 @@ static void afp_goaway(int sig)
 {
         AFPConfig *config;
 
-#ifndef NO_DDP
     asp_kill(sig);
-#endif /* ! NO_DDP */
 
     switch( sig ) {
 

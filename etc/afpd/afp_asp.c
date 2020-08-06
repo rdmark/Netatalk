@@ -12,7 +12,6 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifndef NO_DDP
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -419,4 +418,3 @@ void afp_over_asp(AFPObj *obj)
     }
 }
 
-#endif

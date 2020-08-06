@@ -61,9 +61,7 @@ static struct uam_obj *afp_uam = NULL;
 
 
 void status_versions(char *data,
-#ifndef NO_DDP
                      const ASP asp,
-#endif
                      const DSI *dsi)
 {
     char                *start = data;
@@ -74,9 +72,7 @@ void status_versions(char *data,
     num = sizeof( afp_versions ) / sizeof( afp_versions[ 0 ] );
 
     for ( i = 0; i < num; i++ ) {
-#ifndef NO_DDP
         if ( !asp && (afp_versions[ i ].av_number <= 21)) continue;
-#endif /* ! NO_DDP */
         if ( !dsi && (afp_versions[ i ].av_number >= 22)) continue;
         count++;
     }
@@ -84,9 +80,7 @@ void status_versions(char *data,
     *data++ = count;
 
     for ( i = 0; i < num; i++ ) {
-#ifndef NO_DDP
         if ( !asp && (afp_versions[ i ].av_number <= 21)) continue;
-#endif /* ! NO_DDP */
         if ( !dsi && (afp_versions[ i ].av_number >= 22)) continue;
         len = strlen( afp_versions[ i ].av_name );
         *data++ = len;
@@ -239,7 +233,6 @@ static int login(AFPObj *obj, struct passwd *pwd, void (*logout)(void), int expi
     LOG(log_note, logtype_afpd, "%s Login by %s",
         afp_versions[afp_version_index].av_name, pwd->pw_name);
 
-#ifndef NO_DDP
     if (obj->proto == AFPPROTO_ASP) {
         ASP asp = obj->handle;
         int addr_net = ntohs( asp->asp_sat.sat_addr.s_net );
@@ -276,7 +269,6 @@ static int login(AFPObj *obj, struct passwd *pwd, void (*logout)(void), int expi
             } /* if (addr_net && addr_node ) */
         } /* if (options->authprintdir) */
     } /* if (obj->proto == AFPPROTO_ASP) */
-#endif
 
     if (set_groups(obj, pwd) != 0)
         return AFPERR_BADUAM;

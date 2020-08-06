@@ -118,9 +118,7 @@ static int iconopen(struct vol *vol, u_char creator[ 4 ], int flags, int mode)
 int afp_addicon(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
 {
     struct vol		*vol;
-#ifndef NO_DDP
     struct iovec	iov[ 2 ];
-#endif
     u_char		fcreator[ 4 ], imh[ 12 ], irh[ 12 ], *p;
     int			itype, cc = AFP_OK, iovcnt = 0;
     size_t 		buflen;
@@ -219,7 +217,6 @@ addicon_err:
     }
 
     switch (obj->proto) {
-#ifndef NO_DDP
     case AFPPROTO_ASP:
         buflen = bsize;
         if ((asp_wrtcont(obj->handle, rbuf, &buflen) < 0) || buflen != bsize)
@@ -256,7 +253,6 @@ addicon_err:
             return( AFPERR_PARAM );
         }
         break;
-#endif /* no afp/asp */      
     case AFPPROTO_DSI:
         {
             DSI *dsi = obj->handle;

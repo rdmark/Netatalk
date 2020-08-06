@@ -11,7 +11,6 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifndef NO_DDP
 
 #if defined(linux) /* pull in the linux header */
 #include <sys/socket.h>
@@ -134,6 +133,5 @@ extern struct protosw	atalksw[];
 #endif /* KERNEL */
 
 #endif /* linux */
-#endif /* NO_DDP */
 #endif /* __AT_HEADER__ */
 
