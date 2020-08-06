@@ -190,18 +190,6 @@ AC_MSG_CHECKING([for cracklib support])
 AC_MSG_RESULT([$netatalk_cv_with_cracklib])
 
 netatalk_cv_ddp_enabled=yes
-AC_MSG_CHECKING([whether to enable DDP])
-AC_ARG_ENABLE(ddp,
-	[  --enable-ddp            enable DDP (AppleTalk)],[
-	if test "$enableval" = "no"; then 
-		AC_MSG_RESULT([no])
-		AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
-		netatalk_cv_ddp_enabled=no
-	fi
-	],[
-		AC_MSG_RESULT([yes])
-	]
-)
 
 AC_MSG_CHECKING([whether to enable debug code])
 AC_ARG_ENABLE(debug1,
@@ -261,29 +249,6 @@ AC_ARG_ENABLE(debugging,
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 AC_CHECK_ICONV
-
-dnl ----------- A NOTE ABOUT DROPKLUDGE
-dnl The trouble with this fix is that if you know what the file is called, it
-dnl can be read from the Unix side.  That's okay for most academic institutions
-dnl since the students don't have telnet access to the Mac servers.  There is
-dnl currently no one working on further development/fixes of DROPKLUDGE.
-dnl -----------
-
-netatalk_cv_dropkludge=no
-AC_MSG_CHECKING([whether to enable experimental dropbox support])
-AC_ARG_ENABLE(dropkludge,
-	[  --enable-dropkludge     enable the experimental dropbox fix (INSECURE!) ],[
-	if test "$enableval" = "yes"; then 
-		AC_DEFINE(DROPKLUDGE, 1, [Define if you want to use the experimental dropkludge support])
-		AC_MSG_RESULT([yes])
-		netatalk_cv_dropkludge=yes
-	else
-		AC_MSG_RESULT([no])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
 
 netatalk_cv_force_uidgid=no
 AC_MSG_CHECKING([whether to enable forcing of uid/gid per volume])
@@ -579,31 +544,20 @@ esac
 
 case "$host_cpu" in
 	i386|i486|i586|i686|k7)		this_cpu=x86 ;;
-	alpha)						this_cpu=alpha ;;
-	mips)						this_cpu=mips ;;
-	powerpc|ppc)				this_cpu=ppc ;;
+	alpha)				this_cpu=alpha ;;
+	mips)				this_cpu=mips ;;
+	powerpc|ppc)			this_cpu=ppc ;;
 esac
 
 dnl --------------------- GNU source
 case "$this_os" in
 	linux)	AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
         ;;
-     kfreebsd-gnu) AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
+	kfreebsd-gnu) AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
         ;;
 esac
 
 dnl --------------------- operating system specific flags (port from sys/*)
-
-dnl ----- AIX specific -----
-if test x"$this_os" = "xaix"; then
-	AC_MSG_RESULT([ * AIX specific configuration])
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
-
-	dnl This is probably a lie; AIX 4.3 supports a 64-bit long
-	dnl compilation environment.  It's enough to get things defined
-	dnl right in endian.h provided that long long is supported, though.
-	AC_DEFINE(HAVE_32BIT_LONGS, 1, [Define if the data type long has 32 bit])
-fi
 
 dnl ----- FreeBSD specific -----
 if test x"$this_os" = "xfreebsd"; then 
@@ -619,21 +573,6 @@ if test x"$this_os" = "xkfreebsd-gnu"; then
 	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
 	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
     AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EMLINK, errno returned by open with O_NOFOLLOW)
-fi
-
-dnl ----- HP-UX 11 specific -----
-if test x"$this_os" = "xhpux11"; then
-	AC_MSG_RESULT([ * HP-UX 11 specific configuration])
-
-	AC_DEFINE(_ISOC9X_SOURCE, 1, [Compatibility macro])
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
-fi
-
-dnl ----- IRIX specific -----
-if test x"$this_os" = "xirix"; then
-	AC_MSG_RESULT([ * IRIX specific configuration])
-
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
 fi
 
 dnl ----- Linux specific -----
