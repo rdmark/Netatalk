@@ -144,11 +144,11 @@ static int addstack(char *uname, struct dir *dir, int pidx)
 		dssize += DS_BSIZE;
 		tmpds = realloc(dstack, dssize * sizeof(struct dsitem));	
 		if (tmpds == NULL) {
-            clearstack();
-            free(dstack);
-			return -1;
-        }
-        dstack = tmpds;
+                    clearstack();
+                    free(dstack);
+                    return -1;
+                }
+                dstack = tmpds;
 	}
 
 	/* Put new element. Allocate and copy lname and path. */
