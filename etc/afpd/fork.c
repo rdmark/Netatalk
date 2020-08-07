@@ -34,15 +34,11 @@
 #include "desktop.h"
 #include "volume.h"
 
-#ifdef DEBUG1
-#define Debug(a) ((a)->options.flags & OPTION_DEBUG)
-#else
-#define Debug(a) (0)
-#endif
-
 #ifdef AFS
 struct ofork *writtenfork;
 #endif
+
+extern int debug;
 
 static int getforkparams(struct ofork *ofork, u_int16_t bitmap, char *buf, size_t *buflen)
 {
@@ -950,7 +946,7 @@ static int read_fork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, si
         /* due to the nature of afp packets, we have to exit if we get
            an error. we can't do this with translation on. */
 #ifdef WITH_SENDFILE 
-        if (!(xlate || Debug(obj) )) {
+        if (!(xlate || obj->options.flags & OPTION_DEBUG)) {
             int fd;
                         
             fd = ad_readfile_init(ofork->of_ad, eid, &offset, 0);
@@ -1276,12 +1272,11 @@ static int write_fork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, s
             return( AFPERR_PARAM );
         }
 
-#ifdef DEBUG1
         if (obj->options.flags & OPTION_DEBUG) {
             printf("(write) len: %d\n", *rbuflen);
             bprint(rbuf, *rbuflen);
         }
-#endif
+
         if ((cc = write_file(ofork, eid, offset, rbuf, *rbuflen,
                              xlate)) < 0) {
             *rbuflen = 0;

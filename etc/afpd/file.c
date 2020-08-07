@@ -34,6 +34,8 @@
 #include "filedir.h"
 #include "unix.h"
 
+extern int debug;
+
 /* the format for the finderinfo fields (from IM: Toolbox Essentials):
  * field         bytes        subfield    bytes
  * 
@@ -855,9 +857,8 @@ int setfilparams(struct vol *vol,
     ssize_t len;
     char symbuf[MAXPATHLEN+1];
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_afpd, "begin setfilparams:");
-#endif /* DEBUG */
+    if (debug)
+	LOG(log_debug9, logtype_afpd, "begin setfilparams:");
 
     adp = of_ad(vol, path, &ad);
     upath = path->u_name;
@@ -1088,9 +1089,9 @@ setfilparam_done:
         setdirparams(vol, &Cur_Path, bitmap, (char *)&newdate);
     }
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_afpd, "end setfilparams:");
-#endif /* DEBUG */
+    if (debug)
+	LOG(log_debug9, logtype_afpd, "end setfilparams:");
+
     return err;
 }
 
@@ -1376,9 +1377,8 @@ static int copy_all(const int dfd, const void *buf,
 {
     ssize_t cc;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_afpd, "begin copy_all:");
-#endif /* DEBUG */
+    if (debug)
+	LOG(log_debug9, logtype_afpd, "begin copy_all:");
 
     while (buflen > 0) {
         if ((cc = write(dfd, buf, buflen)) < 0) {
@@ -1392,9 +1392,8 @@ static int copy_all(const int dfd, const void *buf,
         buflen -= cc;
     }
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_afpd, "end copy_all:");
-#endif /* DEBUG */
+    if (debug)
+	LOG(log_debug9, logtype_afpd, "end copy_all:");
 
     return 0;
 }

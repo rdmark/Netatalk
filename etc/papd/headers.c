@@ -22,6 +22,8 @@
 int ch_title( struct papfile *, struct papfile * );
 int ch_for( struct papfile *, struct papfile * );
 
+extern int debug;
+
 static char *get_text(char *start, int linelength)
 {
     char *p, *q;
@@ -125,9 +127,8 @@ int ch_title( struct papfile *in, struct papfile *out _U_)
         return( CH_ERROR );
     }
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "Parsing %%Title");
-#endif
+    if ( debug ) 
+        LOG(log_debug9, logtype_papd, "Parsing %%Title");
 
     cmt = get_text(start, linelength);
 
@@ -192,9 +193,9 @@ int ch_endcomm( struct papfile *in, struct papfile *out _U_)
     char                *start;
     int                 linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "End Comment");
-#endif
+    if ( debug ) 
+        LOG(log_debug9, logtype_papd, "End Comment");
+
     in->pf_state |= PF_STW;
 
     switch ( markline( in, &start, &linelength, &crlflength )) {
@@ -221,9 +222,8 @@ int ch_starttranslate( struct papfile *in, struct papfile *out _U_)
     char                *start;
     int                 linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "Start translate");
-#endif
+    if ( debug ) 
+        LOG(log_debug9, logtype_papd, "Start translate");
 
     switch ( markline( in, &start, &linelength, &crlflength )) {
     case 0 :
@@ -248,9 +248,8 @@ int ch_endtranslate(struct papfile *in, struct papfile *out _U_)
     char                *start;
     int                 linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "EndTranslate");
-#endif
+    if ( debug ) 
+        LOG(log_debug9, logtype_papd, "EndTranslate");
 
     switch ( markline( in, &start, &linelength, &crlflength )) {
     case 0 :
@@ -275,9 +274,8 @@ int ch_translateone( struct papfile *in, struct papfile *out _U_)
     char                *start;
     int                 linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "TranslateOne");
-#endif
+    if ( debug ) 
+        LOG(log_debug9, logtype_papd, "TranslateOne");
 
     switch ( markline( in, &start, &linelength, &crlflength )) {
     case 0 :

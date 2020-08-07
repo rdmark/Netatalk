@@ -244,9 +244,8 @@ int main(int ac, char **av)
       exit(0);
     }      
 
-#ifdef DEBUG1
-    fault_setup(NULL);
-#endif
+    if ( debug ) 
+	fault_setup(NULL);
 
     /*
      * Start logging.
@@ -385,9 +384,9 @@ int main(int ac, char **av)
 		    * If cups is not accepting jobs, we return
 		    * 0xffff to indicate we're busy
 		    */
-#ifdef DEBUG
-                    LOG(log_debug9, logtype_papd, "CUPS: PAP_OPEN");
-#endif
+                    if ( debug ) 
+			LOG(log_debug9, logtype_papd, "CUPS: PAP_OPEN");
+
 		    if ( (pr->p_flags & P_SPOOLED) && (cups_get_printer_status ( pr ) == 0)) {
                         LOG(log_error, logtype_papd, "CUPS_PAP_OPEN: %s is not accepting jobs",
                                 pr->p_printer );

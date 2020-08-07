@@ -34,13 +34,14 @@
 #include "fork.h"
 #include "extattrs.h"
 
+extern int debug;
+
 static const char *ea_finderinfo = "com.apple.FinderInfo";
 static const char *ea_resourcefork = "com.apple.ResourceFork";
 
 /* This should be big enough to consecutively store the names of all attributes */
 static char attrnamebuf[ATTRNAMEBUFSIZ];
 
-#ifdef DEBUG
 static void hexdump(void *m, size_t l) {
     char *p = m;
     int count = 0, len;
@@ -58,7 +59,6 @@ static void hexdump(void *m, size_t l) {
         }
     }
 }
-#endif
 
 /***************************************
  * AFP funcs

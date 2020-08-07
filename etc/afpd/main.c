@@ -44,6 +44,7 @@
 #define FDSET_SAFETY  5
 
 unsigned char	nologin = 0;
+int debug = 0;
 struct afp_options default_options;
 static AFPConfig *configs;
 static server_child *server_children;

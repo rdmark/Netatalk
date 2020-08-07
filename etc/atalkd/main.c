@@ -109,7 +109,7 @@ static int		atservNATSERV = elements( atserv );
 
 struct interface	*interfaces = NULL, *ciface = NULL;
 
-static int		debug = 0, quiet = 0, chatty = 0;
+int			debug = 0, quiet = 0, chatty = 0;
 static char		*configfile = NULL;
 static int		ziptimeout = 0;
 static int		stable = 0, noparent = 0;
@@ -127,6 +127,8 @@ static char     	*pidfile = _PATH_ATALKDLOCK;
 int readconf( char * );
 int getifconf( void );
 int writeconf( char * );
+
+static void consistency (void );
 
 /* this is the messiest of the bunch as atalkd can exit pretty much
  * everywhere. we delete interfaces here instead of in as_down. */
@@ -660,16 +662,15 @@ static void as_timer(int sig _U_)
 	}
     }
 
-#ifdef DEBUG
-    consistency();
-#endif /* DEBUG */
+    if ( debug )
+        consistency();
+
 }
 
-#ifdef DEBUG
 /*
 * Consistency check...
 */
-consistency()
+static void consistency()
 {
     struct rtmptab	*rtmp;
     struct list		*lr, *lz;
@@ -679,7 +680,8 @@ consistency()
 	for ( lr = zt->zt_rt; lr; lr = lr->l_next ) {
 	    rtmp = (struct rtmptab *)lr->l_data;
 	    if ( rtmp->rt_iprev == 0 && rtmp->rt_gate != 0 ) {
-		LOG(log_error, logtype_atalkd, "%.*s has %u-%u (unused)",
+		if ( debug )
+		    LOG(log_error, logtype_atalkd, "%.*s has %u-%u (unused)",
 			zt->zt_len, zt->zt_name, ntohs( rtmp->rt_firstnet ),
 			ntohs( rtmp->rt_lastnet ));
 		atalkd_exit(1);
@@ -690,7 +692,8 @@ consistency()
 		}
 	    }
 	    if ( lz == 0 ) {
-		LOG(log_error, logtype_atalkd, "no map from %u-%u to %.*s", 
+		if ( debug )
+		    LOG(log_error, logtype_atalkd, "no map from %u-%u to %.*s", 
 			ntohs( rtmp->rt_firstnet ),
 			ntohs( rtmp->rt_lastnet ),
 			zt->zt_len, zt->zt_name );
@@ -699,7 +702,6 @@ consistency()
 	}
     }
 }
-#endif /* DEBUG */
 
 static void
 as_debug(int sig _U_)
@@ -1172,7 +1174,7 @@ int main( int ac, char **av)
 			    LOG(log_error, logtype_atalkd, "recvfrom: %s", strerror(errno) );
 			    continue;
 			}
-#ifdef DEBUG1
+
 			if ( debug ) {
 			    printf( "packet from %u.%u on %s (%x) %d (%d)\n",
 				    ntohs( sat.sat_addr.s_net ),
@@ -1180,7 +1182,7 @@ int main( int ac, char **av)
 				    iface->i_flags, ap->ap_port, ap->ap_fd );
 			    bprint( Packet, c );
 			}
-#endif 
+
 			if (sigprocmask(SIG_BLOCK, &signal_set, &old_set) < 0) {
 			    LOG(log_error, logtype_atalkd, "sigprocmask: %s", strerror(errno) );
 			    atalkd_exit( 1 );
@@ -1191,9 +1193,9 @@ int main( int ac, char **av)
 			  atalkd_exit(1);
 			}
 
-#ifdef DEBUG
-			consistency();
-#endif 
+			if ( debug )
+				consistency();
+
 			if (sigprocmask(SIG_SETMASK, &old_set, NULL) < 0) {
 			    LOG(log_error, logtype_atalkd, "sigprocmask old set: %s", strerror(errno) );
 			    atalkd_exit( 1 );
@@ -1482,7 +1484,6 @@ void dumpconfig( struct interface *iface)
     printf( "\n" );
 }
 
-#ifdef DEBUG
 void dumproutes(void)
 {
     struct interface	*iface;
@@ -1558,4 +1559,3 @@ void dumpzones(void)
     printf( "\n" );
     fflush( stdout );
 }
-#endif /* DEBUG */

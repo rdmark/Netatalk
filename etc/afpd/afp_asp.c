@@ -41,6 +41,7 @@
 #include "uid.h"
 #endif /* FORCE_UIDGID */
 
+extern int debug;
 static AFPObj *child;
 
 static void afp_authprint_remove(AFPObj *);
@@ -210,9 +211,7 @@ void afp_over_asp(AFPObj *obj)
     ASP asp;
     struct sigaction  action;
     int		func,  reply = 0;
-#ifdef DEBUG1
     int ccnt = 0;
-#endif    
 
     AFPobj = obj;
     obj->exit = afp_asp_die;
@@ -304,11 +303,11 @@ void afp_over_asp(AFPObj *obj)
             afp_asp_close(obj);
             LOG(log_info, logtype_afpd, "done" );
 
-#ifdef DEBUG1
-            if ( obj->options.flags & OPTION_DEBUG ) {
-                printf( "done\n" );
-            }
-#endif
+	    if ( debug ) 
+                if ( obj->options.flags & OPTION_DEBUG ) {
+                    printf( "done\n" );
+                }
+
             return;
             break;
 
@@ -323,12 +322,12 @@ void afp_over_asp(AFPObj *obj)
             }
 #endif /* AFS */
             func = (u_char) asp->commands[0];
-#ifdef DEBUG1
-            if ( obj->options.flags & OPTION_DEBUG ) {
-                printf("command: %d (%s)\n", func, AfpNum2name(func));
-                bprint( asp->commands, asp->cmdlen );
-            }
-#endif            
+            if ( debug ) 
+		if ( obj->options.flags & OPTION_DEBUG ) {
+                	printf("command: %d (%s)\n", func, AfpNum2name(func));
+                	bprint( asp->commands, asp->cmdlen );
+            	}
+
             if ( afp_switch[ func ] != NULL ) {
                 /*
                  * The function called from afp_switch is expected to
@@ -350,12 +349,13 @@ void afp_over_asp(AFPObj *obj)
                 asp->datalen = 0;
                 reply = AFPERR_NOOP;
             }
-#ifdef DEBUG1
-            if ( obj->options.flags & OPTION_DEBUG ) {
-                printf( "reply: %d, %d\n", reply, ccnt++ );
-                bprint( asp->data, asp->datalen );
-            }
-#endif
+
+            if ( debug ) 
+		if ( obj->options.flags & OPTION_DEBUG ) {
+                	printf( "reply: %d, %d\n", reply, ccnt++ );
+                	bprint( asp->data, asp->datalen );
+            	}
+
             if ( asp_cmdreply( asp, reply ) < 0 ) {
                 LOG(log_error, logtype_afpd, "asp_cmdreply: %s", strerror(errno) );
                 afp_asp_die(EXITERR_CLNT);
@@ -364,12 +364,13 @@ void afp_over_asp(AFPObj *obj)
 
         case ASPFUNC_WRITE :
             func = (u_char) asp->commands[0];
-#ifdef DEBUG1
-            if ( obj->options.flags & OPTION_DEBUG ) {
-                printf( "(write) command: %d\n", func );
-                bprint( asp->commands, asp->cmdlen );
-            }
-#endif
+
+            if ( debug ) 
+		if ( obj->options.flags & OPTION_DEBUG ) {
+                	printf( "(write) command: %d\n", func );
+                	bprint( asp->commands, asp->cmdlen );
+            	}
+
             if ( afp_switch[ func ] != NULL ) {
                 asp->datalen = ASP_DATASIZ;
                 reply = (*afp_switch[ func ])(obj,
@@ -385,12 +386,13 @@ void afp_over_asp(AFPObj *obj)
                 asp->datalen = 0;
                 reply = AFPERR_NOOP;
             }
-#ifdef DEBUG1
-            if ( obj->options.flags & OPTION_DEBUG ) {
-                printf( "(write) reply code: %d, %d\n", reply, ccnt++ );
-                bprint( asp->data, asp->datalen );
-            }
-#endif
+
+            if ( debug ) 
+		if ( obj->options.flags & OPTION_DEBUG ) {
+                	printf( "(write) reply code: %d, %d\n", reply, ccnt++ );
+                	bprint( asp->data, asp->datalen );
+            	}
+
             if ( asp_wrtreply( asp, reply ) < 0 ) {
                 LOG(log_error, logtype_afpd, "asp_wrtreply: %s", strerror(errno) );
                 afp_asp_die(EXITERR_CLNT);
@@ -404,7 +406,7 @@ void afp_over_asp(AFPObj *obj)
             LOG(log_info, logtype_afpd, "main: asp_getrequest: %d", reply );
             break;
         }
-#ifdef DEBUG1
+
         if ( obj->options.flags & OPTION_DEBUG ) {
 #ifdef notdef
             pdesc( stdout );
@@ -412,7 +414,7 @@ void afp_over_asp(AFPObj *obj)
             of_pforkdesc( stdout );
             fflush( stdout );
         }
-#endif
+
     }
 }
 
