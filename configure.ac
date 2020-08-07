@@ -2,9 +2,6 @@ dnl configure.in for netatalk
 
 AC_INIT([netatalk], [m4_esyscmd([echo -n `cat VERSION`])])
 
-NETATALK_VERSION=`cat $srcdir/VERSION`
-AC_SUBST(NETATALK_VERSION)
-
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([subdir-objects])
 AM_CONFIG_HEADER(config.h)

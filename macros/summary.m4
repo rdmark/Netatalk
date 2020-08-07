@@ -4,6 +4,7 @@ dnl Autoconf macros, display configure summary
 AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 
 	AC_MSG_RESULT([Configure summary:])
+	AC_MSG_RESULT([    Version: ($VERSION)])
 	AC_MSG_RESULT([    Install style:])
 	if test "x$sysv_style" != "x"; then
 		AC_MSG_RESULT([         $sysv_style])
