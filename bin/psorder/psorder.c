@@ -40,9 +40,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include "pa.h"
 #include "psorder.h"
 

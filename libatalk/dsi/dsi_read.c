@@ -9,9 +9,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/time.h>

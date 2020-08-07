@@ -10,9 +10,7 @@
 
 #include "config.h"
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
