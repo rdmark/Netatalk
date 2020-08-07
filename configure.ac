@@ -920,9 +920,6 @@ if test x"$neta_cv_REALPATH_TAKES_NULL" = x"yes"; then
     AC_DEFINE(REALPATH_TAKES_NULL,1,[Whether the realpath function allows NULL])
 fi
 
-dnl --------------------- Netatalk Webmin
-NETATALK_WEBMIN
-
 dnl --------------------- last minute substitutions
 
 dnl Comment/change this to deal with gcc "helpful" warnings
