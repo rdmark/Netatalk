@@ -312,15 +312,6 @@ void afp_over_asp(AFPObj *obj)
             break;
 
         case ASPFUNC_CMD :
-#ifdef AFS
-            if ( writtenfork ) {
-                if ( flushfork( writtenfork ) < 0 ) {
-                    LOG(log_error, logtype_afpd, "main flushfork: %s",
-						strerror(errno));
-                }
-                writtenfork = NULL;
-            }
-#endif /* AFS */
             func = (u_char) asp->commands[0];
             if ( debug ) 
 		if ( obj->options.flags & OPTION_DEBUG ) {

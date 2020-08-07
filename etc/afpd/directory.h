@@ -63,7 +63,6 @@
 
 /* file/directory ids. what a mess. we scramble things in a vain attempt
  * to get something meaningful */
-#ifndef AFS
 
 #if 0
 #define CNID_XOR(a)  (((a) >> 16) ^ (a))
@@ -77,9 +76,6 @@
 
 #define CNID(a,b)     ((a)->st_ino & 0xffffffff)
 
-#else /* AFS */
-#define CNID(a,b)     (((a)->st_ino & 0x7fffffff) | CNID_FILE(b))
-#endif /* AFS */
 
 struct maccess {
     u_char	ma_user;

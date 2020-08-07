@@ -34,9 +34,6 @@
 #include "desktop.h"
 #include "volume.h"
 
-#ifdef AFS
-struct ofork *writtenfork;
-#endif
 
 extern int debug;
 
@@ -623,11 +620,6 @@ int afp_setforkparams(AFPObj *obj _U_, char *ibuf, size_t ibuflen, char *rbuf _U
     } else
         return AFPERR_BITMAP;
 
-#ifdef AFS
-    if ( flushfork( ofork ) < 0 ) {
-        LOG(log_error, logtype_afpd, "afp_setforkparams(%s): flushfork: %s", of_name(ofork), strerror(errno) );
-    }
-#endif /* AFS */
 
     return( AFP_OK );
 
@@ -1216,9 +1208,6 @@ static int write_fork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, s
         goto afp_write_err;
     }
 
-#ifdef AFS
-    writtenfork = ofork;
-#endif /* AFS */
 
     if ( ofork->of_flags & AFPFORK_DATA) {
         eid = ADEID_DFORK;
