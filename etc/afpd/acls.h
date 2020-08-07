@@ -15,9 +15,6 @@
 #ifndef AFPD_ACLS_H 
 #define AFPD_ACLS_H
 
-#ifdef HAVE_SOLARIS_ACLS
-#include <sys/acl.h>
-#endif
 
 #include <atalk/uuid.h>		/* for atalk_uuid_t */
 
@@ -34,10 +31,6 @@
  * the wire! We will ignore and spoil em.
  */
 
-#ifdef HAVE_SOLARIS_ACLS
-/* Some stuff for the handling of NFSv4 ACLs */
-#define ACE_TRIVIAL (ACE_OWNER | ACE_GROUP | ACE_EVERYONE)
-#endif /* HAVE_SOLARIS_ACLS */
 
 /* FPGet|Set Bitmap */
 enum {
