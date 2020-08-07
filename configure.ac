@@ -28,7 +28,6 @@ AM_PROG_CC_C_O
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
-AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h limits.h stdint.h strings.h time.h sys/param.h sys/fcntl.h sys/file.h sys/ioctl.h sys/time.h sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h mntent.h syslog.h unistd.h termios.h sys/termios.h netdb.h sgtty.h ufs/quota.h mount.h statfs.h sys/types.h dlfcn.h errno.h sys/errno.h sys/uio.h langinfo.h locale.h sys/filio.h)
 AC_CHECK_HEADERS([sys/mount.h], , , 
@@ -67,7 +66,6 @@ AC_HEADER_MAJOR
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_UTIME_NULL
-AC_FUNC_WAIT3
 AC_CHECK_FUNCS(getcwd gethostname gettimeofday getusershell mkdir rmdir select socket strdup strcasestr strstr strtoul strchr memcpy)
 AC_CHECK_FUNCS(backtrace_symbols setlocale nl_langinfo strlcpy strlcat setlinebuf dirfd pselect access pread pwrite)
 AC_CHECK_FUNCS(waitpid getcwd strdup strndup strnlen strtoul strerror chown fchown chmod fchmod chroot link mknod mknod64)
@@ -156,8 +154,6 @@ AC_ARG_ENABLE(admin-group,
 	]
 )
 
-NETATALK_AFS_CHECK
-
 NETATALK_CONFIG_DIRS
 
 netatalk_cv_with_cracklib=no
@@ -186,62 +182,6 @@ AC_MSG_CHECKING([for cracklib support])
 AC_MSG_RESULT([$netatalk_cv_with_cracklib])
 
 netatalk_cv_ddp_enabled=yes
-
-AC_MSG_CHECKING([whether to enable debug code])
-AC_ARG_ENABLE(debug1,
-	[  --enable-debug1         enable debug code],[
-	if test "$enableval" != "no"; then
-		if test "$enableval" = "yes"; then
-			AC_DEFINE(DEBUG1, 1, [Define if debugging information should be included])
-		else
-			AC_DEFINE_UNQUOTED(DEBUG1, $enableval, [Define if debugging information should be included])
-		fi 
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
-
-AC_MSG_CHECKING([whether to enable verbose debug code])
-AC_ARG_ENABLE(debug,
-	[  --enable-debug          enable verbose debug code],[
-	if test "$enableval" != "no"; then
-		if test "$enableval" = "yes"; then
-			AC_DEFINE(DEBUG, 1, [Define if verbose debugging information should be included])
-		else
-			AC_DEFINE_UNQUOTED(DEBUG, $enableval, [Define if verbose debugging information should be included])
-		fi 
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-        AC_DEFINE(NDEBUG, 1, [Disable assertions])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-        AC_DEFINE(NDEBUG, 1, [Disable assertions])
-	]
-)
-
-AC_MSG_CHECKING([whether to enable debugging with debuggers])
-AC_ARG_ENABLE(debugging,
-	[  --enable-debugging      disable SIGALRM timers and DSI tickles (eg for debugging with gdb/dbx/...)],[
-	if test "$enableval" != "no"; then
-		if test "$enableval" = "yes"; then
-			AC_DEFINE(DEBUGGING, 1, [Define if you want to disable SIGALRM timers and DSI tickles])
-		else
-			AC_DEFINE_UNQUOTED(DEBUGGING, $enableval, [Define if you want to disable SIGALRM timers and DSI tickles])
-		fi 
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 AC_CHECK_ICONV
@@ -347,56 +287,6 @@ AC_ARG_ENABLE(locking,
 		AC_MSG_RESULT([no])
 	]
 
-)
-
-AC_ARG_ENABLE(redhat,
-	[  --enable-redhat         obsoleted ],[
-	echo "ERROR: --enable-redhat is obsoleted. Use --enable-redhat-sysv or --enable-redhat-systemd."
-	exit 1
-	]
-)
-
-AC_ARG_ENABLE(redhat-sysv,
-	[  --enable-redhat-sysv    use redhat-style sysv (upstart) configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=redhat-sysv
-	fi
-	AC_MSG_RESULT([enabling redhat-style sysv support])
-	]
-)
-
-AC_ARG_ENABLE(redhat-systemd,
-	[  --enable-redhat-systemd use redhat-style systemd (>=Fedora15) configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=redhat-systemd
-	fi
-	AC_MSG_RESULT([enabling redhat-style systemd support])
-	]
-)
-
-AC_ARG_ENABLE(suse,
-	[  --enable-suse           obsoleted ],[
-	echo "ERROR: --enable-suse is obsoleted. Use --enable-suse-sysv or --enable-suse-systemd."
-	exit 1
-	]
-)
-
-AC_ARG_ENABLE(suse-sysv,
-	[  --enable-suse-sysv      use suse-style sysv configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=suse-sysv
-	fi
-	AC_MSG_RESULT([enabling suse-style sysv support])
-	]
-)
-
-AC_ARG_ENABLE(suse-systemd,
-	[  --enable-suse-systemd   use suse-style systemd (>=openSUSE12.1) configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=suse-systemd
-	fi
-	AC_MSG_RESULT([enabling suse-style systemd support])
-	]
 )
 
 AC_ARG_ENABLE(gentoo,
@@ -656,10 +546,10 @@ fi
 dnl ----- OpenBSD specific -----
 if test x"$this_os" = "xopenbsd"; then 
 	AC_MSG_RESULT([ * OpenBSD specific configuration])
-    AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
+	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
 	dnl ----- OpenBSD does not have crypt.h, uses unistd.h -----
 	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
-    AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
+	AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
 fi
 
 dnl ----- Solaris specific -----
