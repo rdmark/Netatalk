@@ -1,6 +1,8 @@
 #ifndef _ATALK_LOGGER_H
 #define _ATALK_LOGGER_H 1
 
+#include <stdarg.h>
+
 /* 
  * logger LOG Macro Usage
  * ======================
@@ -198,23 +200,21 @@ UAM_MODULE_EXPORT  void make_log_entry(enum loglevels loglevel, enum logtypes lo
 
 #define LOG_MAX log_info
 
+
+static inline void LOG(int log_level, int type, char *fmt, ...)
+{
+    va_list args;
+    char buffer[256];
+
+    va_start(args, fmt);
+    vsnprintf(buffer, 255, fmt, args);
+    va_end(args);
 #ifdef NO_DEBUG
-
-#define LOG(log_level, type, ...)                                       \
-    do {                                                                \
-        if (log_level <= LOG_MAX)                                       \
-            if (log_level <= type_configs[type].level)                  \
-                make_log_entry((log_level), (type), __FILE__, __LINE__,  __VA_ARGS__); \
-    } while(0)  
-
-#else  /* ! NO_DEBUG */
-
-#define LOG(log_level, type, ...)               \
-    do {                                                                \
-        if (log_level <= type_configs[type].level)                      \
-            make_log_entry((log_level), (type), __FILE__, __LINE__,  __VA_ARGS__); \
-    } while(0)
-
-#endif  /* NO_DEBUG */
+    if (log_level <= LOG_MAX)
+#endif
+       if (log_level <= type_configs[type].level) {
+            make_log_entry((log_level), (type), __FILE__, __LINE__, buffer);
+       }
+}
 
 #endif /* _ATALK_LOGGER_H */
