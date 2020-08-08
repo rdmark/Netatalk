@@ -899,267 +899,282 @@ extern struct path Cur_Path;
 int setfilparams(struct vol *vol,
 		 struct path *path, u_int16_t f_bitmap, char *buf)
 {
-    struct adouble	ad, *adp;
-    struct extmap	*em;
-    int			bit, isad = 1, err = AFP_OK;
-    char                *upath;
-    u_char              achar, *fdType, xyy[4]; /* uninitialized, OK 310105 */
-    u_int16_t		ashort, bshort, oshort;
-    u_int32_t		aint;
-    u_int32_t		upriv;
-    u_int16_t           upriv_bit = 0;
-    
-    struct utimbuf	ut;
+	struct adouble ad, *adp;
+	struct extmap *em;
+	int bit, isad = 1, err = AFP_OK;
+	char *upath;
+	u_char achar, xyy[4];
+	u_char *fdType = NULL;	/* "uninitialized, OK 310105" -- yeah, no */
+	u_int16_t ashort, bshort, oshort;
+	u_int32_t aint;
+	u_int32_t upriv;
+	u_int16_t upriv_bit = 0;
 
-    int                 change_mdate = 0;
-    int                 change_parent_mdate = 0;
-    int                 newdate = 0;
-    struct timeval      tv;
-    uid_t		f_uid;
-    gid_t		f_gid;
-    u_int16_t           bitmap = f_bitmap;
-    u_int32_t           cdate,bdate;
-    u_char              finder_buf[32];
-    int fp;
-    ssize_t len;
-    char symbuf[MAXPATHLEN+1];
+	struct utimbuf ut;
 
-    if (debug)
-	LOG(log_debug9, logtype_afpd, "begin setfilparams:");
+	int change_mdate = 0;
+	int change_parent_mdate = 0;
+	int newdate = 0;
+	struct timeval tv;
+	uid_t f_uid;
+	gid_t f_gid;
+	u_int16_t bitmap = f_bitmap;
+	u_int32_t cdate = 0;
+	u_int32_t bdate = 0;
+	u_char finder_buf[32];
+	int fp;
+	ssize_t len;
+	char symbuf[MAXPATHLEN + 1];
 
-    adp = of_ad(vol, path, &ad);
-    upath = path->u_name;
+	if (debug)
+		LOG(log_debug9, logtype_afpd, "begin setfilparams:");
 
-    if (!vol_unix_priv(vol) && check_access(upath, OPENACC_WR ) < 0) {
-        return AFPERR_ACCESS;
-    }
+	adp = of_ad(vol, path, &ad);
+	upath = path->u_name;
 
-    /* with unix priv maybe we have to change adouble file priv first */
-    bit = 0;
-    while ( bitmap != 0 ) {
-        while (( bitmap & 1 ) == 0 ) {
-            bitmap = bitmap>>1;
-            bit++;
-        }
-        switch(  bit ) {
-        case FILPBIT_ATTR :
-            /* Preserve file dates after a GS/OS folder copy
-             *
-             * change_mdate = 1; */
-            memcpy(&ashort, buf, sizeof( ashort ));
-            buf += sizeof( ashort );
-            break;
-        case FILPBIT_CDATE :
-            change_mdate = 1;
-            memcpy(&cdate, buf, sizeof(cdate));
-            buf += sizeof( cdate );
-            break;
-        case FILPBIT_MDATE :
-            memcpy(&newdate, buf, sizeof( newdate ));
-            buf += sizeof( newdate );
-            break;
-        case FILPBIT_BDATE :
-            change_mdate = 1;
-            memcpy(&bdate, buf, sizeof( bdate));
-            buf += sizeof( bdate );
-            break;
-        case FILPBIT_FINFO :
-            change_mdate = 1;
-            if (memcmp(buf,"slnkrhap",8) == 0
-                && !(S_ISLNK(path->st.st_mode))
-                && !(vol->v_flags & AFPVOL_FOLLOWSYM)) {
-                /* request to turn this into a symlink */
-                if ((fp = open(path->u_name, O_RDONLY)) == -1) {
-                    err = AFPERR_MISC;
-                    goto setfilparam_done;
-                }
-                len = read(fp, symbuf, MAXPATHLEN);
-                close(fp);
-                if (!(len > 0)) {
-                    err = AFPERR_MISC;
-                    goto setfilparam_done;
-                }
-                if (unlink(path->u_name) != 0) {
-                    err = AFPERR_MISC;
-                    goto setfilparam_done;
-                }
-                symbuf[len] = 0;
-                if (symlink(symbuf, path->u_name) != 0) {
-                    err = AFPERR_MISC;
-                    goto setfilparam_done;
-                }
-                of_stat(vol, path);
-            }
-            memcpy(finder_buf, buf, 32 );
-            buf += 32;
-            break;
-        case FILPBIT_UNIXPR :
-            if (!vol_unix_priv(vol)) {
-            	/* this volume doesn't use unix priv */
-            	err = AFPERR_BITMAP;
-            	bitmap = 0;
-            	break;
-            }
-            change_mdate = 1;
-            change_parent_mdate = 1;
+	if (!vol_unix_priv(vol) && check_access(upath, OPENACC_WR) < 0) {
+		return AFPERR_ACCESS;
+	}
 
-            memcpy( &aint, buf, sizeof( aint ));
-            f_uid = ntohl (aint);
-            buf += sizeof( aint );
-            memcpy( &aint, buf, sizeof( aint ));
-            f_gid = ntohl (aint);
-            buf += sizeof( aint );
-            setfilowner(vol, f_uid, f_gid, path);
+	/* with unix priv maybe we have to change adouble file priv first */
+	bit = 0;
+	while (bitmap != 0) {
+		while ((bitmap & 1) == 0) {
+			bitmap = bitmap >> 1;
+			bit++;
+		}
+		switch (bit) {
+		case FILPBIT_ATTR:
+			/* Preserve file dates during a GS/OS folder copy */
+			/* change_mdate = 1; */
+			memcpy(&ashort, buf, sizeof(ashort));
+			buf += sizeof(ashort);
+			break;
+		case FILPBIT_CDATE:
+			change_mdate = 1;
+			memcpy(&cdate, buf, sizeof(cdate));
+			buf += sizeof(cdate);
+			break;
+		case FILPBIT_MDATE:
+			memcpy(&newdate, buf, sizeof(newdate));
+			buf += sizeof(newdate);
+			break;
+		case FILPBIT_BDATE:
+			change_mdate = 1;
+			memcpy(&bdate, buf, sizeof(bdate));
+			buf += sizeof(bdate);
+			break;
+		case FILPBIT_FINFO:
+			change_mdate = 1;
+			if (memcmp(buf, "slnkrhap", 8) == 0
+			    && !(S_ISLNK(path->st.st_mode))
+			    && !(vol->v_flags & AFPVOL_FOLLOWSYM)) {
+				/* request to turn this into a symlink */
+				if ((fp =
+				     open(path->u_name, O_RDONLY)) == -1) {
+					err = AFPERR_MISC;
+					goto setfilparam_done;
+				}
+				len = read(fp, symbuf, MAXPATHLEN);
+				close(fp);
+				if (!(len > 0)) {
+					err = AFPERR_MISC;
+					goto setfilparam_done;
+				}
+				if (unlink(path->u_name) != 0) {
+					err = AFPERR_MISC;
+					goto setfilparam_done;
+				}
+				symbuf[len] = 0;
+				if (symlink(symbuf, path->u_name) != 0) {
+					err = AFPERR_MISC;
+					goto setfilparam_done;
+				}
+				of_stat(vol, path);
+			}
+			memcpy(finder_buf, buf, 32);
+			buf += 32;
+			break;
+		case FILPBIT_UNIXPR:
+			if (!vol_unix_priv(vol)) {
+				/* this volume doesn't use unix priv */
+				err = AFPERR_BITMAP;
+				bitmap = 0;
+				break;
+			}
+			change_mdate = 1;
+			change_parent_mdate = 1;
 
-            memcpy( &upriv, buf, sizeof( upriv ));
-            buf += sizeof( upriv );
-            upriv = ntohl (upriv);
-            if ((upriv & S_IWUSR)) {
-            	setfilunixmode(vol, path, upriv);
-            }
-            else {
-            	/* do it later */
-            	upriv_bit = 1;
-            }
-            break;
-        case FILPBIT_PDINFO :
-            if (afp_version < 30) { /* else it's UTF8 name */
-                achar = *buf;
-                buf += 2;
-                /* Keep special case to support crlf translations */
-                if ((unsigned int) achar == 0x04) {
-	       	    fdType = (u_char *)"TEXT";
-		    buf += 2;
-                } else {
-            	    xyy[0] = ( u_char ) 'p';
-            	    xyy[1] = achar;
-            	    xyy[3] = *buf++;
-            	    xyy[2] = *buf++;
-            	    fdType = xyy;
-	        }
-                break;
-            }
-            /* fallthrough */
-        default :
-            err = AFPERR_BITMAP;
-            /* break while loop */
-            bitmap = 0;
-            break;
-        }
+			memcpy(&aint, buf, sizeof(aint));
+			f_uid = ntohl(aint);
+			buf += sizeof(aint);
+			memcpy(&aint, buf, sizeof(aint));
+			f_gid = ntohl(aint);
+			buf += sizeof(aint);
+			setfilowner(vol, f_uid, f_gid, path);
 
-        bitmap = bitmap>>1;
-        bit++;
-    }
+			memcpy(&upriv, buf, sizeof(upriv));
+			buf += sizeof(upriv);
+			upriv = ntohl(upriv);
+			if ((upriv & S_IWUSR)) {
+				setfilunixmode(vol, path, upriv);
+			} else {
+				/* do it later */
+				upriv_bit = 1;
+			}
+			break;
+		case FILPBIT_PDINFO:
+			if (afp_version < 30) {	/* else it's UTF8 name */
+				achar = *buf;
+				buf += 2;
+				/* Keep special case to support crlf translations */
+				if ((unsigned int) achar == 0x04) {
+					fdType = (u_char *) "TEXT";
+					buf += 2;
+				} else {
+					xyy[0] = (u_char) 'p';
+					xyy[1] = achar;
+					xyy[3] = *buf++;
+					xyy[2] = *buf++;
+					fdType = xyy;
+				}
+				break;
+			}
+			/* fallthrough */
+		default:
+			err = AFPERR_BITMAP;
+			/* break while loop */
+			bitmap = 0;
+			break;
+		}
 
-    /* second try with adouble open 
-    */
-    if ( ad_open_metadata( upath, 0, O_CREAT, adp) < 0) {
-        LOG(log_debug, logtype_afpd, "setfilparams: ad_open_metadata error");
-        /*
-         * For some things, we don't need an adouble header:
-         * - change of modification date
-         * - UNIX privs (Bug-ID #2863424)
-         */
-        if (!vol_noadouble(vol) && (f_bitmap & ~(1<<FILPBIT_MDATE | 1<<FILPBIT_UNIXPR))) {
-            LOG(log_debug, logtype_afpd, "setfilparams: need adouble access");
-            return AFPERR_ACCESS;
-        }
-        LOG(log_debug, logtype_afpd, "setfilparams: no adouble perms, but only FILPBIT_MDATE and/or FILPBIT_UNIXPR");
-        isad = 0;
-    } else if ((ad_get_HF_flags( adp ) & O_CREAT) ) {
-        ad_setname(adp, path->m_name);
-    }
-    
-    bit = 0;
-    bitmap = f_bitmap;
-    while ( bitmap != 0 ) {
-        while (( bitmap & 1 ) == 0 ) {
-            bitmap = bitmap>>1;
-            bit++;
-        }
+		bitmap = bitmap >> 1;
+		bit++;
+	}
 
-        switch(  bit ) {
-        case FILPBIT_ATTR :
-            ad_getattr(adp, &bshort);
-            oshort = bshort;
-            if ( ntohs( ashort ) & ATTRBIT_SETCLR ) {
-                bshort |= htons( ntohs( ashort ) & ~ATTRBIT_SETCLR );
-            } else {
-                bshort &= ~ashort;
-            }
-            if ((bshort & htons(ATTRBIT_INVISIBLE)) != (oshort & htons(ATTRBIT_INVISIBLE)))
-                change_parent_mdate = 1;
-            ad_setattr(adp, bshort);
-            break;
-        case FILPBIT_CDATE :
-            ad_setdate(adp, AD_DATE_CREATE, cdate);
-            break;
-        case FILPBIT_MDATE :
-            break;
-        case FILPBIT_BDATE :
-            ad_setdate(adp, AD_DATE_BACKUP, bdate);
-            break;
-        case FILPBIT_FINFO :
-            if (default_type( ad_entry( adp, ADEID_FINDERI ))
-                    && ( 
-                     ((em = getextmap( path->m_name )) &&
-                      !memcmp(finder_buf, em->em_type, sizeof( em->em_type )) &&
-                      !memcmp(finder_buf + 4, em->em_creator,sizeof( em->em_creator)))
-                     || ((em = getdefextmap()) &&
-                      !memcmp(finder_buf, em->em_type, sizeof( em->em_type )) &&
-                      !memcmp(finder_buf + 4, em->em_creator,sizeof( em->em_creator)))
-            )) {
-                memcpy(finder_buf, ufinderi, 8 );
-            }
-            memcpy(ad_entry( adp, ADEID_FINDERI ), finder_buf, 32 );
-            break;
-        case FILPBIT_UNIXPR :
-            if (upriv_bit) {
-            	setfilunixmode(vol, path, upriv);
-            }
-            break;
-        case FILPBIT_PDINFO :
-            if (afp_version < 30) { /* else it's UTF8 name */
-                memcpy(ad_entry( adp, ADEID_FINDERI ), fdType, 4 );
-                memcpy(ad_entry( adp, ADEID_FINDERI ) + 4, "pdos", 4 );
-                break;
-            }
-            /* fallthrough */
-        default :
-            err = AFPERR_BITMAP;
-            goto setfilparam_done;
-        }
-        bitmap = bitmap>>1;
-        bit++;
-    }
+	/* second try with adouble open 
+	 */
+	if (ad_open_metadata(upath, 0, O_CREAT, adp) < 0) {
+		LOG(log_debug, logtype_afpd,
+		    "setfilparams: ad_open_metadata error");
+		/*
+		 * For some things, we don't need an adouble header:
+		 * - change of modification date
+		 * - UNIX privs (Bug-ID #2863424)
+		 */
+		if (!vol_noadouble(vol)
+		    && (f_bitmap &
+			~(1 << FILPBIT_MDATE | 1 << FILPBIT_UNIXPR))) {
+			LOG(log_debug, logtype_afpd,
+			    "setfilparams: need adouble access");
+			return AFPERR_ACCESS;
+		}
+		LOG(log_debug, logtype_afpd,
+		    "setfilparams: no adouble perms, but only FILPBIT_MDATE and/or FILPBIT_UNIXPR");
+		isad = 0;
+	} else if ((ad_get_HF_flags(adp) & O_CREAT)) {
+		ad_setname(adp, path->m_name);
+	}
 
-setfilparam_done:
-    if (change_mdate && newdate == 0 && gettimeofday(&tv, NULL) == 0) {
-       newdate = AD_DATE_FROM_UNIX(tv.tv_sec);
-    }
-    if (newdate) {
-       if (isad)
-          ad_setdate(adp, AD_DATE_MODIFY, newdate);
-       ut.actime = ut.modtime = AD_DATE_TO_UNIX(newdate);
-       utime(upath, &ut);
-    }
+	bit = 0;
+	bitmap = f_bitmap;
+	while (bitmap != 0) {
+		while ((bitmap & 1) == 0) {
+			bitmap = bitmap >> 1;
+			bit++;
+		}
 
-    if (isad) {
-        ad_flush( adp);
-        ad_close_metadata( adp);
+		switch (bit) {
+		case FILPBIT_ATTR:
+			ad_getattr(adp, &bshort);
+			oshort = bshort;
+			if (ntohs(ashort) & ATTRBIT_SETCLR) {
+				bshort |=
+				    htons(ntohs(ashort) & ~ATTRBIT_SETCLR);
+			} else {
+				bshort &= ~ashort;
+			}
+			if ((bshort & htons(ATTRBIT_INVISIBLE)) !=
+			    (oshort & htons(ATTRBIT_INVISIBLE)))
+				change_parent_mdate = 1;
+			ad_setattr(adp, bshort);
+			break;
+		case FILPBIT_CDATE:
+			ad_setdate(adp, AD_DATE_CREATE, cdate);
+			break;
+		case FILPBIT_MDATE:
+			break;
+		case FILPBIT_BDATE:
+			ad_setdate(adp, AD_DATE_BACKUP, bdate);
+			break;
+		case FILPBIT_FINFO:
+			if (default_type(ad_entry(adp, ADEID_FINDERI))
+			    && (((em = getextmap(path->m_name)) &&
+				 !memcmp(finder_buf, em->em_type,
+					 sizeof(em->em_type))
+				 && !memcmp(finder_buf + 4, em->em_creator,
+					    sizeof(em->em_creator)))
+				|| ((em = getdefextmap())
+				    && !memcmp(finder_buf, em->em_type,
+					       sizeof(em->em_type))
+				    && !memcmp(finder_buf + 4,
+					       em->em_creator,
+					       sizeof(em->em_creator)))
+			    )) {
+				memcpy(finder_buf, ufinderi, 8);
+			}
+			memcpy(ad_entry(adp, ADEID_FINDERI), finder_buf,
+			       32);
+			break;
+		case FILPBIT_UNIXPR:
+			if (upriv_bit) {
+				setfilunixmode(vol, path, upriv);
+			}
+			break;
+		case FILPBIT_PDINFO:
+			if (afp_version < 30) {	/* else it's UTF8 name */
+				memcpy(ad_entry(adp, ADEID_FINDERI),
+				       fdType, 4);
+				memcpy(ad_entry(adp, ADEID_FINDERI) + 4,
+				       "pdos", 4);
+				break;
+			}
+			/* fallthrough */
+		default:
+			err = AFPERR_BITMAP;
+			goto setfilparam_done;
+		}
+		bitmap = bitmap >> 1;
+		bit++;
+	}
 
-    }
+      setfilparam_done:
+	if (change_mdate && newdate == 0 && gettimeofday(&tv, NULL) == 0) {
+		newdate = AD_DATE_FROM_UNIX(tv.tv_sec);
+	}
+	if (newdate) {
+		if (isad)
+			ad_setdate(adp, AD_DATE_MODIFY, newdate);
+		ut.actime = ut.modtime = AD_DATE_TO_UNIX(newdate);
+		utime(upath, &ut);
+	}
 
-    if (change_parent_mdate && gettimeofday(&tv, NULL) == 0) {
-        newdate = AD_DATE_FROM_UNIX(tv.tv_sec);
-        bitmap = 1<<FILPBIT_MDATE;
-        setdirparams(vol, &Cur_Path, bitmap, (char *)&newdate);
-    }
+	if (isad) {
+		ad_flush(adp);
+		ad_close_metadata(adp);
 
-    if (debug)
-	LOG(log_debug9, logtype_afpd, "end setfilparams:");
+	}
 
-    return err;
+	if (change_parent_mdate && gettimeofday(&tv, NULL) == 0) {
+		newdate = AD_DATE_FROM_UNIX(tv.tv_sec);
+		bitmap = 1 << FILPBIT_MDATE;
+		setdirparams(vol, &Cur_Path, bitmap, (char *) &newdate);
+	}
+
+	if (debug)
+		LOG(log_debug9, logtype_afpd, "end setfilparams:");
+
+	return err;
 }
 
 /*
