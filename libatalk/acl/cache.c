@@ -45,8 +45,6 @@ cacheduser_t *uuidcache[256];	/* indexed by hash of uuid */
 void uuidcache_dump(void)
 {
 	int i;
-	int ret = 0;
-	cacheduser_t *entry;
 	char timestr[200];
 	struct tm *tmp = NULL;
 
