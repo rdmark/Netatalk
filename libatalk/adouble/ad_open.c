@@ -1136,14 +1136,12 @@ int ad_mkdir(const char *path, int mode)
 /* ----------------- */
 static int ad_error(struct adouble *ad, int adflags)
 {
-	int err = errno;
 	if ((adflags & ADFLAGS_NOHF)) {
 		/* FIXME double check : set header offset ? */
 		return 0;
 	}
 	if ((adflags & ADFLAGS_DF)) {
 		ad_close(ad, ADFLAGS_DF);
-		err = errno;
 	}
 	return -1;
 }
