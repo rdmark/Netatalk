@@ -138,9 +138,9 @@ void afp_options_free(struct afp_options *opt,
 	free(opt->ntseparator);
     if (opt->logconfig && (opt->logconfig != save->logconfig))
 	free(opt->logconfig);
-	if (opt->mimicmodel && (opt->mimicmodel != save->mimicmodel))
+    if (opt->mimicmodel && (opt->mimicmodel != save->mimicmodel))
 	free(opt->mimicmodel);
-	if (opt->adminauthuser && (opt->adminauthuser != save->adminauthuser))
+    if (opt->adminauthuser && (opt->adminauthuser != save->adminauthuser))
 	free(opt->adminauthuser);
 }
 
@@ -491,18 +491,20 @@ int afp_options_parseline(char *buf, struct afp_options *options)
     if ((c = getoption(buf, "-tcprcvbuf")))
         options->tcp_rcvbuf = atoi(c);
 
-	if ((c = getoption(buf, "-fcelistener"))) {
+    if ((c = getoption(buf, "-fcelistener"))) {
 		LOG(log_note, logtype_afpd, "Adding fce listener \"%s\"", c);
 		fce_add_udp_socket(c);
-	}
-	if ((c = getoption(buf, "-fcecoalesce"))) {
+    }
+
+    if ((c = getoption(buf, "-fcecoalesce"))) {
 		LOG(log_note, logtype_afpd, "Fce coalesce: %s", c);
 		fce_set_coalesce(c);
-	}
-	if ((c = getoption(buf, "-fceevents"))) {
+    }
+
+    if ((c = getoption(buf, "-fceevents"))) {
 		LOG(log_note, logtype_afpd, "Fce events: %s", c);
 		fce_set_events(c);
-	}
+    }
 
     if ((c = getoption(buf, "-fceholdfmod")))
         options->fce_fmodwait = atoi(c);
