@@ -51,7 +51,7 @@ void dsi_opensession(DSI *dsi)
     option_len = dsi->commands[i++];
 
     if (i + option_len > dsi->cmdlen) {
-      LOG(log_error, logtype_dsi, "option %"PRIu8" too large: %zu",
+      LOG(log_error, logtype_dsi, "option %ux too large: %zu",
           cmd, option_len);
       exit(EXITERR_CLNT);
     }
@@ -59,7 +59,7 @@ void dsi_opensession(DSI *dsi)
     switch (cmd) {
     case DSIOPT_ATTNQUANT:
       if (option_len != sizeof(dsi->attn_quantum)) {
-        LOG(log_error, logtype_dsi, "option %"PRIu8" bad length: %zu",
+        LOG(log_error, logtype_dsi, "option %ux bad length: %zu",
             cmd, option_len);
         exit(EXITERR_CLNT);
       }
