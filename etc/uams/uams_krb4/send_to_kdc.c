@@ -15,8 +15,7 @@
 
 #ifndef lint
 static char rcsid_send_to_kdc_c[] =
-"$Id: send_to_kdc.c,v 1.4 2001-06-25 20:13:45 rufustfirefly Exp $";
-#endif /* lint */
+    "$Id: send_to_kdc.c,v 1.4 2001-06-25 20:13:45 rufustfirefly Exp $";
+#endif				/* lint */
 
 #include "config.h"
-
