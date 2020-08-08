@@ -163,6 +163,7 @@ static int maybe_start_dbd(char *dbdpn, struct volinfo *volinfo)
 	char buf1[8];
 	char buf2[8];
 	char *volpath = volinfo->v_path;
+	int ret;
 
 	LOG(log_debug, logtype_cnid, "maybe_start_dbd: Volume: \"%s\"",
 	    volpath);
@@ -249,7 +250,6 @@ static int maybe_start_dbd(char *dbdpn, struct volinfo *volinfo)
 		return -1;
 	}
 	if (pid == 0) {
-		int ret;
 		/*
 		 *  Child. Close descriptors and start the daemon. If it fails
 		 *  just log it. The client process will fail connecting
@@ -281,10 +281,12 @@ static int maybe_start_dbd(char *dbdpn, struct volinfo *volinfo)
 			    execlp(dbdpn, dbdpn, volpath, buf1, buf2,
 				   logconfig, NULL);
 		}
+		if (ret) {
 		/* Yikes! We're still here, so exec failed... */
-		LOG(log_error, logtype_cnid, "Fatal error in exec: %s",
-		    strerror(errno));
-		daemon_exit(0);
+			LOG(log_error, logtype_cnid, "Fatal error in exec: %s",
+			    strerror(errno));
+			daemon_exit(0);
+		}
 	}
 	/*
 	 *  Parent.
