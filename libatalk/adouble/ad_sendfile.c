@@ -38,7 +38,7 @@
 #include <sys/socket.h>
 #include <sys/uio.h>
 
-#include <errno.h>  
+#include <errno.h>
 
 #include <atalk/logger.h>
 #include "ad_private.h"
@@ -46,65 +46,64 @@
 #if defined(SENDFILE_FLAVOR_LINUX)
 #include <sys/sendfile.h>
 
-ssize_t sys_sendfile(int tofd, int fromfd, off_t *offset, size_t count)
+ssize_t sys_sendfile(int tofd, int fromfd, off_t * offset, size_t count)
 {
-    return sendfile(tofd, fromfd, offset, count);
+	return sendfile(tofd, fromfd, offset, count);
 }
 
 #elif defined(SENDFILE_FLAVOR_SOLARIS)
 #include <sys/sendfile.h>
 
-ssize_t sys_sendfile(int tofd, int fromfd, off_t *offset, size_t count)
+ssize_t sys_sendfile(int tofd, int fromfd, off_t * offset, size_t count)
 {
-    return sendfile(tofd, fromfd, offset, count);
+	return sendfile(tofd, fromfd, offset, count);
 }
 
 #elif defined(SENDFILE_FLAVOR_BSD )
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
-ssize_t sys_sendfile(int tofd, int fromfd, off_t *offset, size_t count)
+ssize_t sys_sendfile(int tofd, int fromfd, off_t * offset, size_t count)
 {
-    off_t len;
-    int ret;
+	off_t len;
+	int ret;
 
-    ret = sendfile(fromfd, tofd, *offset, count, NULL, &len, 0);
+	ret = sendfile(fromfd, tofd, *offset, count, NULL, &len, 0);
 
-    *offset += len;
+	*offset += len;
 
-    if (ret != 0)
-        return -1;
-    return len;
+	if (ret != 0)
+		return -1;
+	return len;
 }
 
 #else
 
-ssize_t sys_sendfile(int out_fd, int in_fd, off_t *_offset, size_t count)
+ssize_t sys_sendfile(int out_fd, int in_fd, off_t * _offset, size_t count)
 {
-    /* No sendfile syscall. */
-    errno = ENOSYS;
-    return -1;
+	/* No sendfile syscall. */
+	errno = ENOSYS;
+	return -1;
 }
 #endif
 
 /* ------------------------------- */
-int ad_readfile_init(const struct adouble *ad, 
-				       const int eid, off_t *off,
-				       const int end)
+int ad_readfile_init(const struct adouble *ad,
+		     const int eid, off_t * off, const int end)
 {
-  int fd;
+	int fd;
 
-  if (end) 
-    *off = ad_size(ad, eid) - *off;
+	if (end)
+		*off = ad_size(ad, eid) - *off;
 
-  if (eid == ADEID_DFORK) {
-    fd = ad_data_fileno(ad);
-  } else {
-    *off += ad_getentryoff(ad, eid);
-    fd = ad_reso_fileno(ad);
-  }
+	if (eid == ADEID_DFORK) {
+		fd = ad_data_fileno(ad);
+	} else {
+		*off += ad_getentryoff(ad, eid);
+		fd = ad_reso_fileno(ad);
+	}
 
-  return fd;
+	return fd;
 }
 
 
@@ -112,24 +111,24 @@ int ad_readfile_init(const struct adouble *ad,
 #if 0
 #ifdef HAVE_SENDFILE_WRITE
 /* read from a socket and write to an adouble file */
-ssize_t ad_writefile(struct adouble *ad, const int eid, 
+ssize_t ad_writefile(struct adouble *ad, const int eid,
 		     const int sock, off_t off, const int end,
 		     const size_t len)
 {
 #ifdef __linux__
-  ssize_t cc;
-  int fd;
+	ssize_t cc;
+	int fd;
 
-  fd = ad_sendfile_init(ad, eid, &off, end);
-  if ((cc = sys_sendfile(fd, sock, &off, len)) < 0)
-    return -1;
+	fd = ad_sendfile_init(ad, eid, &off, end);
+	if ((cc = sys_sendfile(fd, sock, &off, len)) < 0)
+		return -1;
 
-  if ((eid != ADEID_DFORK) && (off > ad_getentrylen(ad, eid))) 
-    ad_setentrylen(ad, eid, off);
+	if ((eid != ADEID_DFORK) && (off > ad_getentrylen(ad, eid)))
+		ad_setentrylen(ad, eid, off);
 
-  return cc;
-#endif /* __linux__ */
+	return cc;
+#endif				/* __linux__ */
 }
-#endif /* HAVE_SENDFILE_WRITE */
-#endif /* 0 */
+#endif				/* HAVE_SENDFILE_WRITE */
+#endif				/* 0 */
 #endif
