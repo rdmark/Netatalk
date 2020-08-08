@@ -343,43 +343,43 @@ EC_CLEANUP:
 
 static uint32_t posix_permset_to_darwin_rights(acl_entry_t e, int is_dir)
 {
-    EC_INIT;
-    uint32_t rights = 0;
-    acl_permset_t permset;
+	EC_INIT;
+	uint32_t rights = 0;
+	acl_permset_t permset;
 
-    EC_ZERO_LOG(acl_get_permset(e, &permset));
+	EC_ZERO_LOG(acl_get_permset(e, &permset));
 
 #ifdef HAVE_ACL_GET_PERM_NP
-    if (acl_get_perm_np(permset, ACL_READ))
+	if (acl_get_perm_np(permset, ACL_READ))
 #else
-    if (acl_get_perm(permset, ACL_READ))
+	if (acl_get_perm(permset, ACL_READ))
 #endif
-        rights = DARWIN_ACE_READ_DATA
-            | DARWIN_ACE_READ_EXTATTRIBUTES
-            | DARWIN_ACE_READ_ATTRIBUTES
-            | DARWIN_ACE_READ_SECURITY;
+		rights = DARWIN_ACE_READ_DATA
+		    | DARWIN_ACE_READ_EXTATTRIBUTES
+		    | DARWIN_ACE_READ_ATTRIBUTES
+		    | DARWIN_ACE_READ_SECURITY;
 #ifdef HAVE_ACL_GET_PERM_NP
-    if (acl_get_perm_np(permset, ACL_WRITE)) {
+	if (acl_get_perm_np(permset, ACL_WRITE)) {
 #else
-    if (acl_get_perm(permset, ACL_WRITE)) {
+	if (acl_get_perm(permset, ACL_WRITE)) {
 #endif
-        rights |= DARWIN_ACE_WRITE_DATA
-            | DARWIN_ACE_APPEND_DATA
-            | DARWIN_ACE_WRITE_EXTATTRIBUTES
-            | DARWIN_ACE_WRITE_ATTRIBUTES;
-        if (is_dir)
-            rights |= DARWIN_ACE_DELETE_CHILD;
-    }
+		rights |= DARWIN_ACE_WRITE_DATA
+		    | DARWIN_ACE_APPEND_DATA
+		    | DARWIN_ACE_WRITE_EXTATTRIBUTES
+		    | DARWIN_ACE_WRITE_ATTRIBUTES;
+		if (is_dir)
+			rights |= DARWIN_ACE_DELETE_CHILD;
+	}
 #ifdef HAVE_ACL_GET_PERM_NP
-    if (acl_get_perm_np(permset, ACL_EXECUTE))
+	if (acl_get_perm_np(permset, ACL_EXECUTE))
 #else
-    if (acl_get_perm(permset, ACL_EXECUTE))
+	if (acl_get_perm(permset, ACL_EXECUTE))
 #endif
-        rights |= DARWIN_ACE_EXECUTE;
+		rights |= DARWIN_ACE_EXECUTE;
 
-EC_CLEANUP:
-    LOG(log_maxdebug, logtype_afpd, "mapped rights: 0x%08x", rights);
-    return rights;
+      EC_CLEANUP:
+	LOG(log_maxdebug, logtype_afpd, "mapped rights: 0x%08x", rights);
+	return rights;
 }
 
 /*! 
@@ -396,92 +396,124 @@ EC_CLEANUP:
  * @returns                  0 or -1 on error
  */
 static int posix_acl_rights(const char *path,
-                            const struct stat *sb,
-                            uint32_t *result)
+			    const struct stat *sb, uint32_t * result)
 {
-    EC_INIT;
-    int entry_id = ACL_FIRST_ENTRY;
-    uint32_t rights = 0; /* rights which do not depend on ACL_MASK */
-    uint32_t acl_rights = 0; /* rights which are subject to limitations imposed by ACL_MASK */
-    uint32_t mask_rights = 0xffffffff;
-    uid_t *uid = NULL;
-    gid_t *gid = NULL;
-    acl_t acl = NULL;
-    acl_entry_t e;
-    acl_tag_t tag;
+	EC_INIT;
+	int entry_id = ACL_FIRST_ENTRY;
+	uint32_t rights = 0;	/* rights which do not depend on ACL_MASK */
+	uint32_t acl_rights = 0;	/* rights which are subject to limitations imposed by ACL_MASK */
+	uint32_t mask_rights = 0xffffffff;
+	uid_t *uid = NULL;
+	gid_t *gid = NULL;
+	acl_t acl = NULL;
+	acl_entry_t e;
+	acl_tag_t tag;
 
-    EC_NULL_LOGSTR(acl = acl_get_file(path, ACL_TYPE_ACCESS),
-                   "acl_get_file(\"%s\"): %s", fullpathname(path), strerror(errno));
+	EC_NULL_LOGSTR(acl = acl_get_file(path, ACL_TYPE_ACCESS),
+		       "acl_get_file(\"%s\"): %s", fullpathname(path),
+		       strerror(errno));
 
-    /* Iterate through all ACEs. If we apply mask_rights later there is no need to iterate twice. */
-    while (acl_get_entry(acl, entry_id, &e) == 1) {
-        entry_id = ACL_NEXT_ENTRY;
-        EC_ZERO_LOG(acl_get_tag_type(e, &tag));
+	/* Iterate through all ACEs. If we apply mask_rights later there is no need to iterate twice. */
+	while (acl_get_entry(acl, entry_id, &e) == 1) {
+		entry_id = ACL_NEXT_ENTRY;
+		EC_ZERO_LOG(acl_get_tag_type(e, &tag));
 
-        switch (tag) {
-            case ACL_USER_OBJ:
-                if (sb->st_uid == uuid) {
-                    LOG(log_maxdebug, logtype_afpd, "ACL_USER_OBJ: %u", sb->st_uid);
-                    rights |= posix_permset_to_darwin_rights(e, S_ISDIR(sb->st_mode));
-                }
-                break;
+		switch (tag) {
+		case ACL_USER_OBJ:
+			if (sb->st_uid == uuid) {
+				LOG(log_maxdebug, logtype_afpd,
+				    "ACL_USER_OBJ: %u", sb->st_uid);
+				rights |=
+				    posix_permset_to_darwin_rights(e,
+								   S_ISDIR
+								   (sb->
+								    st_mode));
+			}
+			break;
 
-            case ACL_USER:
-                EC_NULL_LOG(uid = (uid_t *)acl_get_qualifier(e));
+		case ACL_USER:
+			EC_NULL_LOG(uid = (uid_t *) acl_get_qualifier(e));
 
-                if (*uid == uuid) {
-                    LOG(log_maxdebug, logtype_afpd, "ACL_USER: %u", *uid);
-                    acl_rights |= posix_permset_to_darwin_rights(e, S_ISDIR(sb->st_mode));
-                }
-                acl_free(uid);
-                uid = NULL;
-                break;
+			if (*uid == uuid) {
+				LOG(log_maxdebug, logtype_afpd,
+				    "ACL_USER: %u", *uid);
+				acl_rights |=
+				    posix_permset_to_darwin_rights(e,
+								   S_ISDIR
+								   (sb->
+								    st_mode));
+			}
+			acl_free(uid);
+			uid = NULL;
+			break;
 
-            case ACL_GROUP_OBJ:
-                if (!(sb->st_uid == uuid) && gmem(sb->st_gid)) {
-                    LOG(log_maxdebug, logtype_afpd, "ACL_GROUP_OBJ: %u", sb->st_gid);
-                    acl_rights |= posix_permset_to_darwin_rights(e, S_ISDIR(sb->st_mode));
-                }
-                break;
+		case ACL_GROUP_OBJ:
+			if (!(sb->st_uid == uuid) && gmem(sb->st_gid)) {
+				LOG(log_maxdebug, logtype_afpd,
+				    "ACL_GROUP_OBJ: %u", sb->st_gid);
+				acl_rights |=
+				    posix_permset_to_darwin_rights(e,
+								   S_ISDIR
+								   (sb->
+								    st_mode));
+			}
+			break;
 
-            case ACL_GROUP:
-                EC_NULL_LOG(gid = (gid_t *)acl_get_qualifier(e));
+		case ACL_GROUP:
+			EC_NULL_LOG(gid = (gid_t *) acl_get_qualifier(e));
 
-                if (gmem(*gid)) {
-                    LOG(log_maxdebug, logtype_afpd, "ACL_GROUP: %u", *gid);
-                    acl_rights |= posix_permset_to_darwin_rights(e, S_ISDIR(sb->st_mode));
-                }
-                acl_free(gid);
-                gid = NULL;
-                break;
+			if (gmem(*gid)) {
+				LOG(log_maxdebug, logtype_afpd,
+				    "ACL_GROUP: %u", *gid);
+				acl_rights |=
+				    posix_permset_to_darwin_rights(e,
+								   S_ISDIR
+								   (sb->
+								    st_mode));
+			}
+			acl_free(gid);
+			gid = NULL;
+			break;
 
-            case ACL_MASK:
-                mask_rights = posix_permset_to_darwin_rights(e, S_ISDIR(sb->st_mode));
-                LOG(log_maxdebug, logtype_afpd, "maskrights: 0x%08x", mask_rights);
-                break;
+		case ACL_MASK:
+			mask_rights =
+			    posix_permset_to_darwin_rights(e,
+							   S_ISDIR(sb->
+								   st_mode));
+			LOG(log_maxdebug, logtype_afpd,
+			    "maskrights: 0x%08x", mask_rights);
+			break;
 
-            case ACL_OTHER:
-                if (!(sb->st_uid == uuid) && !gmem(sb->st_gid)) {
-                    LOG(log_maxdebug, logtype_afpd, "ACL_OTHER");
-                    rights |= posix_permset_to_darwin_rights(e, S_ISDIR(sb->st_mode));
-                }
-                break;
+		case ACL_OTHER:
+			if (!(sb->st_uid == uuid) && !gmem(sb->st_gid)) {
+				LOG(log_maxdebug, logtype_afpd,
+				    "ACL_OTHER");
+				rights |=
+				    posix_permset_to_darwin_rights(e,
+								   S_ISDIR
+								   (sb->
+								    st_mode));
+			}
+			break;
 
-            default:
-                continue;
-        }
-    } /* while */
+		default:
+			continue;
+		}
+	}			/* while */
 
-    /* apply the mask and collect the rights */
-    rights |= (acl_rights & mask_rights);
+	/* apply the mask and collect the rights */
+	rights |= (acl_rights & mask_rights);
 
-    *result |= rights;
+	*result |= rights;
 
-EC_CLEANUP:
-    if (acl) acl_free(acl);
-    if (uid) acl_free(uid);
-    if (gid) acl_free(gid);
-    EC_EXIT;
+      EC_CLEANUP:
+	if (acl)
+		acl_free(acl);
+	if (uid)
+		acl_free(uid);
+	if (gid)
+		acl_free(gid);
+	EC_EXIT;
 }
 
 /*!
@@ -492,35 +524,36 @@ EC_CLEANUP:
  *
  * @returns         access rights
  */
-static u_char acl_permset_to_uarights(acl_entry_t entry) {
-    acl_permset_t permset;
-    u_char rights = 0;
+static u_char acl_permset_to_uarights(acl_entry_t entry)
+{
+	acl_permset_t permset;
+	u_char rights = 0;
 
-    if (acl_get_permset(entry, &permset) == -1)
-        return rights;
-
-#ifdef HAVE_ACL_GET_PERM_NP
-    if (acl_get_perm_np(permset, ACL_READ))
-#else
-    if (acl_get_perm(permset, ACL_READ))
-#endif
-        rights |= AR_UREAD;
+	if (acl_get_permset(entry, &permset) == -1)
+		return rights;
 
 #ifdef HAVE_ACL_GET_PERM_NP
-    if (acl_get_perm_np(permset, ACL_WRITE))
+	if (acl_get_perm_np(permset, ACL_READ))
 #else
-    if (acl_get_perm(permset, ACL_WRITE))
+	if (acl_get_perm(permset, ACL_READ))
 #endif
-        rights |= AR_UWRITE;
+		rights |= AR_UREAD;
 
 #ifdef HAVE_ACL_GET_PERM_NP
-    if (acl_get_perm_np(permset, ACL_EXECUTE))
+	if (acl_get_perm_np(permset, ACL_WRITE))
 #else
-    if (acl_get_perm(permset, ACL_EXECUTE))
+	if (acl_get_perm(permset, ACL_WRITE))
 #endif
-        rights |= AR_USEARCH;
+		rights |= AR_UWRITE;
 
-    return rights;
+#ifdef HAVE_ACL_GET_PERM_NP
+	if (acl_get_perm_np(permset, ACL_EXECUTE))
+#else
+	if (acl_get_perm(permset, ACL_EXECUTE))
+#endif
+		rights |= AR_USEARCH;
+
+	return rights;
 }
 
 /*!
@@ -539,86 +572,97 @@ static u_char acl_permset_to_uarights(acl_entry_t entry) {
  *
  * @returns                  0 or -1 on error
  */
-static int posix_acls_to_uaperms(const char *path, struct stat *sb, struct maccess *ma) {
-    EC_INIT;
+static int posix_acls_to_uaperms(const char *path, struct stat *sb,
+				 struct maccess *ma)
+{
+	EC_INIT;
 
-    int entry_id = ACL_FIRST_ENTRY;
-    acl_entry_t entry;
-    acl_tag_t tag;
-    acl_t acl = NULL;
-    uid_t *uid;
-    gid_t *gid;
-    uid_t whoami = geteuid();
+	int entry_id = ACL_FIRST_ENTRY;
+	acl_entry_t entry;
+	acl_tag_t tag;
+	acl_t acl = NULL;
+	uid_t *uid;
+	gid_t *gid;
+	uid_t whoami = geteuid();
 
-    u_char group_rights = 0x00;
-    u_char acl_rights = 0x00;
-    u_char mask = 0xff;
+	u_char group_rights = 0x00;
+	u_char acl_rights = 0x00;
+	u_char mask = 0xff;
 
-    EC_NULL_LOG(acl = acl_get_file(path, ACL_TYPE_ACCESS));
+	EC_NULL_LOG(acl = acl_get_file(path, ACL_TYPE_ACCESS));
 
-    /* iterate through all ACEs */
-    while (acl_get_entry(acl, entry_id, &entry) == 1) {
-        entry_id = ACL_NEXT_ENTRY;
-        EC_ZERO_LOG(acl_get_tag_type(entry, &tag));
+	/* iterate through all ACEs */
+	while (acl_get_entry(acl, entry_id, &entry) == 1) {
+		entry_id = ACL_NEXT_ENTRY;
+		EC_ZERO_LOG(acl_get_tag_type(entry, &tag));
 
-        switch (tag) {
-            case ACL_USER:
-                EC_NULL_LOG(uid = (uid_t *)acl_get_qualifier(entry));
+		switch (tag) {
+		case ACL_USER:
+			EC_NULL_LOG(uid =
+				    (uid_t *) acl_get_qualifier(entry));
 
-                if (*uid == uuid && !(whoami == sb->st_uid)) {
-                    LOG(log_maxdebug, logtype_afpd, "ACL_USER: %u", *uid);
-                    acl_rights |= acl_permset_to_uarights(entry);
-                }
-                acl_free(uid);
-                break;
+			if (*uid == uuid && !(whoami == sb->st_uid)) {
+				LOG(log_maxdebug, logtype_afpd,
+				    "ACL_USER: %u", *uid);
+				acl_rights |=
+				    acl_permset_to_uarights(entry);
+			}
+			acl_free(uid);
+			break;
 
-            case ACL_GROUP_OBJ:
-                group_rights = acl_permset_to_uarights(entry);
-                LOG(log_maxdebug, logtype_afpd, "ACL_GROUP_OBJ: %u", sb->st_gid);
+		case ACL_GROUP_OBJ:
+			group_rights = acl_permset_to_uarights(entry);
+			LOG(log_maxdebug, logtype_afpd,
+			    "ACL_GROUP_OBJ: %u", sb->st_gid);
 
-                if (gmem(sb->st_gid) && !(whoami == sb->st_uid))
-                    acl_rights |= group_rights;
-                break;
+			if (gmem(sb->st_gid) && !(whoami == sb->st_uid))
+				acl_rights |= group_rights;
+			break;
 
-            case ACL_GROUP:
-                EC_NULL_LOG(gid = (gid_t *)acl_get_qualifier(entry));
+		case ACL_GROUP:
+			EC_NULL_LOG(gid =
+				    (gid_t *) acl_get_qualifier(entry));
 
-                if (gmem(*gid) && !(whoami == sb->st_uid)) {
-                    LOG(log_maxdebug, logtype_afpd, "ACL_GROUP: %u", *gid);
-                    acl_rights |= acl_permset_to_uarights(entry);
-                }
-                acl_free(gid);
-                break;
+			if (gmem(*gid) && !(whoami == sb->st_uid)) {
+				LOG(log_maxdebug, logtype_afpd,
+				    "ACL_GROUP: %u", *gid);
+				acl_rights |=
+				    acl_permset_to_uarights(entry);
+			}
+			acl_free(gid);
+			break;
 
-            case ACL_MASK:
-                mask = acl_permset_to_uarights(entry);
-                LOG(log_maxdebug, logtype_afpd, "ACL_MASK: 0x%02x", mask);
-                break;
+		case ACL_MASK:
+			mask = acl_permset_to_uarights(entry);
+			LOG(log_maxdebug, logtype_afpd, "ACL_MASK: 0x%02x",
+			    mask);
+			break;
 
-            default:
-                break;
-        }
-    }
-    /* apply the mask and adjust user and group permissions */
-    ma->ma_user |= (acl_rights & mask);
-    ma->ma_group = (group_rights & mask);
+		default:
+			break;
+		}
+	}
+	/* apply the mask and adjust user and group permissions */
+	ma->ma_user |= (acl_rights & mask);
+	ma->ma_group = (group_rights & mask);
 
-    /* update st_mode to properly reflect group permissions */
-    sb->st_mode &= ~S_IRWXG;
+	/* update st_mode to properly reflect group permissions */
+	sb->st_mode &= ~S_IRWXG;
 
-    if (ma->ma_group & AR_USEARCH)
-        sb->st_mode |= S_IXGRP;
+	if (ma->ma_group & AR_USEARCH)
+		sb->st_mode |= S_IXGRP;
 
-    if (ma->ma_group & AR_UWRITE)
-        sb->st_mode |= S_IWGRP;
+	if (ma->ma_group & AR_UWRITE)
+		sb->st_mode |= S_IWGRP;
 
-    if (ma->ma_group & AR_UREAD)
-        sb->st_mode |= S_IRGRP;
+	if (ma->ma_group & AR_UREAD)
+		sb->st_mode |= S_IRGRP;
 
-EC_CLEANUP:
-    if (acl) acl_free(acl);
+      EC_CLEANUP:
+	if (acl)
+		acl_free(acl);
 
-    EC_EXIT;
+	EC_EXIT;
 }
 
 /*!
@@ -629,19 +673,20 @@ EC_CLEANUP:
  *
  * @returns 0 on success, -1 on error
  */
-static int acl_add_acl(acl_t *aclp, const acl_t acl)
+static int acl_add_acl(acl_t * aclp, const acl_t acl)
 {
-    EC_INIT;
-    int id;
-    acl_entry_t se, de;
+	EC_INIT;
+	int id;
+	acl_entry_t se, de;
 
-    for (id = ACL_FIRST_ENTRY; acl_get_entry(acl, id, &se) == 1; id = ACL_NEXT_ENTRY) {
-        EC_ZERO_LOG_ERR(acl_create_entry(aclp, &de), AFPERR_MISC);
-        EC_ZERO_LOG_ERR(acl_copy_entry(de, se), AFPERR_MISC);
-    }
+	for (id = ACL_FIRST_ENTRY; acl_get_entry(acl, id, &se) == 1;
+	     id = ACL_NEXT_ENTRY) {
+		EC_ZERO_LOG_ERR(acl_create_entry(aclp, &de), AFPERR_MISC);
+		EC_ZERO_LOG_ERR(acl_copy_entry(de, se), AFPERR_MISC);
+	}
 
-EC_CLEANUP:
-    EC_EXIT;
+      EC_CLEANUP:
+	EC_EXIT;
 }
 
 /*!
@@ -658,20 +703,24 @@ EC_CLEANUP:
  *
  * @returns mapping result as acl_perm_t, -1 on error
  */
-static acl_perm_t map_darwin_right_to_posix_permset(uint32_t darwin_ace_rights, int is_dir)
+static acl_perm_t map_darwin_right_to_posix_permset(uint32_t
+						    darwin_ace_rights,
+						    int is_dir)
 {
-    acl_perm_t perm = 0;
+	acl_perm_t perm = 0;
 
-    if (darwin_ace_rights & DARWIN_ACE_READ_DATA)
-        perm |= ACL_READ;
+	if (darwin_ace_rights & DARWIN_ACE_READ_DATA)
+		perm |= ACL_READ;
 
-    if (darwin_ace_rights & (DARWIN_ACE_WRITE_DATA | (is_dir ? DARWIN_ACE_DELETE_CHILD : 0)))
-        perm |= ACL_WRITE;
+	if (darwin_ace_rights &
+	    (DARWIN_ACE_WRITE_DATA |
+	     (is_dir ? DARWIN_ACE_DELETE_CHILD : 0)))
+		perm |= ACL_WRITE;
 
-    if (darwin_ace_rights & DARWIN_ACE_EXECUTE)
-        perm |= ACL_EXECUTE;
+	if (darwin_ace_rights & DARWIN_ACE_EXECUTE)
+		perm |= ACL_EXECUTE;
 
-    return perm;
+	return perm;
 }
 
 /*!
@@ -689,47 +738,50 @@ static acl_perm_t map_darwin_right_to_posix_permset(uint32_t darwin_ace_rights, 
  *
  * @returns 0 on success, -1 on failure
  */
-static int posix_acl_add_perm(acl_t *aclp, acl_tag_t type, uid_t id, acl_perm_t perm)
+static int posix_acl_add_perm(acl_t * aclp, acl_tag_t type, uid_t id,
+			      acl_perm_t perm)
 {
-    EC_INIT;
-    uid_t *eid = NULL;
-    acl_entry_t e;
-    acl_tag_t tag;
-    int entry_id = ACL_FIRST_ENTRY;
-    acl_permset_t permset;
+	EC_INIT;
+	uid_t *eid = NULL;
+	acl_entry_t e;
+	acl_tag_t tag;
+	int entry_id = ACL_FIRST_ENTRY;
+	acl_permset_t permset;
 
-    int found = 0;
-    for ( ; (! found) && acl_get_entry(*aclp, entry_id, &e) == 1; entry_id = ACL_NEXT_ENTRY) {
-        EC_ZERO_LOG(acl_get_tag_type(e, &tag));
-        if (tag != ACL_USER && tag != ACL_GROUP)
-            continue;
-        EC_NULL_LOG(eid = (uid_t *)acl_get_qualifier(e));
-        if ((*eid == id) && (type == tag)) {
-            /* found an ACE for this type/id */
-            found = 1;
-            EC_ZERO_LOG(acl_get_permset(e, &permset));
-            EC_ZERO_LOG(acl_add_perm(permset, perm));
-        }
+	int found = 0;
+	for (; (!found) && acl_get_entry(*aclp, entry_id, &e) == 1;
+	     entry_id = ACL_NEXT_ENTRY) {
+		EC_ZERO_LOG(acl_get_tag_type(e, &tag));
+		if (tag != ACL_USER && tag != ACL_GROUP)
+			continue;
+		EC_NULL_LOG(eid = (uid_t *) acl_get_qualifier(e));
+		if ((*eid == id) && (type == tag)) {
+			/* found an ACE for this type/id */
+			found = 1;
+			EC_ZERO_LOG(acl_get_permset(e, &permset));
+			EC_ZERO_LOG(acl_add_perm(permset, perm));
+		}
 
-        acl_free(eid);
-        eid = NULL;
-    }
+		acl_free(eid);
+		eid = NULL;
+	}
 
-    if ( ! found) {
-        /* there was no existing ACE for this type/id */
-        EC_ZERO_LOG(acl_create_entry(aclp, &e));
-        EC_ZERO_LOG(acl_set_tag_type(e, type));
-        EC_ZERO_LOG(acl_set_qualifier(e, &id));
-        EC_ZERO_LOG(acl_get_permset(e, &permset));
-        EC_ZERO_LOG(acl_clear_perms(permset));
-        EC_ZERO_LOG(acl_add_perm(permset, perm));
-        EC_ZERO_LOG(acl_set_permset(e, permset));
-    }
+	if (!found) {
+		/* there was no existing ACE for this type/id */
+		EC_ZERO_LOG(acl_create_entry(aclp, &e));
+		EC_ZERO_LOG(acl_set_tag_type(e, type));
+		EC_ZERO_LOG(acl_set_qualifier(e, &id));
+		EC_ZERO_LOG(acl_get_permset(e, &permset));
+		EC_ZERO_LOG(acl_clear_perms(permset));
+		EC_ZERO_LOG(acl_add_perm(permset, perm));
+		EC_ZERO_LOG(acl_set_permset(e, permset));
+	}
 
-EC_CLEANUP:
-    if (eid) acl_free(eid);
+      EC_CLEANUP:
+	if (eid)
+		acl_free(eid);
 
-    EC_EXIT;
+	EC_EXIT;
 }
 
 /*!
@@ -754,81 +806,95 @@ EC_CLEANUP:
  * is set to HAS_DEFAULT_ACL|HAS_EXT_DEFAULT_ACL in case there is at least one
  * extended default ace. Otherwise default_acl_flags is left unchanged.
  */
-static int map_aces_darwin_to_posix(const darwin_ace_t *darwin_aces,
-                                    acl_t *def_aclp,
-                                    acl_t *acc_aclp,
-                                    int ace_count,
-                                    uint32_t *default_acl_flags)
+static int map_aces_darwin_to_posix(const darwin_ace_t * darwin_aces,
+				    acl_t * def_aclp,
+				    acl_t * acc_aclp,
+				    int ace_count,
+				    uint32_t * default_acl_flags)
 {
-    EC_INIT;
-    char *name = NULL;
-    uuidtype_t uuidtype;
-    struct passwd *pwd;
-    struct group *grp;
-    uid_t id;
-    uint32_t darwin_ace_flags, darwin_ace_rights;
-    acl_tag_t tag;
-    acl_perm_t perm;
+	EC_INIT;
+	char *name = NULL;
+	uuidtype_t uuidtype;
+	struct passwd *pwd;
+	struct group *grp;
+	uid_t id;
+	uint32_t darwin_ace_flags, darwin_ace_rights;
+	acl_tag_t tag;
+	acl_perm_t perm;
 
-    for ( ; ace_count != 0; ace_count--, darwin_aces++) {
-        /* type: allow/deny, posix only has allow */
-        darwin_ace_flags = ntohl(darwin_aces->darwin_ace_flags);
-        if ( ! (darwin_ace_flags & DARWIN_ACE_FLAGS_PERMIT))
-            continue;
+	for (; ace_count != 0; ace_count--, darwin_aces++) {
+		/* type: allow/deny, posix only has allow */
+		darwin_ace_flags = ntohl(darwin_aces->darwin_ace_flags);
+		if (!(darwin_ace_flags & DARWIN_ACE_FLAGS_PERMIT))
+			continue;
 
-        darwin_ace_rights = ntohl(darwin_aces->darwin_ace_rights);
-        perm = map_darwin_right_to_posix_permset(darwin_ace_rights, (*def_aclp != NULL));
-        if (perm == 0)
-            continue;       /* dont add empty perm */
+		darwin_ace_rights = ntohl(darwin_aces->darwin_ace_rights);
+		perm =
+		    map_darwin_right_to_posix_permset(darwin_ace_rights,
+						      (*def_aclp != NULL));
+		if (perm == 0)
+			continue;	/* dont add empty perm */
 
-        LOG(log_debug, logtype_afpd, "map_ace: no: %u, flags: %08x, darwin: %08x, posix: %02x",
-            ace_count, darwin_ace_flags, darwin_ace_rights, perm);
+		LOG(log_debug, logtype_afpd,
+		    "map_ace: no: %u, flags: %08x, darwin: %08x, posix: %02x",
+		    ace_count, darwin_ace_flags, darwin_ace_rights, perm);
 
-         /* uid/gid */
-        EC_ZERO_LOG(getnamefromuuid(darwin_aces->darwin_ace_uuid, &name, &uuidtype));
-        switch (uuidtype) {
-        case UUID_USER:
-            EC_NULL_LOG(pwd = getpwnam(name));
-            tag = ACL_USER;
-            id = pwd->pw_uid;
-            LOG(log_debug, logtype_afpd, "map_ace: name: %s, uid: %u", name, id);
-            break;
-        case UUID_GROUP:
-            EC_NULL_LOG(grp = getgrnam(name));
-            tag = ACL_GROUP;
-            id = (uid_t)(grp->gr_gid);
-            LOG(log_debug, logtype_afpd, "map_ace: name: %s, gid: %u", name, id);
-            break;
-        default:
-            continue;
-        }
-        free(name);
-        name = NULL;
+		/* uid/gid */
+		EC_ZERO_LOG(getnamefromuuid
+			    (darwin_aces->darwin_ace_uuid, &name,
+			     &uuidtype));
+		switch (uuidtype) {
+		case UUID_USER:
+			EC_NULL_LOG(pwd = getpwnam(name));
+			tag = ACL_USER;
+			id = pwd->pw_uid;
+			LOG(log_debug, logtype_afpd,
+			    "map_ace: name: %s, uid: %u", name, id);
+			break;
+		case UUID_GROUP:
+			EC_NULL_LOG(grp = getgrnam(name));
+			tag = ACL_GROUP;
+			id = (uid_t) (grp->gr_gid);
+			LOG(log_debug, logtype_afpd,
+			    "map_ace: name: %s, gid: %u", name, id);
+			break;
+		default:
+			continue;
+		}
+		free(name);
+		name = NULL;
 
-        if (darwin_ace_flags & DARWIN_ACE_INHERIT_CONTROL_FLAGS) {
-            if (*def_aclp == NULL) {
-                /* ace request inheritane but we haven't got a default acl pointer */
-                LOG(log_warning, logtype_afpd, "map_acl: unexpected ACE, flags: 0x%04x",
-                    darwin_ace_flags);
-                EC_FAIL;
-            }
-            /* add it as default ace */
-            EC_ZERO_LOG(posix_acl_add_perm(def_aclp, tag, id, perm));
-            *default_acl_flags = (HAS_DEFAULT_ACL|HAS_EXT_DEFAULT_ACL);
+		if (darwin_ace_flags & DARWIN_ACE_INHERIT_CONTROL_FLAGS) {
+			if (*def_aclp == NULL) {
+				/* ace request inheritane but we haven't got a default acl pointer */
+				LOG(log_warning, logtype_afpd,
+				    "map_acl: unexpected ACE, flags: 0x%04x",
+				    darwin_ace_flags);
+				EC_FAIL;
+			}
+			/* add it as default ace */
+			EC_ZERO_LOG(posix_acl_add_perm
+				    (def_aclp, tag, id, perm));
+			*default_acl_flags =
+			    (HAS_DEFAULT_ACL | HAS_EXT_DEFAULT_ACL);
 
-            if (! (darwin_ace_flags & DARWIN_ACE_FLAGS_ONLY_INHERIT))
-                /* if it not a "inherit only" ace, it must be added as access aces too */
-                EC_ZERO_LOG(posix_acl_add_perm(acc_aclp, tag, id, perm));
-        } else {
-            EC_ZERO_LOG(posix_acl_add_perm(acc_aclp, tag, id, perm));
-        }
-    }
+			if (!
+			    (darwin_ace_flags &
+			     DARWIN_ACE_FLAGS_ONLY_INHERIT))
+				/* if it not a "inherit only" ace, it must be added as access aces too */
+				EC_ZERO_LOG(posix_acl_add_perm
+					    (acc_aclp, tag, id, perm));
+		} else {
+			EC_ZERO_LOG(posix_acl_add_perm
+				    (acc_aclp, tag, id, perm));
+		}
+	}
 
-EC_CLEANUP:
-    if (name)
-        free(name);
+      EC_CLEANUP:
+	if (name)
+		free(name);
 
-    EC_EXIT;
+	EC_EXIT;
 }
 
 /*
@@ -836,90 +902,101 @@ EC_CLEANUP:
  * type is either POSIX_DEFAULT_2_DARWIN or POSIX_ACCESS_2_DARWIN, cf. acl_get_file.
  * Return number of mapped ACES, -1 on error.
  */
-static int map_acl_posix_to_darwin(int type, const acl_t acl, darwin_ace_t *darwin_aces)
+static int map_acl_posix_to_darwin(int type, const acl_t acl,
+				   darwin_ace_t * darwin_aces)
 {
-    EC_INIT;
-    int mapped_aces = 0;
-    int entry_id = ACL_FIRST_ENTRY;
-    acl_entry_t e;
-    acl_tag_t tag;
-    uid_t *uid = NULL;
-    gid_t *gid = NULL;
-    struct passwd *pwd = NULL;
-    struct group *grp = NULL;
-    uint32_t flags;
-    uint32_t rights, maskrights = 0;
-    darwin_ace_t *saved_darwin_aces = darwin_aces;
+	EC_INIT;
+	int mapped_aces = 0;
+	int entry_id = ACL_FIRST_ENTRY;
+	acl_entry_t e;
+	acl_tag_t tag;
+	uid_t *uid = NULL;
+	gid_t *gid = NULL;
+	struct passwd *pwd = NULL;
+	struct group *grp = NULL;
+	uint32_t flags;
+	uint32_t rights, maskrights = 0;
+	darwin_ace_t *saved_darwin_aces = darwin_aces;
 
-    LOG(log_maxdebug, logtype_afpd, "map_aces_posix_to_darwin(%s)",
-        (type & MAP_MASK) == POSIX_DEFAULT_2_DARWIN ?
-        "POSIX_DEFAULT_2_DARWIN" : "POSIX_ACCESS_2_DARWIN");
+	LOG(log_maxdebug, logtype_afpd, "map_aces_posix_to_darwin(%s)",
+	    (type & MAP_MASK) == POSIX_DEFAULT_2_DARWIN ?
+	    "POSIX_DEFAULT_2_DARWIN" : "POSIX_ACCESS_2_DARWIN");
 
-    /* itereate through all ACEs */
-    while (acl_get_entry(acl, entry_id, &e) == 1) {
-        entry_id = ACL_NEXT_ENTRY;
+	/* itereate through all ACEs */
+	while (acl_get_entry(acl, entry_id, &e) == 1) {
+		entry_id = ACL_NEXT_ENTRY;
 
-        /* get ACE type */
-        EC_ZERO_LOG(acl_get_tag_type(e, &tag));
+		/* get ACE type */
+		EC_ZERO_LOG(acl_get_tag_type(e, &tag));
 
-        /* we return user and group ACE */
-        switch (tag) {
-        case ACL_USER:
-            EC_NULL_LOG(uid = (uid_t *)acl_get_qualifier(e));
-            EC_NULL_LOG(pwd = getpwuid(*uid));
-            LOG(log_debug, logtype_afpd, "map_aces_posix_to_darwin: uid: %d -> name: %s",
-                *uid, pwd->pw_name);
-            EC_ZERO_LOG(getuuidfromname(pwd->pw_name, UUID_USER, darwin_aces->darwin_ace_uuid));
-            acl_free(uid);
-            uid = NULL;
-            break;
+		/* we return user and group ACE */
+		switch (tag) {
+		case ACL_USER:
+			EC_NULL_LOG(uid = (uid_t *) acl_get_qualifier(e));
+			EC_NULL_LOG(pwd = getpwuid(*uid));
+			LOG(log_debug, logtype_afpd,
+			    "map_aces_posix_to_darwin: uid: %d -> name: %s",
+			    *uid, pwd->pw_name);
+			EC_ZERO_LOG(getuuidfromname
+				    (pwd->pw_name, UUID_USER,
+				     darwin_aces->darwin_ace_uuid));
+			acl_free(uid);
+			uid = NULL;
+			break;
 
-        case ACL_GROUP:
-            EC_NULL_LOG(gid = (gid_t *)acl_get_qualifier(e));
-            EC_NULL_LOG(grp = getgrgid(*gid));
-            LOG(log_debug, logtype_afpd, "map_aces_posix_to_darwin: gid: %d -> name: %s",
-                *gid, grp->gr_name);
-            EC_ZERO_LOG(getuuidfromname(grp->gr_name, UUID_GROUP, darwin_aces->darwin_ace_uuid));
-            acl_free(gid);
-            gid = NULL;
-            break;
+		case ACL_GROUP:
+			EC_NULL_LOG(gid = (gid_t *) acl_get_qualifier(e));
+			EC_NULL_LOG(grp = getgrgid(*gid));
+			LOG(log_debug, logtype_afpd,
+			    "map_aces_posix_to_darwin: gid: %d -> name: %s",
+			    *gid, grp->gr_name);
+			EC_ZERO_LOG(getuuidfromname
+				    (grp->gr_name, UUID_GROUP,
+				     darwin_aces->darwin_ace_uuid));
+			acl_free(gid);
+			gid = NULL;
+			break;
 
-        case ACL_MASK:
-            maskrights = posix_permset_to_darwin_rights(e, type & IS_DIR);
-            continue;
+		case ACL_MASK:
+			maskrights =
+			    posix_permset_to_darwin_rights(e,
+							   type & IS_DIR);
+			continue;
 
-        default:
-            continue;
-        }
+		default:
+			continue;
+		}
 
-        /* flags */
-        flags = DARWIN_ACE_FLAGS_PERMIT;
-        if ((type & MAP_MASK) == POSIX_DEFAULT_2_DARWIN)
-            flags |= DARWIN_ACE_FLAGS_FILE_INHERIT
-                | DARWIN_ACE_FLAGS_DIRECTORY_INHERIT
-                | DARWIN_ACE_FLAGS_ONLY_INHERIT;
-        darwin_aces->darwin_ace_flags = htonl(flags);
+		/* flags */
+		flags = DARWIN_ACE_FLAGS_PERMIT;
+		if ((type & MAP_MASK) == POSIX_DEFAULT_2_DARWIN)
+			flags |= DARWIN_ACE_FLAGS_FILE_INHERIT
+			    | DARWIN_ACE_FLAGS_DIRECTORY_INHERIT
+			    | DARWIN_ACE_FLAGS_ONLY_INHERIT;
+		darwin_aces->darwin_ace_flags = htonl(flags);
 
-        /* rights */
-        rights = posix_permset_to_darwin_rights(e, type & IS_DIR);
-        darwin_aces->darwin_ace_rights = htonl(rights);
+		/* rights */
+		rights = posix_permset_to_darwin_rights(e, type & IS_DIR);
+		darwin_aces->darwin_ace_rights = htonl(rights);
 
-        darwin_aces++;
-        mapped_aces++;
-    } /* while */
+		darwin_aces++;
+		mapped_aces++;
+	}			/* while */
 
-    /* Loop through the mapped ACE buffer once again, applying the mask */
-    for (int i = mapped_aces; i > 0; i--) {
-        saved_darwin_aces->darwin_ace_rights &= htonl(maskrights);
-        saved_darwin_aces++;
-    }
+	/* Loop through the mapped ACE buffer once again, applying the mask */
+	for (int i = mapped_aces; i > 0; i--) {
+		saved_darwin_aces->darwin_ace_rights &= htonl(maskrights);
+		saved_darwin_aces++;
+	}
 
-    EC_STATUS(mapped_aces);
+	EC_STATUS(mapped_aces);
 
-EC_CLEANUP:
-    if (uid) acl_free(uid);
-    if (gid) acl_free(gid);
-    EC_EXIT;
+      EC_CLEANUP:
+	if (uid)
+		acl_free(uid);
+	if (gid)
+		acl_free(gid);
+	EC_EXIT;
 }
 #endif
 
@@ -932,13 +1009,13 @@ EC_CLEANUP:
  * Ignores trivial ACEs.
  * Return no of mapped ACEs or -1 on error.
  */
-static int map_acl(int type, void *acl, darwin_ace_t *buf, int ace_count)
+static int map_acl(int type, void *acl, darwin_ace_t * buf, int ace_count)
 {
-    int mapped_aces;
+	int mapped_aces;
 
-    LOG(log_debug9, logtype_afpd, "map_acl: BEGIN");
+	LOG(log_debug9, logtype_afpd, "map_acl: BEGIN");
 
-    switch (type & MAP_MASK) {
+	switch (type & MAP_MASK) {
 
 #ifdef HAVE_SOLARIS_ACLS
     case SOLARIS_2_DARWIN:
@@ -951,28 +1028,30 @@ static int map_acl(int type, void *acl, darwin_ace_t *buf, int ace_count)
 #endif /* HAVE_SOLARIS_ACLS */
 
 #ifdef HAVE_POSIX_ACLS
-    case POSIX_DEFAULT_2_DARWIN:
-        mapped_aces = map_acl_posix_to_darwin(type, (const acl_t)acl, buf);
-        break;
+	case POSIX_DEFAULT_2_DARWIN:
+		mapped_aces =
+		    map_acl_posix_to_darwin(type, (const acl_t) acl, buf);
+		break;
 
-    case POSIX_ACCESS_2_DARWIN:
-        mapped_aces = map_acl_posix_to_darwin(type, (const acl_t)acl, buf);
-        break;
+	case POSIX_ACCESS_2_DARWIN:
+		mapped_aces =
+		    map_acl_posix_to_darwin(type, (const acl_t) acl, buf);
+		break;
 
-    case DARWIN_2_POSIX_DEFAULT:
-        break;
+	case DARWIN_2_POSIX_DEFAULT:
+		break;
 
-    case DARWIN_2_POSIX_ACCESS:
-        break;
-#endif /* HAVE_POSIX_ACLS */
+	case DARWIN_2_POSIX_ACCESS:
+		break;
+#endif				/* HAVE_POSIX_ACLS */
 
-    default:
-        mapped_aces = -1;
-        break;
-    }
+	default:
+		mapped_aces = -1;
+		break;
+	}
 
-    LOG(log_debug9, logtype_afpd, "map_acl: END");
-    return mapped_aces;
+	LOG(log_debug9, logtype_afpd, "map_acl: END");
+	return mapped_aces;
 }
 
 /* Get ACL from object omitting trivial ACEs. Map to Darwin ACL style and
@@ -980,23 +1059,23 @@ static int map_acl(int type, void *acl, darwin_ace_t *buf, int ace_count)
    Returns 0 on success, -1 on error. */
 static int get_and_map_acl(char *name, char *rbuf, size_t *rbuflen)
 {
-    EC_INIT;
-    int mapped_aces = 0;
-    int dirflag;
-    char *darwin_ace_count = rbuf;
+	EC_INIT;
+	int mapped_aces = 0;
+	int dirflag;
+	uint32_t *darwin_ace_count = (u_int32_t *) rbuf;
 #ifdef HAVE_SOLARIS_ACLS
     int ace_count = 0;
     ace_t *aces = NULL;
 #endif
 #ifdef HAVE_POSIX_ACLS
-    struct stat st;
+	struct stat st;
 #endif
-    LOG(log_debug9, logtype_afpd, "get_and_map_acl: BEGIN");
+	LOG(log_debug9, logtype_afpd, "get_and_map_acl: BEGIN");
 
-    /* Skip length and flags */
-    rbuf += 4;
-    *rbuf = 0;
-    rbuf += 4;
+	/* Skip length and flags */
+	rbuf += 4;
+	*rbuf = 0;
+	rbuf += 4;
 
 #ifdef HAVE_SOLARIS_ACLS
     EC_NEG1(ace_count = get_nfsv4_acl(name, &aces));
@@ -1043,28 +1122,30 @@ EC_CLEANUP:
     if (aces) free(aces);
 #endif
 #ifdef HAVE_POSIX_ACLS
-    if (defacl) acl_free(defacl);
-    if (accacl) acl_free(accacl);
-#endif /* HAVE_POSIX_ACLS */
+	if (defacl)
+		acl_free(defacl);
+	if (accacl)
+		acl_free(accacl);
+#endif				/* HAVE_POSIX_ACLS */
 
-    LOG(log_debug9, logtype_afpd, "get_and_map_acl: END");
+	LOG(log_debug9, logtype_afpd, "get_and_map_acl: END");
 
-    EC_EXIT;
+	EC_EXIT;
 }
 
 /* Removes all non-trivial ACLs from object. Returns full AFPERR code. */
-static int remove_acl(const struct vol *vol,const char *path, int dir)
+static int remove_acl(const struct vol *vol, const char *path, int dir)
 {
-    int ret = AFP_OK;
+	int ret = AFP_OK;
 
 #if (defined HAVE_SOLARIS_ACLS || defined HAVE_POSIX_ACLS)
-    /* Ressource etc. first */
-    if ((ret = vol->vfs->vfs_remove_acl(vol, path, dir)) != AFP_OK)
-        return ret;
-    /* now the data fork or dir */
-    ret = remove_acl_vfs(path);
+	/* Resource etc. first */
+	if ((ret = vol->vfs->vfs_remove_acl(vol, path, dir)) != AFP_OK)
+		return ret;
+	/* now the data fork or dir */
+	ret = remove_acl_vfs(path);
 #endif
-    return ret;
+	return ret;
 }
 
 /*
@@ -1186,143 +1267,160 @@ EC_CLEANUP:
 #ifndef HAVE_ACL_FROM_MODE
 static acl_t acl_from_mode(mode_t mode)
 {
-    acl_t acl;
-    acl_entry_t entry;
-    acl_permset_t permset;
+	acl_t acl;
+	acl_entry_t entry;
+	acl_permset_t permset;
 
-    if (!(acl = acl_init(3)))
-        return NULL;
+	if (!(acl = acl_init(3)))
+		return NULL;
 
-    if (acl_create_entry(&acl, &entry) != 0)
-        goto error;
-    acl_set_tag_type(entry, ACL_USER_OBJ);
-    acl_get_permset(entry, &permset);
-    acl_clear_perms(permset);
-    if (mode & S_IRUSR)
-        acl_add_perm(permset, ACL_READ);
-    if (mode & S_IWUSR)
-        acl_add_perm(permset, ACL_WRITE);
-    if (mode & S_IXUSR)
-        acl_add_perm(permset, ACL_EXECUTE);
-    acl_set_permset(entry, permset);
+	if (acl_create_entry(&acl, &entry) != 0)
+		goto error;
+	acl_set_tag_type(entry, ACL_USER_OBJ);
+	acl_get_permset(entry, &permset);
+	acl_clear_perms(permset);
+	if (mode & S_IRUSR)
+		acl_add_perm(permset, ACL_READ);
+	if (mode & S_IWUSR)
+		acl_add_perm(permset, ACL_WRITE);
+	if (mode & S_IXUSR)
+		acl_add_perm(permset, ACL_EXECUTE);
+	acl_set_permset(entry, permset);
 
-    if (acl_create_entry(&acl, &entry) != 0)
-        goto error;
-    acl_set_tag_type(entry, ACL_GROUP_OBJ);
-    acl_get_permset(entry, &permset);
-    acl_clear_perms(permset);
-    if (mode & S_IRGRP)
-        acl_add_perm(permset, ACL_READ);
-    if (mode & S_IWGRP)
-        acl_add_perm(permset, ACL_WRITE);
-    if (mode & S_IXGRP)
-        acl_add_perm(permset, ACL_EXECUTE);
-    acl_set_permset(entry, permset);
+	if (acl_create_entry(&acl, &entry) != 0)
+		goto error;
+	acl_set_tag_type(entry, ACL_GROUP_OBJ);
+	acl_get_permset(entry, &permset);
+	acl_clear_perms(permset);
+	if (mode & S_IRGRP)
+		acl_add_perm(permset, ACL_READ);
+	if (mode & S_IWGRP)
+		acl_add_perm(permset, ACL_WRITE);
+	if (mode & S_IXGRP)
+		acl_add_perm(permset, ACL_EXECUTE);
+	acl_set_permset(entry, permset);
 
-    if (acl_create_entry(&acl, &entry) != 0)
-        goto error;
-    acl_set_tag_type(entry, ACL_OTHER);
-    acl_get_permset(entry, &permset);
-    acl_clear_perms(permset);
-    if (mode & S_IROTH)
-        acl_add_perm(permset, ACL_READ);
-    if (mode & S_IWOTH)
-        acl_add_perm(permset, ACL_WRITE);
-    if (mode & S_IXOTH)
-        acl_add_perm(permset, ACL_EXECUTE);
-    acl_set_permset(entry, permset);
+	if (acl_create_entry(&acl, &entry) != 0)
+		goto error;
+	acl_set_tag_type(entry, ACL_OTHER);
+	acl_get_permset(entry, &permset);
+	acl_clear_perms(permset);
+	if (mode & S_IROTH)
+		acl_add_perm(permset, ACL_READ);
+	if (mode & S_IWOTH)
+		acl_add_perm(permset, ACL_WRITE);
+	if (mode & S_IXOTH)
+		acl_add_perm(permset, ACL_EXECUTE);
+	acl_set_permset(entry, permset);
 
-    return acl;
+	return acl;
 
-error:
-    acl_free(acl);
-    return NULL;
+      error:
+	acl_free(acl);
+	return NULL;
 }
 #endif
 
 static int set_acl(const struct vol *vol,
-                   const char *name,
-                   int inherit _U_,
-                   darwin_ace_t *daces,
-                   uint32_t ace_count)
+		   const char *name,
+		   int inherit _U_,
+		   darwin_ace_t * daces, uint32_t ace_count)
 {
-    EC_INIT;
-    struct stat st;
-    acl_t default_acl = NULL;
-    acl_t access_acl = NULL;
-    acl_entry_t entry;
-    acl_tag_t tag;
-    int entry_id = ACL_FIRST_ENTRY;
-    int has_def_acl = 0;
-    /* flags to indicate if the object has a minimal default acl and/or an extended
-     * default acl.
-     */
-    uint32_t default_acl_flags = 0;
+	EC_INIT;
+	struct stat st;
+	acl_t default_acl = NULL;
+	acl_t access_acl = NULL;
+	acl_entry_t entry;
+	acl_tag_t tag;
+	int entry_id = ACL_FIRST_ENTRY;
+	int has_def_acl = 0;
+	/* flags to indicate if the object has a minimal default acl and/or an extended
+	 * default acl.
+	 */
+	uint32_t default_acl_flags = 0;
 
-    LOG(log_maxdebug, logtype_afpd, "set_acl: BEGIN");
+	LOG(log_maxdebug, logtype_afpd, "set_acl: BEGIN");
 
-    EC_NULL_LOG_ERR(access_acl = acl_get_file(name, ACL_TYPE_ACCESS), AFPERR_MISC);
+	EC_NULL_LOG_ERR(access_acl =
+			acl_get_file(name, ACL_TYPE_ACCESS), AFPERR_MISC);
 
-    /* Iterate through acl and remove all extended acl entries. */
-    while (acl_get_entry(access_acl, entry_id, &entry) == 1) {
-        entry_id = ACL_NEXT_ENTRY;
-        EC_ZERO_LOG(acl_get_tag_type(entry, &tag));
+	/* Iterate through acl and remove all extended acl entries. */
+	while (acl_get_entry(access_acl, entry_id, &entry) == 1) {
+		entry_id = ACL_NEXT_ENTRY;
+		EC_ZERO_LOG(acl_get_tag_type(entry, &tag));
 
-        if ((tag == ACL_USER) || (tag == ACL_GROUP) || (tag == ACL_MASK)) {
-            EC_ZERO_LOG_ERR(acl_delete_entry(access_acl, entry), AFPERR_MISC);
-        }
-    } /* while */
+		if ((tag == ACL_USER) || (tag == ACL_GROUP)
+		    || (tag == ACL_MASK)) {
+			EC_ZERO_LOG_ERR(acl_delete_entry
+					(access_acl, entry), AFPERR_MISC);
+		}
+	}			/* while */
 
-   /* In case we are acting on a directory prepare a default acl. For files default_acl will be NULL.
-    * If the directory already has a default acl it will be preserved.
-    */
-   EC_ZERO_LOG_ERR(lstat(name, &st), AFPERR_NOOBJ);
+	/* In case we are acting on a directory prepare a default acl. For files default_acl will be NULL.
+	 * If the directory already has a default acl it will be preserved.
+	 */
+	EC_ZERO_LOG_ERR(lstat(name, &st), AFPERR_NOOBJ);
 
-   if (S_ISDIR(st.st_mode)) {
-       default_acl = acl_get_file(name, ACL_TYPE_DEFAULT);
+	if (S_ISDIR(st.st_mode)) {
+		default_acl = acl_get_file(name, ACL_TYPE_DEFAULT);
 
-       if (default_acl) {
-           /* If default_acl is not empty then the dir has a default acl. */
-           if (acl_get_entry(default_acl, ACL_FIRST_ENTRY, &entry) == 1)
-               default_acl_flags = HAS_DEFAULT_ACL;
+		if (default_acl) {
+			/* If default_acl is not empty then the dir has a default acl. */
+			if (acl_get_entry
+			    (default_acl, ACL_FIRST_ENTRY, &entry) == 1)
+				default_acl_flags = HAS_DEFAULT_ACL;
 
-           acl_free(default_acl);
-       }
-       default_acl = acl_dup(access_acl);
-    }
-    /* adds the clients aces */
-    EC_ZERO_ERR(map_aces_darwin_to_posix(daces, &default_acl, &access_acl, ace_count, &default_acl_flags), AFPERR_MISC);
+			acl_free(default_acl);
+		}
+		default_acl = acl_dup(access_acl);
+	}
+	/* adds the clients aces */
+	EC_ZERO_ERR(map_aces_darwin_to_posix
+		    (daces, &default_acl, &access_acl, ace_count,
+		     &default_acl_flags), AFPERR_MISC);
 
-    /* calcuate ACL mask */
-    EC_ZERO_LOG_ERR(acl_calc_mask(&access_acl), AFPERR_MISC);
+	/* calcuate ACL mask */
+	EC_ZERO_LOG_ERR(acl_calc_mask(&access_acl), AFPERR_MISC);
 
-    /* is it ok? */
-    EC_ZERO_LOG_ERR(acl_valid(access_acl), AFPERR_MISC);
+	/* is it ok? */
+	EC_ZERO_LOG_ERR(acl_valid(access_acl), AFPERR_MISC);
 
-    /* set it */
-    EC_ZERO_LOG_ERR(acl_set_file(name, ACL_TYPE_ACCESS, access_acl), AFPERR_MISC);
-    EC_ZERO_LOG_ERR(vol->vfs->vfs_acl(vol, name, ACL_TYPE_ACCESS, 0, access_acl), AFPERR_MISC);
+	/* set it */
+	EC_ZERO_LOG_ERR(acl_set_file(name, ACL_TYPE_ACCESS, access_acl),
+			AFPERR_MISC);
+	EC_ZERO_LOG_ERR(vol->vfs->
+			vfs_acl(vol, name, ACL_TYPE_ACCESS, 0, access_acl),
+			AFPERR_MISC);
 
-    if (default_acl) {
-        /* If the dir has an extended default acl it's ACL_MASK must be updated.*/
-        if (default_acl_flags & HAS_EXT_DEFAULT_ACL)
-            EC_ZERO_LOG_ERR(acl_calc_mask(&default_acl), AFPERR_MISC);
+	if (default_acl) {
+		/* If the dir has an extended default acl it's ACL_MASK must be updated. */
+		if (default_acl_flags & HAS_EXT_DEFAULT_ACL)
+			EC_ZERO_LOG_ERR(acl_calc_mask(&default_acl),
+					AFPERR_MISC);
 
-        if (default_acl_flags) {
-            EC_ZERO_LOG_ERR(acl_valid(default_acl), AFPERR_MISC);
-            EC_ZERO_LOG_ERR(acl_set_file(name, ACL_TYPE_DEFAULT, default_acl), AFPERR_MISC);
-            EC_ZERO_LOG_ERR(vol->vfs->vfs_acl(vol, name, ACL_TYPE_DEFAULT, 0, default_acl), AFPERR_MISC);
-        }
-    }
+		if (default_acl_flags) {
+			EC_ZERO_LOG_ERR(acl_valid(default_acl),
+					AFPERR_MISC);
+			EC_ZERO_LOG_ERR(acl_set_file
+					(name, ACL_TYPE_DEFAULT,
+					 default_acl), AFPERR_MISC);
+			EC_ZERO_LOG_ERR(vol->vfs->
+					vfs_acl(vol, name,
+						ACL_TYPE_DEFAULT, 0,
+						default_acl), AFPERR_MISC);
+		}
+	}
 
-EC_CLEANUP:
-    if (access_acl) acl_free(access_acl);
-    if (default_acl) acl_free(default_acl);
+      EC_CLEANUP:
+	if (access_acl)
+		acl_free(access_acl);
+	if (default_acl)
+		acl_free(default_acl);
 
-    LOG(log_maxdebug, logtype_afpd, "set_acl: END");
-    EC_EXIT;
+	LOG(log_maxdebug, logtype_afpd, "set_acl: END");
+	EC_EXIT;
 }
-#endif /* HAVE_POSIX_ACLS */
+#endif				/* HAVE_POSIX_ACLS */
 
 /*!
  * Checks if a given UUID has requested_rights(type darwin_ace_rights) for path.
@@ -1338,371 +1436,436 @@ EC_CLEANUP:
  * @returns                    AFP result code
 */
 static int check_acl_access(const struct vol *vol,
-                            struct dir *dir,
-                            const char *path,
-                            const uuidp_t uuid,
-                            uint32_t requested_rights)
+			    struct dir *dir,
+			    const char *path,
+			    const uuidp_t uuid, uint32_t requested_rights)
 {
-    int            ret;
-    uint32_t       allowed_rights = 0;
-    char           *username = NULL;
-    uuidtype_t     uuidtype;
-    struct stat    st;
-    bstring        parent = NULL;
-    int            is_dir;
+	int ret;
+	uint32_t allowed_rights = 0;
+	char *username = NULL;
+	uuidtype_t uuidtype;
+	struct stat st;
+	bstring parent = NULL;
+	int is_dir;
 
-    LOG(log_maxdebug, logtype_afpd, "check_acl_access(dir: \"%s\", path: \"%s\", curdir: \"%s\", 0x%08x)",
-        cfrombstr(dir->d_fullpath), path, getcwdpath(), requested_rights);
+	LOG(log_maxdebug, logtype_afpd,
+	    "check_acl_access(dir: \"%s\", path: \"%s\", curdir: \"%s\", 0x%08x)",
+	    cfrombstr(dir->d_fullpath), path, getcwdpath(),
+	    requested_rights);
 
-    /* This check is not used anymore, as OS X Server seems to be ignoring too */
+	/* This check is not used anymore, as OS X Server seems to be ignoring too */
 #if 0
-    /* Get uid or gid from UUID */
-    EC_ZERO_ERR(getnamefromuuid(uuid, &username, &uuidtype), AFPERR_PARAM);
-    switch (uuidtype) {
-    case UUID_USER:
-        break;
-    case UUID_GROUP:
-        LOG(log_warning, logtype_afpd, "check_acl_access: afp_access not supported for groups");
-        EC_STATUS(AFPERR_MISC);
-        goto EC_CLEANUP;
-    default:
-        EC_STATUS(AFPERR_MISC);
-        goto EC_CLEANUP;
-    }
+	/* Get uid or gid from UUID */
+	EC_ZERO_ERR(getnamefromuuid(uuid, &username, &uuidtype),
+		    AFPERR_PARAM);
+	switch (uuidtype) {
+	case UUID_USER:
+		break;
+	case UUID_GROUP:
+		LOG(log_warning, logtype_afpd,
+		    "check_acl_access: afp_access not supported for groups");
+		EC_STATUS(AFPERR_MISC);
+		goto EC_CLEANUP;
+	default:
+		EC_STATUS(AFPERR_MISC);
+		goto EC_CLEANUP;
+	}
 #endif
 
-    EC_ZERO_LOG_ERR(ostat(path, &st, vol_syml_opt(vol)), AFPERR_PARAM);
+	EC_ZERO_LOG_ERR(ostat(path, &st, vol_syml_opt(vol)), AFPERR_PARAM);
 
-    is_dir = !strcmp(path, ".");
+	is_dir = !strcmp(path, ".");
 
-    if (is_dir && (curdir->d_rights_cache != 0xffffffff)) {
-        /* its a dir and the cache value is valid */
-        allowed_rights = curdir->d_rights_cache;
-        LOG(log_debug, logtype_afpd, "check_access: allowed rights from dircache: 0x%08x", allowed_rights);
-    } else {
+	if (is_dir && (curdir->d_rights_cache != 0xffffffff)) {
+		/* its a dir and the cache value is valid */
+		allowed_rights = curdir->d_rights_cache;
+		LOG(log_debug, logtype_afpd,
+		    "check_access: allowed rights from dircache: 0x%08x",
+		    allowed_rights);
+	} else {
 #ifdef HAVE_SOLARIS_ACLS
         EC_ZERO_LOG(solaris_acl_rights(path, &st, &allowed_rights));
 #endif
 #ifdef HAVE_POSIX_ACLS
-        EC_ZERO_LOG(posix_acl_rights(path, &st, &allowed_rights));
+		EC_ZERO_LOG(posix_acl_rights(path, &st, &allowed_rights));
 #endif
-        /*
-         * The DARWIN_ACE_DELETE right might implicitly result from write acces to the parent
-         * directory. As it seems the 10.6 AFP client is puzzled when this right is not
-         * allowed where a delete would succeed because the parent dir gives write perms.
-         * So we check the parent dir for write access and set the right accordingly.
-         * Currentyl acl2ownermode calls us with dir = NULL, because it doesn't make sense
-         * there to do this extra check -- afaict.
-         */
-        if (vol && dir && (requested_rights & DARWIN_ACE_DELETE)) {
-            int i;
-            uint32_t parent_rights = 0;
+		/*
+		 * The DARWIN_ACE_DELETE right might implicitly result from write acces to the parent
+		 * directory. As it seems the 10.6 AFP client is puzzled when this right is not
+		 * allowed where a delete would succeed because the parent dir gives write perms.
+		 * So we check the parent dir for write access and set the right accordingly.
+		 * Currentyl acl2ownermode calls us with dir = NULL, because it doesn't make sense
+		 * there to do this extra check -- afaict.
+		 */
+		if (vol && dir && (requested_rights & DARWIN_ACE_DELETE)) {
+			int i;
+			uint32_t parent_rights = 0;
 
-            if (curdir->d_did == DIRDID_ROOT_PARENT) {
-                /* use volume path */
-                EC_NULL_LOG_ERR(parent = bfromcstr(vol->v_path), AFPERR_MISC);
-            } else {
-                /* build path for parent */
-                EC_NULL_LOG_ERR(parent = bstrcpy(curdir->d_fullpath), AFPERR_MISC);
-                EC_ZERO_LOG_ERR(bconchar(parent, '/'), AFPERR_MISC);
-                EC_ZERO_LOG_ERR(bcatcstr(parent, path), AFPERR_MISC);
-                EC_NEG1_LOG_ERR(i = bstrrchr(parent, '/'), AFPERR_MISC);
-                EC_ZERO_LOG_ERR(binsertch(parent, i, 1, 0), AFPERR_MISC);
-            }
+			if (curdir->d_did == DIRDID_ROOT_PARENT) {
+				/* use volume path */
+				EC_NULL_LOG_ERR(parent =
+						bfromcstr(vol->v_path),
+						AFPERR_MISC);
+			} else {
+				/* build path for parent */
+				EC_NULL_LOG_ERR(parent =
+						bstrcpy(curdir->
+							d_fullpath),
+						AFPERR_MISC);
+				EC_ZERO_LOG_ERR(bconchar(parent, '/'),
+						AFPERR_MISC);
+				EC_ZERO_LOG_ERR(bcatcstr(parent, path),
+						AFPERR_MISC);
+				EC_NEG1_LOG_ERR(i =
+						bstrrchr(parent, '/'),
+						AFPERR_MISC);
+				EC_ZERO_LOG_ERR(binsertch(parent, i, 1, 0),
+						AFPERR_MISC);
+			}
 
-            LOG(log_debug, logtype_afpd,"parent: %s", cfrombstr(parent));
-            EC_ZERO_LOG_ERR(lstat(cfrombstr(parent), &st), AFPERR_MISC);
+			LOG(log_debug, logtype_afpd, "parent: %s",
+			    cfrombstr(parent));
+			EC_ZERO_LOG_ERR(lstat(cfrombstr(parent), &st),
+					AFPERR_MISC);
 
 #ifdef HAVE_SOLARIS_ACLS
             EC_ZERO_LOG(solaris_acl_rights(cfrombstr(parent), &st, &parent_rights));
 #endif
 #ifdef HAVE_POSIX_ACLS
-            EC_ZERO_LOG(posix_acl_rights(path, &st, &parent_rights));
+			EC_ZERO_LOG(posix_acl_rights
+				    (path, &st, &parent_rights));
 #endif
-            if (parent_rights & (DARWIN_ACE_WRITE_DATA | DARWIN_ACE_DELETE_CHILD))
-                allowed_rights |= DARWIN_ACE_DELETE; /* man, that was a lot of work! */
-        }
+			if (parent_rights &
+			    (DARWIN_ACE_WRITE_DATA |
+			     DARWIN_ACE_DELETE_CHILD))
+				allowed_rights |= DARWIN_ACE_DELETE;	/* man, that was a lot of work! */
+		}
 
-        if (is_dir) {
-            /* Without DARWIN_ACE_DELETE set OS X 10.6 refuses to rename subdirectories in a
-             * directory.
-             */
-            if (allowed_rights & DARWIN_ACE_ADD_SUBDIRECTORY)
-                allowed_rights |= DARWIN_ACE_DELETE;
+		if (is_dir) {
+			/* Without DARWIN_ACE_DELETE set OS X 10.6 refuses to rename subdirectories in a
+			 * directory.
+			 */
+			if (allowed_rights & DARWIN_ACE_ADD_SUBDIRECTORY)
+				allowed_rights |= DARWIN_ACE_DELETE;
 
-            curdir->d_rights_cache = allowed_rights;
-        }
-        LOG(log_debug, logtype_afpd, "allowed rights: 0x%08x", allowed_rights);
-    }
+			curdir->d_rights_cache = allowed_rights;
+		}
+		LOG(log_debug, logtype_afpd, "allowed rights: 0x%08x",
+		    allowed_rights);
+	}
 
-    if ((requested_rights & allowed_rights) != requested_rights) {
-        LOG(log_debug, logtype_afpd, "some requested right wasn't allowed: 0x%08x / 0x%08x",
-            requested_rights, allowed_rights);
-        EC_STATUS(AFPERR_ACCESS);
-    } else {
-        LOG(log_debug, logtype_afpd, "all requested rights are allowed: 0x%08x",
-            requested_rights);
-        EC_STATUS(AFP_OK);
-    }
+	if ((requested_rights & allowed_rights) != requested_rights) {
+		LOG(log_debug, logtype_afpd,
+		    "some requested right wasn't allowed: 0x%08x / 0x%08x",
+		    requested_rights, allowed_rights);
+		EC_STATUS(AFPERR_ACCESS);
+	} else {
+		LOG(log_debug, logtype_afpd,
+		    "all requested rights are allowed: 0x%08x",
+		    requested_rights);
+		EC_STATUS(AFP_OK);
+	}
 
-EC_CLEANUP:
-    if (username) free(username);
-    if (parent) bdestroy(parent);
+      EC_CLEANUP:
+	if (username)
+		free(username);
+	if (parent)
+		bdestroy(parent);
 
-    EC_EXIT;
+	EC_EXIT;
 }
 
 /********************************************************
  * Interface
  ********************************************************/
 
-int afp_access(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_access(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
+	       char *rbuf _U_, size_t *rbuflen)
 {
-    int         ret;
-    struct vol      *vol;
-    struct dir      *dir;
-    uint32_t            did, darwin_ace_rights;
-    uint16_t        vid;
-    struct path         *s_path;
-    uuidp_t             uuid;
+	int ret;
+	struct vol *vol;
+	struct dir *dir;
+	uint32_t did, darwin_ace_rights;
+	uint16_t vid;
+	struct path *s_path;
+	uuidp_t uuid;
 
-    *rbuflen = 0;
-    ibuf += 2;
+	*rbuflen = 0;
+	ibuf += 2;
 
-    memcpy(&vid, ibuf, sizeof( vid ));
-    ibuf += sizeof(vid);
-    if (NULL == ( vol = getvolbyvid( vid ))) {
-        LOG(log_error, logtype_afpd, "afp_access: error getting volid:%d", vid);
-        return AFPERR_NOOBJ;
-    }
+	memcpy(&vid, ibuf, sizeof(vid));
+	ibuf += sizeof(vid);
+	if (NULL == (vol = getvolbyvid(vid))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_access: error getting volid:%d", vid);
+		return AFPERR_NOOBJ;
+	}
 
-    memcpy(&did, ibuf, sizeof( did ));
-    ibuf += sizeof( did );
-    if (NULL == ( dir = dirlookup( vol, did ))) {
-        LOG(log_error, logtype_afpd, "afp_access: error getting did:%d", did);
-        return afp_errno;
-    }
+	memcpy(&did, ibuf, sizeof(did));
+	ibuf += sizeof(did);
+	if (NULL == (dir = dirlookup(vol, did))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_access: error getting did:%d", did);
+		return afp_errno;
+	}
 
-    /* Skip bitmap */
-    ibuf += 2;
+	/* Skip bitmap */
+	ibuf += 2;
 
-    /* Store UUID address */
-    uuid = (uuidp_t)ibuf;
-    ibuf += UUID_BINSIZE;
+	/* Store UUID address */
+	uuid = (uuidp_t) ibuf;
+	ibuf += UUID_BINSIZE;
 
-    /* Store ACE rights */
-    memcpy(&darwin_ace_rights, ibuf, 4);
-    darwin_ace_rights = ntohl(darwin_ace_rights);
-    ibuf += 4;
+	/* Store ACE rights */
+	memcpy(&darwin_ace_rights, ibuf, 4);
+	darwin_ace_rights = ntohl(darwin_ace_rights);
+	ibuf += 4;
 
-    /* get full path and handle file/dir subtleties in netatalk code*/
-    if (NULL == ( s_path = cname( vol, dir, &ibuf ))) {
-        LOG(log_error, logtype_afpd, "afp_getacl: cname got an error!");
-        return AFPERR_NOOBJ;
-    }
-    if (!s_path->st_valid)
-        of_statdir(vol, s_path);
-    if ( s_path->st_errno != 0 ) {
-        LOG(log_error, logtype_afpd, "afp_getacl: cant stat");
-        return AFPERR_NOOBJ;
-    }
+	/* get full path and handle file/dir subtleties in netatalk code */
+	if (NULL == (s_path = cname(vol, dir, &ibuf))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_getacl: cname got an error!");
+		return AFPERR_NOOBJ;
+	}
+	if (!s_path->st_valid)
+		of_statdir(vol, s_path);
+	if (s_path->st_errno != 0) {
+		LOG(log_error, logtype_afpd, "afp_getacl: cant stat");
+		return AFPERR_NOOBJ;
+	}
 
-    ret = check_acl_access(vol, dir, s_path->u_name, uuid, darwin_ace_rights);
+	ret =
+	    check_acl_access(vol, dir, s_path->u_name, uuid,
+			     darwin_ace_rights);
 
-    return ret;
+	return ret;
 }
 
-int afp_getacl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_getacl(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
+	       char *rbuf _U_, size_t *rbuflen)
 {
-    struct vol      *vol;
-    struct dir      *dir;
-    int         ret;
-    uint32_t           did;
-    uint16_t        vid, bitmap;
-    struct path         *s_path;
-    struct passwd       *pw;
-    struct group        *gr;
+	struct vol *vol;
+	struct dir *dir;
+	int ret;
+	uint32_t did;
+	uint16_t vid, bitmap;
+	struct path *s_path;
+	struct passwd *pw;
+	struct group *gr;
 
-    LOG(log_debug9, logtype_afpd, "afp_getacl: BEGIN");
-    *rbuflen = 0;
-    ibuf += 2;
+	LOG(log_debug9, logtype_afpd, "afp_getacl: BEGIN");
+	*rbuflen = 0;
+	ibuf += 2;
 
-    memcpy(&vid, ibuf, sizeof( vid ));
-    ibuf += sizeof(vid);
-    if (NULL == ( vol = getvolbyvid( vid ))) {
-        LOG(log_error, logtype_afpd, "afp_getacl: error getting volid:%d", vid);
-        return AFPERR_NOOBJ;
-    }
+	memcpy(&vid, ibuf, sizeof(vid));
+	ibuf += sizeof(vid);
+	if (NULL == (vol = getvolbyvid(vid))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_getacl: error getting volid:%d", vid);
+		return AFPERR_NOOBJ;
+	}
 
-    memcpy(&did, ibuf, sizeof( did ));
-    ibuf += sizeof( did );
-    if (NULL == ( dir = dirlookup( vol, did ))) {
-        LOG(log_error, logtype_afpd, "afp_getacl: error getting did:%d", did);
-        return afp_errno;
-    }
+	memcpy(&did, ibuf, sizeof(did));
+	ibuf += sizeof(did);
+	if (NULL == (dir = dirlookup(vol, did))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_getacl: error getting did:%d", did);
+		return afp_errno;
+	}
 
-    memcpy(&bitmap, ibuf, sizeof( bitmap ));
-    memcpy(rbuf, ibuf, sizeof( bitmap ));
-    bitmap = ntohs( bitmap );
-    ibuf += sizeof( bitmap );
-    rbuf += sizeof( bitmap );
-    *rbuflen += sizeof( bitmap );
+	memcpy(&bitmap, ibuf, sizeof(bitmap));
+	memcpy(rbuf, ibuf, sizeof(bitmap));
+	bitmap = ntohs(bitmap);
+	ibuf += sizeof(bitmap);
+	rbuf += sizeof(bitmap);
+	*rbuflen += sizeof(bitmap);
 
-    /* skip maxreplysize */
-    ibuf += 4;
+	/* skip maxreplysize */
+	ibuf += 4;
 
-    /* get full path and handle file/dir subtleties in netatalk code*/
-    if (NULL == ( s_path = cname( vol, dir, &ibuf ))) {
-        LOG(log_error, logtype_afpd, "afp_getacl: cname got an error!");
-        return AFPERR_NOOBJ;
-    }
-    if (!s_path->st_valid)
-        of_statdir(vol, s_path);
-    if ( s_path->st_errno != 0 ) {
-        LOG(log_error, logtype_afpd, "afp_getacl: cant stat");
-        return AFPERR_NOOBJ;
-    }
+	/* get full path and handle file/dir subtleties in netatalk code */
+	if (NULL == (s_path = cname(vol, dir, &ibuf))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_getacl: cname got an error!");
+		return AFPERR_NOOBJ;
+	}
+	if (!s_path->st_valid)
+		of_statdir(vol, s_path);
+	if (s_path->st_errno != 0) {
+		LOG(log_error, logtype_afpd, "afp_getacl: cant stat");
+		return AFPERR_NOOBJ;
+	}
 
-    /* Shall we return owner UUID ? */
-    if (bitmap & kFileSec_UUID) {
-        LOG(log_debug, logtype_afpd, "afp_getacl: client requested files owner user UUID");
-        if (NULL == (pw = getpwuid(s_path->st.st_uid))) {
-            LOG(log_debug, logtype_afpd, "afp_getacl: local uid: %u", s_path->st.st_uid);
-            localuuid_from_id(rbuf, UUID_USER, s_path->st.st_uid);
-        } else {
-            LOG(log_debug, logtype_afpd, "afp_getacl: got uid: %d, name: %s", s_path->st.st_uid, pw->pw_name);
-            if ((ret = getuuidfromname(pw->pw_name, UUID_USER, rbuf)) != 0)
-                return AFPERR_MISC;
-        }
-        rbuf += UUID_BINSIZE;
-        *rbuflen += UUID_BINSIZE;
-    }
+	/* Shall we return owner UUID ? */
+	if (bitmap & kFileSec_UUID) {
+		LOG(log_debug, logtype_afpd,
+		    "afp_getacl: client requested files owner user UUID");
+		if (NULL == (pw = getpwuid(s_path->st.st_uid))) {
+			LOG(log_debug, logtype_afpd,
+			    "afp_getacl: local uid: %u",
+			    s_path->st.st_uid);
+			localuuid_from_id(rbuf, UUID_USER,
+					  s_path->st.st_uid);
+		} else {
+			LOG(log_debug, logtype_afpd,
+			    "afp_getacl: got uid: %d, name: %s",
+			    s_path->st.st_uid, pw->pw_name);
+			if ((ret =
+			     getuuidfromname(pw->pw_name, UUID_USER,
+					     rbuf)) != 0)
+				return AFPERR_MISC;
+		}
+		rbuf += UUID_BINSIZE;
+		*rbuflen += UUID_BINSIZE;
+	}
 
-    /* Shall we return group UUID ? */
-    if (bitmap & kFileSec_GRPUUID) {
-        LOG(log_debug, logtype_afpd, "afp_getacl: client requested files owner group UUID");
-        if (NULL == (gr = getgrgid(s_path->st.st_gid))) {
-            LOG(log_debug, logtype_afpd, "afp_getacl: local gid: %u", s_path->st.st_gid);
-            localuuid_from_id(rbuf, UUID_GROUP, s_path->st.st_gid);
-        } else {
-            LOG(log_debug, logtype_afpd, "afp_getacl: got gid: %d, name: %s", s_path->st.st_gid, gr->gr_name);
-            if ((ret = getuuidfromname(gr->gr_name, UUID_GROUP, rbuf)) != 0)
-                return AFPERR_MISC;
-        }
-        rbuf += UUID_BINSIZE;
-        *rbuflen += UUID_BINSIZE;
-    }
+	/* Shall we return group UUID ? */
+	if (bitmap & kFileSec_GRPUUID) {
+		LOG(log_debug, logtype_afpd,
+		    "afp_getacl: client requested files owner group UUID");
+		if (NULL == (gr = getgrgid(s_path->st.st_gid))) {
+			LOG(log_debug, logtype_afpd,
+			    "afp_getacl: local gid: %u",
+			    s_path->st.st_gid);
+			localuuid_from_id(rbuf, UUID_GROUP,
+					  s_path->st.st_gid);
+		} else {
+			LOG(log_debug, logtype_afpd,
+			    "afp_getacl: got gid: %d, name: %s",
+			    s_path->st.st_gid, gr->gr_name);
+			if ((ret =
+			     getuuidfromname(gr->gr_name, UUID_GROUP,
+					     rbuf)) != 0)
+				return AFPERR_MISC;
+		}
+		rbuf += UUID_BINSIZE;
+		*rbuflen += UUID_BINSIZE;
+	}
 
-    /* Shall we return ACL ? */
-    if (bitmap & kFileSec_ACL) {
-        LOG(log_debug, logtype_afpd, "afp_getacl: client requested files ACL");
-        if (get_and_map_acl(s_path->u_name, rbuf, rbuflen) != 0) {
-            LOG(log_error, logtype_afpd, "afp_getacl(\"%s/%s\"): mapping error",
-                getcwdpath(), s_path->u_name);
-            return AFPERR_MISC;
-        }
-    }
+	/* Shall we return ACL ? */
+	if (bitmap & kFileSec_ACL) {
+		LOG(log_debug, logtype_afpd,
+		    "afp_getacl: client requested files ACL");
+		if (get_and_map_acl(s_path->u_name, rbuf, rbuflen) != 0) {
+			LOG(log_error, logtype_afpd,
+			    "afp_getacl(\"%s/%s\"): mapping error",
+			    getcwdpath(), s_path->u_name);
+			return AFPERR_MISC;
+		}
+	}
 
-    LOG(log_debug9, logtype_afpd, "afp_getacl: END");
-    return AFP_OK;
+	LOG(log_debug9, logtype_afpd, "afp_getacl: END");
+	return AFP_OK;
 }
 
-int afp_setacl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_setacl(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
+	       char *rbuf _U_, size_t *rbuflen)
 {
-    struct vol      *vol;
-    struct dir      *dir;
-    int         ret;
-    uint32_t            did;
-    uint16_t        vid, bitmap;
-    struct path         *s_path;
+	struct vol *vol;
+	struct dir *dir;
+	int ret;
+	uint32_t did;
+	uint16_t vid, bitmap;
+	struct path *s_path;
 
-    LOG(log_debug9, logtype_afpd, "afp_setacl: BEGIN");
-    *rbuflen = 0;
-    ibuf += 2;
+	LOG(log_debug9, logtype_afpd, "afp_setacl: BEGIN");
+	*rbuflen = 0;
+	ibuf += 2;
 
-    memcpy(&vid, ibuf, sizeof( vid ));
-    ibuf += sizeof(vid);
-    if (NULL == ( vol = getvolbyvid( vid ))) {
-        LOG(log_error, logtype_afpd, "afp_setacl: error getting volid:%d", vid);
-        return AFPERR_NOOBJ;
-    }
+	memcpy(&vid, ibuf, sizeof(vid));
+	ibuf += sizeof(vid);
+	if (NULL == (vol = getvolbyvid(vid))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_setacl: error getting volid:%d", vid);
+		return AFPERR_NOOBJ;
+	}
 
-    memcpy(&did, ibuf, sizeof( did ));
-    ibuf += sizeof( did );
-    if (NULL == ( dir = dirlookup( vol, did ))) {
-        LOG(log_error, logtype_afpd, "afp_setacl: error getting did:%d", did);
-        return afp_errno;
-    }
+	memcpy(&did, ibuf, sizeof(did));
+	ibuf += sizeof(did);
+	if (NULL == (dir = dirlookup(vol, did))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_setacl: error getting did:%d", did);
+		return afp_errno;
+	}
 
-    memcpy(&bitmap, ibuf, sizeof( bitmap ));
-    bitmap = ntohs( bitmap );
-    ibuf += sizeof( bitmap );
+	memcpy(&bitmap, ibuf, sizeof(bitmap));
+	bitmap = ntohs(bitmap);
+	ibuf += sizeof(bitmap);
 
-    /* get full path and handle file/dir subtleties in netatalk code*/
-    if (NULL == ( s_path = cname( vol, dir, &ibuf ))) {
-        LOG(log_error, logtype_afpd, "afp_setacl: cname got an error!");
-        return AFPERR_NOOBJ;
-    }
-    if (!s_path->st_valid)
-        of_statdir(vol, s_path);
-    if ( s_path->st_errno != 0 ) {
-        LOG(log_error, logtype_afpd, "afp_setacl: cant stat");
-        return AFPERR_NOOBJ;
-    }
-    LOG(log_debug, logtype_afpd, "afp_setacl: unixname: %s", s_path->u_name);
+	/* get full path and handle file/dir subtleties in netatalk code */
+	if (NULL == (s_path = cname(vol, dir, &ibuf))) {
+		LOG(log_error, logtype_afpd,
+		    "afp_setacl: cname got an error!");
+		return AFPERR_NOOBJ;
+	}
+	if (!s_path->st_valid)
+		of_statdir(vol, s_path);
+	if (s_path->st_errno != 0) {
+		LOG(log_error, logtype_afpd, "afp_setacl: cant stat");
+		return AFPERR_NOOBJ;
+	}
+	LOG(log_debug, logtype_afpd, "afp_setacl: unixname: %s",
+	    s_path->u_name);
 
-    /* Padding? */
-    if ((unsigned long)ibuf & 1)
-        ibuf++;
+	/* Padding? */
+	if ((unsigned long) ibuf & 1)
+		ibuf++;
 
-    /* Start processing request */
+	/* Start processing request */
 
-    /* Change owner: dont even try */
-    if (bitmap & kFileSec_UUID) {
-        LOG(log_note, logtype_afpd, "afp_setacl: change owner request, discarded");
-        ret = AFPERR_ACCESS;
-        ibuf += UUID_BINSIZE;
-    }
+	/* Change owner: dont even try */
+	if (bitmap & kFileSec_UUID) {
+		LOG(log_note, logtype_afpd,
+		    "afp_setacl: change owner request, discarded");
+		ret = AFPERR_ACCESS;
+		ibuf += UUID_BINSIZE;
+	}
 
-    /* Change group: certain changes might be allowed, so try it. FIXME: not implemented yet. */
-    if (bitmap & kFileSec_UUID) {
-        LOG(log_note, logtype_afpd, "afp_setacl: change group request, not supported");
-        ret = AFPERR_PARAM;
-        ibuf += UUID_BINSIZE;
-    }
+	/* Change group: certain changes might be allowed, so try it. FIXME: not implemented yet. */
+	if (bitmap & kFileSec_UUID) {
+		LOG(log_note, logtype_afpd,
+		    "afp_setacl: change group request, not supported");
+		ret = AFPERR_PARAM;
+		ibuf += UUID_BINSIZE;
+	}
 
-    /* Remove ACL ? */
-    if (bitmap & kFileSec_REMOVEACL) {
-        LOG(log_debug, logtype_afpd, "afp_setacl: Remove ACL request.");
-        if ((ret = remove_acl(vol, s_path->u_name, S_ISDIR(s_path->st.st_mode))) != AFP_OK)
-            LOG(log_error, logtype_afpd, "afp_setacl: error from remove_acl");
-    }
+	/* Remove ACL ? */
+	if (bitmap & kFileSec_REMOVEACL) {
+		LOG(log_debug, logtype_afpd,
+		    "afp_setacl: Remove ACL request.");
+		if ((ret =
+		     remove_acl(vol, s_path->u_name,
+				S_ISDIR(s_path->st.st_mode))) != AFP_OK)
+			LOG(log_error, logtype_afpd,
+			    "afp_setacl: error from remove_acl");
+	}
 
-    /* Change ACL ? */
-    if (bitmap & kFileSec_ACL) {
-        LOG(log_debug, logtype_afpd, "afp_setacl: Change ACL request.");
-        /*  Get no of ACEs the client put on the wire */
-        uint32_t ace_count;
-        memcpy(&ace_count, ibuf, sizeof(uint32_t));
-        ace_count = htonl(ace_count);
-        ibuf += 8;      /* skip ACL flags (see acls.h) */
+	/* Change ACL ? */
+	if (bitmap & kFileSec_ACL) {
+		LOG(log_debug, logtype_afpd,
+		    "afp_setacl: Change ACL request.");
+		/*  Get no of ACEs the client put on the wire */
+		uint32_t ace_count;
+		memcpy(&ace_count, ibuf, sizeof(uint32_t));
+		ace_count = htonl(ace_count);
+		ibuf += 8;	/* skip ACL flags (see acls.h) */
 
-        ret = set_acl(vol,
-                      s_path->u_name,
-                      (bitmap & kFileSec_Inherit),
-                      (darwin_ace_t *)ibuf,
-                      ace_count);
-        if (ret == 0)
-            ret = AFP_OK;
-        else {
-            LOG(log_warning, logtype_afpd, "afp_setacl(\"%s/%s\"): error",
-                getcwdpath(), s_path->u_name);
-            ret = AFPERR_MISC;
-        }
-    }
+		ret = set_acl(vol,
+			      s_path->u_name,
+			      (bitmap & kFileSec_Inherit),
+			      (darwin_ace_t *) ibuf, ace_count);
+		if (ret == 0)
+			ret = AFP_OK;
+		else {
+			LOG(log_warning, logtype_afpd,
+			    "afp_setacl(\"%s/%s\"): error", getcwdpath(),
+			    s_path->u_name);
+			ret = AFPERR_MISC;
+		}
+	}
 
-    LOG(log_debug9, logtype_afpd, "afp_setacl: END");
-    return ret;
+	LOG(log_debug9, logtype_afpd, "afp_setacl: END");
+	return ret;
 }
 
 /********************************************************************
@@ -1715,17 +1878,19 @@ int afp_setacl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size
  * This is the magic function that makes ACLs usable by calculating
  * the access granted by ACEs to the logged in user.
  */
-int acltoownermode(const struct vol *vol, char *path, struct stat *st, struct maccess *ma)
+int acltoownermode(const struct vol *vol, char *path, struct stat *st,
+		   struct maccess *ma)
 {
-    EC_INIT;
-    uint32_t rights = 0;
+	EC_INIT;
+	uint32_t rights = 0;
 
-    if ( ! (AFPobj->options.flags & OPTION_ACL2MACCESS)
-         || ! (vol->v_flags & AFPVOL_ACLS))
-         return 0;
+	if (!(AFPobj->options.flags & OPTION_ACL2MACCESS)
+	    || !(vol->v_flags & AFPVOL_ACLS))
+		return 0;
 
-    LOG(log_maxdebug, logtype_afpd, "acltoownermode(\"%s/%s\", 0x%02x)",
-        getcwdpath(), path, ma->ma_user);
+	LOG(log_maxdebug, logtype_afpd,
+	    "acltoownermode(\"%s/%s\", 0x%02x)", getcwdpath(), path,
+	    ma->ma_user);
 
 #ifdef HAVE_SOLARIS_ACLS
     EC_ZERO_LOG(solaris_acl_rights(path, st, &rights));
@@ -1741,13 +1906,15 @@ int acltoownermode(const struct vol *vol, char *path, struct stat *st, struct ma
 #endif
 
 #ifdef HAVE_POSIX_ACLS
-    EC_ZERO_LOG(posix_acls_to_uaperms(path, st, ma));
+	EC_ZERO_LOG(posix_acls_to_uaperms(path, st, ma));
 #endif
 
-    LOG(log_maxdebug, logtype_afpd, "resulting user maccess: 0x%02x group maccess: 0x%02x", ma->ma_user, ma->ma_group);
+	LOG(log_maxdebug, logtype_afpd,
+	    "resulting user maccess: 0x%02x group maccess: 0x%02x",
+	    ma->ma_user, ma->ma_group);
 
-EC_CLEANUP:
-    EC_EXIT;
+      EC_CLEANUP:
+	EC_EXIT;
 }
 
 /*!
@@ -1759,7 +1926,7 @@ EC_CLEANUP:
  */
 int check_vol_acl_support(const struct vol *vol)
 {
-    int ret = 0;
+	int ret = 0;
 
 #ifdef HAVE_SOLARIS_ACLS
     ace_t *aces = NULL;
@@ -1768,20 +1935,21 @@ int check_vol_acl_support(const struct vol *vol)
         ret = 0;
 #endif
 #ifdef HAVE_POSIX_ACLS
-    acl_t acl = NULL;
-    ret = 1;
-    if ((acl = acl_get_file(vol->v_path, ACL_TYPE_ACCESS)) == NULL)
-        ret = 0;
+	acl_t acl = NULL;
+	ret = 1;
+	if ((acl = acl_get_file(vol->v_path, ACL_TYPE_ACCESS)) == NULL)
+		ret = 0;
 #endif
 
 #ifdef HAVE_SOLARIS_ACLS
     if (aces) free(aces);
 #endif
 #ifdef HAVE_POSIX_ACLS
-    if (acl) acl_free(acl);
-#endif /* HAVE_POSIX_ACLS */
+	if (acl)
+		acl_free(acl);
+#endif				/* HAVE_POSIX_ACLS */
 
-    LOG(log_debug, logtype_afpd, "Volume \"%s\" ACL support: %s",
-        vol->v_path, ret ? "yes" : "no");
-    return ret;
+	LOG(log_debug, logtype_afpd, "Volume \"%s\" ACL support: %s",
+	    vol->v_path, ret ? "yes" : "no");
+	return ret;
 }
