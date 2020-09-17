@@ -1297,6 +1297,14 @@ static int readvolfile(AFPObj * obj, struct afp_volume_name *p1, char *p2,
 		p1->mtime = st.st_mtime;
 	}
 
+	/* This used to fail if we can't lock the volume file.
+	   Problem is that this will prevent afpd from presenting volumes to
+	   a client if, say, someone is editing the volume file with vi.
+
+	   Since we're only reading it, it's safe to skip this.
+	*/
+
+#if 0
 	/* try putting a read lock on the volume file twice, sleep 1 second if first attempt fails */
 	int retries = 2;
 	while (1) {
@@ -1318,6 +1326,7 @@ static int readvolfile(AFPObj * obj, struct afp_volume_name *p1, char *p2,
 		}
 		break;
 	}
+#endif
 
 	memset(default_options, 0, sizeof(default_options));
 
