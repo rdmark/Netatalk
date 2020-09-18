@@ -1013,7 +1013,6 @@ AC_OUTPUT([Makefile
 	etc/atalkd/Makefile
 	etc/cnid_dbd/Makefile
 	etc/uams/Makefile
-	etc/uams/uams_krb4/Makefile
 	etc/papd/Makefile
 	etc/psf/Makefile
 	include/Makefile
