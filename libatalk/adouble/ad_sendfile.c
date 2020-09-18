@@ -51,32 +51,6 @@ ssize_t sys_sendfile(int tofd, int fromfd, off_t * offset, size_t count)
 	return sendfile(tofd, fromfd, offset, count);
 }
 
-#elif defined(SENDFILE_FLAVOR_SOLARIS)
-#include <sys/sendfile.h>
-
-ssize_t sys_sendfile(int tofd, int fromfd, off_t * offset, size_t count)
-{
-	return sendfile(tofd, fromfd, offset, count);
-}
-
-#elif defined(SENDFILE_FLAVOR_BSD )
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/uio.h>
-ssize_t sys_sendfile(int tofd, int fromfd, off_t * offset, size_t count)
-{
-	off_t len;
-	int ret;
-
-	ret = sendfile(fromfd, tofd, *offset, count, NULL, &len, 0);
-
-	*offset += len;
-
-	if (ret != 0)
-		return -1;
-	return len;
-}
-
 #else
 
 ssize_t sys_sendfile(int out_fd, int in_fd, off_t * _offset, size_t count)
