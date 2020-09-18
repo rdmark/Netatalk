@@ -28,63 +28,6 @@
 #include <atalk/errchk.h>
 #include <atalk/acl.h>
 
-#ifdef HAVE_SOLARIS_ACLS
-
-/* Removes all non-trivial ACLs from object. Returns full AFPERR code. */
-int remove_acl_vfs(const char *name)
-{
-    int ret,i, ace_count, trivial_aces, new_aces_count;
-    ace_t *old_aces = NULL;
-    ace_t *new_aces = NULL;
-
-    LOG(log_debug9, logtype_afpd, "remove_acl: BEGIN");
-
-    /* Get existing ACL and count trivial ACEs */
-    if ((ace_count = get_nfsv4_acl(name, &old_aces)) == -1)
-        return AFPERR_MISC;
-    trivial_aces = 0;
-    for ( i=0; i < ace_count; i++) {
-        if (old_aces[i].a_flags & (ACE_OWNER | ACE_GROUP | ACE_EVERYONE))
-            trivial_aces++;
-    }
-
-    /* malloc buffer for new ACL */
-    if ((new_aces = malloc(trivial_aces * sizeof(ace_t))) == NULL) {
-        LOG(log_error, logtype_afpd, "remove_acl: malloc %s", strerror(errno));
-        ret = AFPERR_MISC;
-        goto exit;
-    }
-
-    /* Now copy the trivial ACEs */
-    new_aces_count = 0;
-    for (i=0; i < ace_count; i++) {
-        if (old_aces[i].a_flags  & (ACE_OWNER | ACE_GROUP | ACE_EVERYONE)) {
-            memcpy(&new_aces[new_aces_count], &old_aces[i], sizeof(ace_t));
-            new_aces_count++;
-        }
-    }
-
-    if ( (acl(name, ACE_SETACL, trivial_aces, new_aces)) == 0)
-        ret = AFP_OK;
-    else {
-        LOG(log_error, logtype_afpd, "set_acl: error setting acl: %s", strerror(errno));
-        if (errno == (EACCES | EPERM))
-            ret = AFPERR_ACCESS;
-        else if (errno == ENOENT)
-            ret = AFPERR_NOITEM;
-        else
-            ret = AFPERR_MISC;
-    }
-
-exit:
-    free(old_aces);
-    free(new_aces);
-
-    LOG(log_debug9, logtype_afpd, "remove_acl: END");
-    return ret;
-}
-
-#endif  /* HAVE_SOLARIS_ACLS */
 
 #ifdef HAVE_POSIX_ACLS
 /*!

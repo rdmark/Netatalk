@@ -422,57 +422,6 @@ static int RF_copyfile_adouble(VFS_FUNC_ARGS_COPYFILE)
 	EC_EXIT;
 }
 
-#ifdef HAVE_SOLARIS_ACLS
-static int RF_solaris_acl(VFS_FUNC_ARGS_ACL)
-{
-    static char buf[ MAXPATHLEN + 1];
-    struct stat st;
-    int len;
-
-    if ((stat(path, &st)) != 0)
-	return -1;
-    if (S_ISDIR(st.st_mode)) {
-	len = snprintf(buf, MAXPATHLEN, "%s/.AppleDouble",path);
-	if (len < 0 || len >=  MAXPATHLEN)
-	    return -1;
-	/* set acl on .AppleDouble dir first */
-	if ((acl(buf, cmd, count, aces)) != 0)
-	    return -1;
-	/* now set ACL on ressource fork */
-	if ((acl(vol->ad_path(path, ADFLAGS_DIR), cmd, count, aces)) != 0)
-	    return -1;
-    } else
-	/* set ACL on ressource fork */
-	if ((acl(vol->ad_path(path, ADFLAGS_HF), cmd, count, aces)) != 0)
-	    return -1;
-
-    return 0;
-}
-
-static int RF_solaris_remove_acl(VFS_FUNC_ARGS_REMOVE_ACL)
-{
-    int ret;
-    static char buf[ MAXPATHLEN + 1];
-    int len;
-
-    if (dir) {
-	len = snprintf(buf, MAXPATHLEN, "%s/.AppleDouble",path);
-	if (len < 0 || len >=  MAXPATHLEN)
-	    return AFPERR_MISC;
-	/* remove ACL from .AppleDouble/.Parent first */
-	if ((ret = remove_acl_vfs(vol->ad_path(path, ADFLAGS_DIR))) != AFP_OK)
-	    return ret;
-	/* now remove from .AppleDouble dir */
-	if ((ret = remove_acl_vfs(buf)) != AFP_OK)
-	    return ret;
-    } else
-	/* remove ACL from ressource fork */
-	if ((ret = remove_acl_vfs(vol->ad_path(path, ADFLAGS_HF))) != AFP_OK)
-	    return ret;
-
-    return AFP_OK;
-}
-#endif
 
 #ifdef HAVE_POSIX_ACLS
 static int RF_posix_acl(VFS_FUNC_ARGS_ACL)
@@ -1213,24 +1162,6 @@ static struct vfs_ops netatalk_ea_sys = {
  * Tertiary VFS modules for ACLs
  */
 
-#ifdef HAVE_SOLARIS_ACLS
-static struct vfs_ops netatalk_solaris_acl_adouble = {
-    /* validupath:        */ NULL,
-    /* rf_chown:          */ NULL,
-    /* rf_renamedir:      */ NULL,
-    /* rf_deletecurdir:   */ NULL,
-    /* rf_setfilmode:     */ NULL,
-    /* rf_setdirmode:     */ NULL,
-    /* rf_setdirunixmode: */ NULL,
-    /* rf_setdirowner:    */ NULL,
-    /* rf_deletefile:     */ NULL,
-    /* rf_renamefile:     */ NULL,
-    /* vfs_copyfile       */ NULL,
-    /* rf_acl:            */ RF_solaris_acl,
-    /* rf_remove_acl      */ RF_solaris_remove_acl,
-    NULL
-};
-#endif
 
 #ifdef HAVE_POSIX_ACLS
 static struct vfs_ops netatalk_posix_acl_adouble = {
@@ -1282,10 +1213,7 @@ void initvol_vfs(struct vol *vol)
 		    "initvol_vfs: volume without EA support");
 	}
 
-	/* ACLs */
-#ifdef HAVE_SOLARIS_ACLS
-    vol->vfs_modules[2] = &netatalk_solaris_acl_adouble;
-#endif
+    /* ACLs */
 #ifdef HAVE_POSIX_ACLS
     vol->vfs_modules[2] = &netatalk_posix_acl_adouble;
 #endif
