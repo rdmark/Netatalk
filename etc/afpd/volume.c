@@ -2465,7 +2465,8 @@ static void check_ea_sys_support(struct vol *vol)
 		if (process_uid) {
 			if (seteuid(process_uid) == -1) {
 				LOG(log_error, logtype_afpd,
-				    "can't seteuid back %s",
+				    "check_ea_sys_support: can't seteuid back to %i (%s)",
+				    process_uid,
 				    strerror(errno));
 				exit(EXITERR_SYS);
 			}
@@ -3138,7 +3139,7 @@ static void handle_special_folders(const struct vol *vol)
 	if (process_uid) {
 		if (seteuid(process_uid) == -1) {
 			LOG(log_error, logtype_logger,
-			    "can't seteuid back %s", strerror(errno));
+			    "handle_special_folders: can't seteuid back to %i (%s)", process_uid, strerror(errno));
 			exit(EXITERR_SYS);
 		}
 	}
