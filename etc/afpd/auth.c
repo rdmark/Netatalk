@@ -34,9 +34,6 @@
 #include "status.h"
 #include "fork.h"
 #include "extattrs.h"
-#ifdef HAVE_ACLS
-#include "acls.h"
-#endif
 
 int afp_version = 11;
 static int afp_version_index;
@@ -166,17 +163,6 @@ static int set_auth_switch(int expired)
 
 		case 33:
 		case 32:
-#ifdef HAVE_ACLS
-			uam_afpserver_action(AFP_GETACL,
-					     UAM_AFPSERVER_POSTAUTH,
-					     afp_getacl, NULL);
-			uam_afpserver_action(AFP_SETACL,
-					     UAM_AFPSERVER_POSTAUTH,
-					     afp_setacl, NULL);
-			uam_afpserver_action(AFP_ACCESS,
-					     UAM_AFPSERVER_POSTAUTH,
-					     afp_access, NULL);
-#endif				/* HAVE_ACLS */
 			uam_afpserver_action(AFP_GETEXTATTR,
 					     UAM_AFPSERVER_POSTAUTH,
 					     afp_getextattr, NULL);

@@ -423,59 +423,6 @@ static int RF_copyfile_adouble(VFS_FUNC_ARGS_COPYFILE)
 }
 
 
-#ifdef HAVE_POSIX_ACLS
-static int RF_posix_acl(VFS_FUNC_ARGS_ACL)
-{
-    EC_INIT;
-    static char buf[ MAXPATHLEN + 1];
-    struct stat st;
-    int len;
-
-    if (S_ISDIR(st.st_mode)) {
-        len = snprintf(buf, MAXPATHLEN, "%s/.AppleDouble",path);
-        if (len < 0 || len >=  MAXPATHLEN)
-            EC_FAIL;
-        /* set acl on .AppleDouble dir first */
-        EC_ZERO_LOG(acl_set_file(buf, type, acl));
-
-        if (type == ACL_TYPE_ACCESS)
-            /* set ACL on ressource fork (".Parent") too */
-            EC_ZERO_LOG(acl_set_file(vol->ad_path(path, ADFLAGS_DIR), type, acl));
-    } else {
-        /* set ACL on ressource fork */
-        EC_ZERO_LOG(acl_set_file(vol->ad_path(path, ADFLAGS_HF), type, acl));
-    }
-    
-EC_CLEANUP:
-    if (ret != 0)
-        return AFPERR_MISC;
-    return AFP_OK;
-}
-
-static int RF_posix_remove_acl(VFS_FUNC_ARGS_REMOVE_ACL)
-{
-    EC_INIT;
-    static char buf[ MAXPATHLEN + 1];
-    int len;
-
-    if (dir) {
-        len = snprintf(buf, MAXPATHLEN, "%s/.AppleDouble",path);
-        if (len < 0 || len >=  MAXPATHLEN)
-            return AFPERR_MISC;
-        /* remove ACL from .AppleDouble/.Parent first */
-        EC_ZERO_LOG_ERR(remove_acl_vfs(vol->ad_path(path, ADFLAGS_DIR)), AFPERR_MISC);
-
-        /* now remove from .AppleDouble dir */
-        EC_ZERO_LOG_ERR(remove_acl_vfs(buf), AFPERR_MISC);
-    } else {
-        /* remove ACL from ressource fork */
-        EC_ZERO_LOG_ERR(remove_acl_vfs(vol->ad_path(path, ADFLAGS_HF)), AFPERR_MISC);
-    }
-
-EC_CLEANUP:
-    EC_EXIT;
-}
-#endif
 
 /*********************************************************************************
  * sfm adouble format
@@ -998,7 +945,7 @@ static int RF_renamefile_osx(VFS_FUNC_ARGS_RENAMEFILE)
         return ret; \
     }
 
-VFS_MFUNC(chown, VFS_FUNC_ARGS_CHOWN, VFS_FUNC_VARS_CHOWN)
+    VFS_MFUNC(chown, VFS_FUNC_ARGS_CHOWN, VFS_FUNC_VARS_CHOWN)
     VFS_MFUNC(renamedir, VFS_FUNC_ARGS_RENAMEDIR, VFS_FUNC_VARS_RENAMEDIR)
     VFS_MFUNC(deletecurdir, VFS_FUNC_ARGS_DELETECURDIR,
 	  VFS_FUNC_VARS_DELETECURDIR)
@@ -1011,16 +958,13 @@ VFS_MFUNC(chown, VFS_FUNC_ARGS_CHOWN, VFS_FUNC_VARS_CHOWN)
     VFS_MFUNC(deletefile, VFS_FUNC_ARGS_DELETEFILE, VFS_FUNC_VARS_DELETEFILE)
     VFS_MFUNC(renamefile, VFS_FUNC_ARGS_RENAMEFILE, VFS_FUNC_VARS_RENAMEFILE)
     VFS_MFUNC(copyfile, VFS_FUNC_ARGS_COPYFILE, VFS_FUNC_VARS_COPYFILE)
-#ifdef HAVE_ACLS
-    VFS_MFUNC(acl, VFS_FUNC_ARGS_ACL, VFS_FUNC_VARS_ACL)
-    VFS_MFUNC(remove_acl, VFS_FUNC_ARGS_REMOVE_ACL, VFS_FUNC_VARS_REMOVE_ACL)
-#endif
     VFS_MFUNC(ea_getsize, VFS_FUNC_ARGS_EA_GETSIZE, VFS_FUNC_VARS_EA_GETSIZE)
     VFS_MFUNC(ea_getcontent, VFS_FUNC_ARGS_EA_GETCONTENT,
 	  VFS_FUNC_VARS_EA_GETCONTENT)
     VFS_MFUNC(ea_list, VFS_FUNC_ARGS_EA_LIST, VFS_FUNC_VARS_EA_LIST)
     VFS_MFUNC(ea_set, VFS_FUNC_ARGS_EA_SET, VFS_FUNC_VARS_EA_SET)
     VFS_MFUNC(ea_remove, VFS_FUNC_ARGS_EA_REMOVE, VFS_FUNC_VARS_EA_REMOVE)
+
 static int vfs_validupath(VFS_FUNC_ARGS_VALIDUPATH)
 {
 	return vol->vfs_modules[0]->
@@ -1043,10 +987,6 @@ static struct vfs_ops vfs_master_funcs = {
 	vfs_deletefile,
 	vfs_renamefile,
 	vfs_copyfile,
-#ifdef HAVE_ACLS
-    vfs_acl,
-    vfs_remove_acl,
-#endif
 	vfs_ea_getsize,
 	vfs_ea_getcontent,
 	vfs_ea_list,
@@ -1124,10 +1064,6 @@ static struct vfs_ops netatalk_ea_adouble = {
 	/* vfs_deletefile:    */ ea_deletefile,
 	/* vfs_renamefile:    */ ea_renamefile,
 	/* vfs_copyfile       */ ea_copyfile,
-#ifdef HAVE_ACLS
-    /* vfs_acl:           */ NULL,
-    /* vfs_remove_acl     */ NULL,
-#endif
 	/* vfs_getsize        */ get_easize,
 	/* vfs_getcontent     */ get_eacontent,
 	/* vfs_list           */ list_eas,
@@ -1147,10 +1083,6 @@ static struct vfs_ops netatalk_ea_sys = {
 	/* rf_deletefile:     */ NULL,
 	/* rf_renamefile:     */ NULL,
 	/* vfs_copyfile:      */ sys_ea_copyfile,
-#ifdef HAVE_ACLS
-    /* rf_acl:            */ NULL,
-    /* rf_remove_acl      */ NULL,
-#endif
 	/* ea_getsize         */ sys_get_easize,
 	/* ea_getcontent      */ sys_get_eacontent,
 	/* ea_list            */ sys_list_eas,
@@ -1163,24 +1095,6 @@ static struct vfs_ops netatalk_ea_sys = {
  */
 
 
-#ifdef HAVE_POSIX_ACLS
-static struct vfs_ops netatalk_posix_acl_adouble = {
-    /* validupath:        */ NULL,
-    /* rf_chown:          */ NULL,
-    /* rf_renamedir:      */ NULL,
-    /* rf_deletecurdir:   */ NULL,
-    /* rf_setfilmode:     */ NULL,
-    /* rf_setdirmode:     */ NULL,
-    /* rf_setdirunixmode: */ NULL,
-    /* rf_setdirowner:    */ NULL,
-    /* rf_deletefile:     */ NULL,
-    /* rf_renamefile:     */ NULL,
-    /* vfs_copyfile       */ NULL,
-    /* rf_acl:            */ RF_posix_acl,
-    /* rf_remove_acl      */ RF_posix_remove_acl,
-    NULL
-};
-#endif
 
 /* ---------------- */
 void initvol_vfs(struct vol *vol)
@@ -1214,8 +1128,5 @@ void initvol_vfs(struct vol *vol)
 	}
 
     /* ACLs */
-#ifdef HAVE_POSIX_ACLS
-    vol->vfs_modules[2] = &netatalk_posix_acl_adouble;
-#endif
 
 }

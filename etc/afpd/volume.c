@@ -612,159 +612,179 @@ static void showvol(const ucs2_t * name)
 static int creatvol(AFPObj * obj, struct passwd *pwd, char *path, char *name, struct vol_option *options, const int user	/* user defined volume */
     )
 {
-    struct vol  *volume;
-    int         suffixlen, vlen, tmpvlen, u8mvlen, macvlen;
-    int         hide = 0;
-    char        tmpname[AFPVOL_U8MNAMELEN+1];
-    ucs2_t      u8mtmpname[(AFPVOL_U8MNAMELEN+1)*2], mactmpname[(AFPVOL_MACNAMELEN+1)*2];
-    char        suffix[6]; /* max is #FFFF */
-    u_int16_t   flags;
+	struct vol *volume;
+	int suffixlen, vlen, tmpvlen, u8mvlen, macvlen;
+	int hide = 0;
+	char tmpname[AFPVOL_U8MNAMELEN + 1];
+	ucs2_t u8mtmpname[(AFPVOL_U8MNAMELEN + 1) * 2],
+	    mactmpname[(AFPVOL_MACNAMELEN + 1) * 2];
+	char suffix[6];		/* max is #FFFF */
+	u_int16_t flags;
 
-    LOG(log_debug, logtype_afpd, "createvol: Volume '%s'", name);
+	LOG(log_debug, logtype_afpd, "createvol: Volume '%s'", name);
 
-    if ( name == NULL || *name == '\0' ) {
-        if ((name = strrchr( path, '/' )) == NULL) {
-            return -1;  /* Obviously not a fully qualified path */
-        }
+	if (name == NULL || *name == '\0') {
+		if ((name = strrchr(path, '/')) == NULL) {
+			return -1;	/* Obviously not a fully qualified path */
+		}
 
-        /* if you wish to share /, you need to specify a name. */
-        if (*++name == '\0')
-            return -1;
-    }
+		/* if you wish to share /, you need to specify a name. */
+		if (*++name == '\0')
+			return -1;
+	}
 
-    /* suffix for mangling use (lastvid + 1)   */
-    /* because v_vid has not been decided yet. */
-    suffixlen = snprintf(suffix, sizeof(suffix), "%c%X", MANGLE_CHAR, lastvid + 1);
+	/* suffix for mangling use (lastvid + 1)   */
+	/* because v_vid has not been decided yet. */
+	suffixlen =
+	    snprintf(suffix, sizeof(suffix), "%c%X", MANGLE_CHAR,
+		     lastvid + 1);
 
-    vlen = strlen( name );
+	vlen = strlen(name);
 
-    /* Unicode Volume Name */
-    /* Firstly convert name from unixcharset to UTF8-MAC */
-    flags = CONV_IGNORE;
-    tmpvlen = convert_charset(obj->options.unixcharset, CH_UTF8_MAC, 0, name, vlen, tmpname, AFPVOL_U8MNAMELEN, &flags);
-    if (tmpvlen <= 0) {
-        strcpy(tmpname, "???");
-        tmpvlen = 3;
-    }
+	/* Unicode Volume Name */
+	/* Firstly convert name from unixcharset to UTF8-MAC */
+	flags = CONV_IGNORE;
+	tmpvlen =
+	    convert_charset(obj->options.unixcharset, CH_UTF8_MAC, 0, name,
+			    vlen, tmpname, AFPVOL_U8MNAMELEN, &flags);
+	if (tmpvlen <= 0) {
+		strcpy(tmpname, "???");
+		tmpvlen = 3;
+	}
 
-    /* Do we have to mangle ? */
-    if ( (flags & CONV_REQMANGLE) || (tmpvlen > obj->options.volnamelen)) {
-        if (tmpvlen + suffixlen > obj->options.volnamelen) {
-            flags = CONV_FORCE;
-            tmpvlen = convert_charset(obj->options.unixcharset, CH_UTF8_MAC, 0, name, vlen, tmpname, obj->options.volnamelen - suffixlen, &flags);
-            tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
-        }
-        strcat(tmpname, suffix);
-        tmpvlen = strlen(tmpname);
-    }
+	/* Do we have to mangle ? */
+	if ((flags & CONV_REQMANGLE)
+	    || (tmpvlen > obj->options.volnamelen)) {
+		if (tmpvlen + suffixlen > obj->options.volnamelen) {
+			flags = CONV_FORCE;
+			tmpvlen =
+			    convert_charset(obj->options.unixcharset,
+					    CH_UTF8_MAC, 0, name, vlen,
+					    tmpname,
+					    obj->options.volnamelen -
+					    suffixlen, &flags);
+			tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
+		}
+		strcat(tmpname, suffix);
+		tmpvlen = strlen(tmpname);
+	}
 
-    /* Secondly convert name from UTF8-MAC to UCS2 */
-    if ( 0 >= ( u8mvlen = convert_string(CH_UTF8_MAC, CH_UCS2, tmpname, tmpvlen, u8mtmpname, AFPVOL_U8MNAMELEN*2)) )
-        return -1;
+	/* Secondly convert name from UTF8-MAC to UCS2 */
+	if (0 >=
+	    (u8mvlen =
+	     convert_string(CH_UTF8_MAC, CH_UCS2, tmpname, tmpvlen,
+			    u8mtmpname, AFPVOL_U8MNAMELEN * 2)))
+		return -1;
 
-    LOG(log_maxdebug, logtype_afpd, "createvol: Volume '%s' -> UTF8-MAC Name: '%s'", name, tmpname);
+	LOG(log_maxdebug, logtype_afpd,
+	    "createvol: Volume '%s' -> UTF8-MAC Name: '%s'", name,
+	    tmpname);
 
-    /* Maccharset Volume Name */
-    /* Firsty convert name from unixcharset to maccharset */
-    flags = CONV_IGNORE;
-    tmpvlen = convert_charset(obj->options.unixcharset, obj->options.maccharset, 0, name, vlen, tmpname, AFPVOL_U8MNAMELEN, &flags);
-    if (tmpvlen <= 0) {
-        strcpy(tmpname, "???");
-        tmpvlen = 3;
-    }
+	/* Maccharset Volume Name */
+	/* Firsty convert name from unixcharset to maccharset */
+	flags = CONV_IGNORE;
+	tmpvlen =
+	    convert_charset(obj->options.unixcharset,
+			    obj->options.maccharset, 0, name, vlen,
+			    tmpname, AFPVOL_U8MNAMELEN, &flags);
+	if (tmpvlen <= 0) {
+		strcpy(tmpname, "???");
+		tmpvlen = 3;
+	}
 
-    /* Do we have to mangle ? */
-    if ( (flags & CONV_REQMANGLE) || (tmpvlen > AFPVOL_MACNAMELEN)) {
-        if (tmpvlen + suffixlen > AFPVOL_MACNAMELEN) {
-            flags = CONV_FORCE;
-            tmpvlen = convert_charset(obj->options.unixcharset,
-                                      obj->options.maccharset,
-                                      0,
-                                      name,
-                                      vlen,
-                                      tmpname,
-                                      AFPVOL_MACNAMELEN - suffixlen,
-                                      &flags);
-            tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
-        }
-        strcat(tmpname, suffix);
-        tmpvlen = strlen(tmpname);
-    }
+	/* Do we have to mangle ? */
+	if ((flags & CONV_REQMANGLE) || (tmpvlen > AFPVOL_MACNAMELEN)) {
+		if (tmpvlen + suffixlen > AFPVOL_MACNAMELEN) {
+			flags = CONV_FORCE;
+			tmpvlen = convert_charset(obj->options.unixcharset,
+						  obj->options.maccharset,
+						  0,
+						  name,
+						  vlen,
+						  tmpname,
+						  AFPVOL_MACNAMELEN -
+						  suffixlen, &flags);
+			tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
+		}
+		strcat(tmpname, suffix);
+		tmpvlen = strlen(tmpname);
+	}
 
-    /* Secondly convert name from maccharset to UCS2 */
-    if ( 0 >= ( macvlen = convert_string(obj->options.maccharset,
-                                         CH_UCS2,
-                                         tmpname,
-                                         tmpvlen,
-                                         mactmpname,
-                                         AFPVOL_U8MNAMELEN*2)) )
-        return -1;
+	/* Secondly convert name from maccharset to UCS2 */
+	if (0 >= (macvlen = convert_string(obj->options.maccharset,
+					   CH_UCS2,
+					   tmpname,
+					   tmpvlen,
+					   mactmpname,
+					   AFPVOL_U8MNAMELEN * 2)))
+		return -1;
 
-    LOG(log_maxdebug, logtype_afpd, "createvol: Volume '%s' ->  Longname: '%s'", name, tmpname);
+	LOG(log_maxdebug, logtype_afpd,
+	    "createvol: Volume '%s' ->  Longname: '%s'", name, tmpname);
 
-    /* check duplicate */
-    for ( volume = Volumes; volume; volume = volume->v_next ) {
-        if ((utf8_encoding() && (strcasecmp_w(volume->v_u8mname, u8mtmpname) == 0))
-             ||
-            (!utf8_encoding() && (strcasecmp_w(volume->v_macname, mactmpname) == 0))) {
-            if (volume->v_deleted) {
-                volume->v_new = hide = 1;
-            } else {
-                LOG (log_error, logtype_afpd,
-                     "Duplicate volume name, check AppleVolumes files: previous: \"%s\", new: \"%s\"",
-                     volume->v_localname, name);
-                return -1;  /* Won't be able to access it, anyway... */
-            }
-        }
-    }
+	/* check duplicate */
+	for (volume = Volumes; volume; volume = volume->v_next) {
+		if ((utf8_encoding()
+		     && (strcasecmp_w(volume->v_u8mname, u8mtmpname) == 0))
+		    || (!utf8_encoding()
+			&& (strcasecmp_w(volume->v_macname, mactmpname) ==
+			    0))) {
+			if (volume->v_deleted) {
+				volume->v_new = hide = 1;
+			} else {
+				LOG(log_error, logtype_afpd,
+				    "Duplicate volume name, check AppleVolumes files: previous: \"%s\", new: \"%s\"",
+				    volume->v_localname, name);
+				return -1;	/* Won't be able to access it, anyway... */
+			}
+		}
+	}
 
-    if (!( volume = (struct vol *)calloc(1, sizeof( struct vol ))) ) {
-        LOG(log_error, logtype_afpd, "creatvol: malloc: %s", strerror(errno) );
-        return -1;
-    }
-    if ( NULL == ( volume->v_localname = strdup(name))) {
-        LOG(log_error, logtype_afpd, "creatvol: malloc: %s", strerror(errno) );
-        free(volume);
-        return -1;
-    }
+	if (!(volume = (struct vol *) calloc(1, sizeof(struct vol)))) {
+		LOG(log_error, logtype_afpd, "creatvol: malloc: %s",
+		    strerror(errno));
+		return -1;
+	}
+	if (NULL == (volume->v_localname = strdup(name))) {
+		LOG(log_error, logtype_afpd, "creatvol: malloc: %s",
+		    strerror(errno));
+		free(volume);
+		return -1;
+	}
 
-    if ( NULL == ( volume->v_u8mname = strdup_w(u8mtmpname))) {
-        LOG(log_error, logtype_afpd, "creatvol: malloc: %s", strerror(errno) );
-        volume_free(volume);
-        free(volume);
-        return -1;
-    }
-    if ( NULL == ( volume->v_macname = strdup_w(mactmpname))) {
-        LOG(log_error, logtype_afpd, "creatvol: malloc: %s", strerror(errno) );
-        volume_free(volume);
-        free(volume);
-        return -1;
-    }
-    if (!( volume->v_path = (char *)malloc( strlen( path ) + 1 )) ) {
-        LOG(log_error, logtype_afpd, "creatvol: malloc: %s", strerror(errno) );
-        volume_free(volume);
-        free(volume);
-        return -1;
-    }
+	if (NULL == (volume->v_u8mname = strdup_w(u8mtmpname))) {
+		LOG(log_error, logtype_afpd, "creatvol: malloc: %s",
+		    strerror(errno));
+		volume_free(volume);
+		free(volume);
+		return -1;
+	}
+	if (NULL == (volume->v_macname = strdup_w(mactmpname))) {
+		LOG(log_error, logtype_afpd, "creatvol: malloc: %s",
+		    strerror(errno));
+		volume_free(volume);
+		free(volume);
+		return -1;
+	}
+	if (!(volume->v_path = (char *) malloc(strlen(path) + 1))) {
+		LOG(log_error, logtype_afpd, "creatvol: malloc: %s",
+		    strerror(errno));
+		volume_free(volume);
+		free(volume);
+		return -1;
+	}
 
-    volume->v_name = utf8_encoding()?volume->v_u8mname:volume->v_macname;
-    volume->v_hide = hide;
-    strcpy( volume->v_path, path );
+	volume->v_name =
+	    utf8_encoding()? volume->v_u8mname : volume->v_macname;
+	volume->v_hide = hide;
+	strcpy(volume->v_path, path);
 
 #ifdef __svr4__
     volume->v_qfd = -1;
 #endif /* __svr4__ */
-    /* os X start at 1 and use network order ie. 1 2 3 */
-    volume->v_vid = ++lastvid;
-    volume->v_vid = htons(volume->v_vid);
-#ifdef HAVE_ACLS
-	if (!check_vol_acl_support(volume)) {
-		LOG(log_debug, logtype_afpd,
-		    "creatvol(\"%s\"): disabling ACL support",
-		    volume->v_path);
-		options[VOLOPT_FLAGS].i_value &= ~AFPVOL_ACLS;
-	}
-#endif
+	/* os X start at 1 and use network order ie. 1 2 3 */
+	volume->v_vid = ++lastvid;
+	volume->v_vid = htons(volume->v_vid);
 
 	/* handle options */
 	if (options) {
@@ -1251,9 +1271,6 @@ static int readvolfile(AFPObj * obj, struct afp_volume_name *p1, char *p2,
 
 	/* Enable some default options for all volumes */
 	default_options[VOLOPT_FLAGS].i_value |= AFPVOL_CACHE;
-#ifdef HAVE_ACLS
-	default_options[VOLOPT_FLAGS].i_value |= AFPVOL_ACLS;
-#endif
 	default_options[VOLOPT_EA_VFS].i_value = AFPVOL_EA_AUTO;
 	LOG(log_maxdebug, logtype_afpd,
 	    "readvolfile: seeding default umask: %04o",

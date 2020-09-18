@@ -626,11 +626,7 @@ static void show_version_extended(void)
 	puts(EA_MODULES);
 
 	printf("           ACL support:\t");
-#ifdef HAVE_ACLS
-	puts("Yes");
-#else
 	puts("No");
-#endif
 
 	printf("          LDAP support:\t");
 #ifdef HAVE_LDAP

@@ -64,10 +64,6 @@
 #define VFS_FUNC_ARGS_ACL const struct vol *vol, const char *path, int cmd, int count, void *aces
 #define VFS_FUNC_VARS_ACL vol, path, cmd, count, aces
 #endif
-#ifdef HAVE_POSIX_ACLS
-#define VFS_FUNC_ARGS_ACL const struct vol *vol, const char *path, acl_type_t type, int count, acl_t acl
-#define VFS_FUNC_VARS_ACL vol, path, type, count, acl
-#endif
 
 #define VFS_FUNC_ARGS_REMOVE_ACL const struct vol *vol, const char *path, int dir
 #define VFS_FUNC_VARS_REMOVE_ACL vol, path, dir
@@ -106,11 +102,6 @@ struct vfs_ops {
     int (*vfs_renamefile)    (VFS_FUNC_ARGS_RENAMEFILE);
     int (*vfs_copyfile)      (VFS_FUNC_ARGS_COPYFILE);
 
-#ifdef HAVE_ACLS
-    /* ACLs */
-    int (*vfs_acl)           (VFS_FUNC_ARGS_ACL);
-    int (*vfs_remove_acl)    (VFS_FUNC_ARGS_REMOVE_ACL);
-#endif
 
     /* Extended Attributes */
     int (*vfs_ea_getsize)    (VFS_FUNC_ARGS_EA_GETSIZE);
