@@ -518,9 +518,9 @@ static void as_timer(int sig _U_)
 	 * interface is configured as a router.  
 	 */
 	if ((iface->i_flags & IFACE_ISROUTER)) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	    sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	    sat.sat_family = AF_APPLETALK;
 	    sat.sat_addr.s_net = ATADDR_ANYNET;
 	    sat.sat_addr.s_node = ATADDR_BCAST;
@@ -1082,7 +1082,7 @@ int main( int ac, char **av)
      * Socket for use in routing ioctl()s. Can't add routes to our
      * interfaces until we have our routing socket.
      */
-#ifdef BSD4_4
+#ifdef __NetBSD__
     if (( rtfd = socket( PF_ROUTE, SOCK_RAW, AF_APPLETALK )) < 0 ) {
 	LOG(log_error, logtype_atalkd, "route socket: %s", strerror(errno) );
 	atalkd_exit( 1 );
@@ -1091,12 +1091,12 @@ int main( int ac, char **av)
 	LOG(log_error, logtype_atalkd, "route shutdown: %s", strerror(errno) );
 	atalkd_exit( 1 );
     }
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     if (( rtfd = socket( AF_APPLETALK, SOCK_DGRAM, 0 )) < 0 ) {
 	LOG(log_error, logtype_atalkd, "route socket: %s", strerror(errno) );
 	atalkd_exit( 1 );
     }
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
     ciface = interfaces;
     bootaddr( ciface );
@@ -1311,9 +1311,9 @@ void setaddr(struct interface *iface,
 	}
     }
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     iface->i_addr.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     iface->i_addr.sat_family = AF_APPLETALK;
     iface->i_addr.sat_addr.s_net = net;
     iface->i_addr.sat_addr.s_node = node;
@@ -1349,9 +1349,9 @@ smaller net range.", iface->i_name, ntohs(first), ntohs(last), strerror(errno));
 #endif /* ! __svr4 */
 
 	memset( &sat, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	sat.sat_family = AF_APPLETALK;
 	sat.sat_addr.s_net = iface->i_addr.sat_addr.s_net;
 	sat.sat_addr.s_node = iface->i_addr.sat_addr.s_node;

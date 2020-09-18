@@ -90,12 +90,12 @@ struct at_addr {
  */
 #ifndef MACOSX_SERVER
 struct sockaddr_at {
-#ifdef BSD4_4
+#ifdef __NetBSD__
     u_char		sat_len;
     u_char		sat_family;
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     short		sat_family;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     u_char		sat_port;
     struct at_addr	sat_addr;
 #ifdef notdef

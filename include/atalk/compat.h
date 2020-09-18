@@ -37,11 +37,11 @@ extern int inet_aton (const char *, struct in_addr *);
 #endif /* SA_INTERRUPT */
 #endif /* linux */
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
 #ifndef SA_INTERRUPT
 #define SA_INTERRUPT	0
 #endif
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
 #if defined(NEED_GETUSERSHELL)
 extern char *getusershell (void);

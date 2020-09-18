@@ -97,7 +97,7 @@ at_ifawithnet( sat, ifa )
     struct at_ifaddr	*aa;
 
     for (; ifa; ifa = ifa->ifa_next ) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	if ( ifa->ifa_addr->sa_family != AF_APPLETALK ) {
 	    continue;
 	}
@@ -105,7 +105,7 @@ at_ifawithnet( sat, ifa )
 		sat->sat_addr.s_net ) {
 	    break;
 	}
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	if ( ifa->ifa_addr.sa_family != AF_APPLETALK ) {
 	    continue;
 	}
@@ -114,7 +114,7 @@ at_ifawithnet( sat, ifa )
 		ntohs( sat->sat_addr.s_net ) <= ntohs( aa->aa_lastnet )) {
 	    break;
 	}
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     }
     return( ifa );
 }
@@ -130,20 +130,20 @@ aarpwhohas( ac, sat )
     struct llc		*llc;
     struct sockaddr	sa;
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     if (( m = m_gethdr( M_DONTWAIT, MT_DATA )) == NULL ) {
 	return;
     }
     m->m_len = sizeof( *ea );
     m->m_pkthdr.len = sizeof( *ea );
     MH_ALIGN( m, sizeof( *ea ));
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     if (( m = m_get( M_DONTWAIT, MT_DATA )) == NULL ) {
 	return;
     }
     m->m_len = sizeof( *ea );
     m->m_off = MMAXOFF - sizeof( *ea );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
     ea = mtod( m, struct ether_aarp *);
     bzero((caddr_t)ea, sizeof( *ea ));
@@ -175,12 +175,12 @@ aarpwhohas( ac, sat )
 	bcopy((caddr_t)atmulticastaddr, (caddr_t)eh->ether_dhost,
 		sizeof( eh->ether_dhost ));
 	eh->ether_type = sizeof( struct llc ) + sizeof( struct ether_aarp );
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	M_PREPEND( m, sizeof( struct llc ), M_WAIT );
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	m->m_len += sizeof( struct llc );
 	m->m_off -= sizeof( struct llc );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	llc = mtod( m, struct llc *);
 	llc->llc_dsap = llc->llc_ssap = LLC_SNAP_LSAP;
 	llc->llc_control = LLC_UI;
@@ -203,9 +203,9 @@ aarpwhohas( ac, sat )
 	ea->aarp_tpa = sat->sat_addr.s_node;
     }
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     sa.sa_len = sizeof( struct sockaddr );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     sa.sa_family = AF_UNSPEC;
     (*ac->ac_if.if_output)(&ac->ac_if, m, &sa );
 }
@@ -276,9 +276,9 @@ aarpinput( ac, m )
     if ( ac->ac_if.if_flags & IFF_NOARP )
 	goto out;
 
-#ifndef BSD4_4
+#ifndef __NetBSD__
     IF_ADJ( m );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
     if ( m->m_len < sizeof( struct arphdr )) {
 	goto out;
@@ -466,13 +466,13 @@ at_aarpinput( ac, m )
 
     if ( aa->aa_flags & AFA_PHASE2 ) {
 	eh->ether_type = sizeof( struct llc ) + sizeof( struct ether_aarp );
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	M_PREPEND( m, sizeof( struct llc ), M_DONTWAIT );
 	if ( m == NULL ) {
 	    m_freem( m );
 	    return;
 	}
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	MGET( m0, M_DONTWAIT, MT_HEADER );
 	if ( m0 == NULL ) {
 	    m_freem( m );
@@ -482,7 +482,7 @@ at_aarpinput( ac, m )
 	m = m0;
 	m->m_off = MMAXOFF - sizeof( struct llc );
 	m->m_len = sizeof ( struct llc );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	llc = mtod( m, struct llc *);
 	llc->llc_dsap = llc->llc_ssap = LLC_SNAP_LSAP;
 	llc->llc_control = LLC_UI;
@@ -499,9 +499,9 @@ at_aarpinput( ac, m )
     ea->aarp_spnode = ma.s_node;
     ea->aarp_op = htons( AARPOP_RESPONSE );
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     sa.sa_len = sizeof( struct sockaddr );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     sa.sa_family = AF_UNSPEC;
     (*ac->ac_if.if_output)( &ac->ac_if, m, &sa );
     return;
@@ -590,20 +590,20 @@ aarpprobe( ac )
 	timeout( aarpprobe, (caddr_t)ac, hz / 5 );
     }
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     if (( m = m_gethdr( M_DONTWAIT, MT_DATA )) == NULL ) {
 	return;
     }
     m->m_len = sizeof( *ea );
     m->m_pkthdr.len = sizeof( *ea );
     MH_ALIGN( m, sizeof( *ea ));
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     if (( m = m_get( M_DONTWAIT, MT_DATA )) == NULL ) {
 	return;
     }
     m->m_len = sizeof( *ea );
     m->m_off = MMAXOFF - sizeof( *ea );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
     ea = mtod( m, struct ether_aarp *);
     bzero((caddr_t)ea, sizeof( *ea ));
@@ -622,12 +622,12 @@ aarpprobe( ac )
 	bcopy((caddr_t)atmulticastaddr, (caddr_t)eh->ether_dhost,
 		sizeof( eh->ether_dhost ));
 	eh->ether_type = sizeof( struct llc ) + sizeof( struct ether_aarp );
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	M_PREPEND( m, sizeof( struct llc ), M_WAIT );
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	m->m_len += sizeof( struct llc );
 	m->m_off -= sizeof( struct llc );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	llc = mtod( m, struct llc *);
 	llc->llc_dsap = llc->llc_ssap = LLC_SNAP_LSAP;
 	llc->llc_control = LLC_UI;
@@ -646,9 +646,9 @@ aarpprobe( ac )
 	ea->aarp_spa = ea->aarp_tpa = AA_SAT( aa )->sat_addr.s_node;
     }
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     sa.sa_len = sizeof( struct sockaddr );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     sa.sa_family = AF_UNSPEC;
     (*ac->ac_if.if_output)(&ac->ac_if, m, &sa );
     aa->aa_probcnt--;

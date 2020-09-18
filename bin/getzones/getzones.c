@@ -71,9 +71,9 @@ int main( int argc, char *argv[])
     }
 
     memset( &saddr, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     saddr.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     saddr.sat_family = AF_APPLETALK;
     if (( se = getservbyname( "zip", "ddp" )) == NULL )
 	saddr.sat_port = 6;

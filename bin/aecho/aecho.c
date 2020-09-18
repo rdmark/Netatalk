@@ -162,9 +162,9 @@ int main(int ac, char **av)
        port = ntohs( se->s_port );
 
     memset( &target, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     target.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     target.sat_family = AF_APPLETALK;
     if ( !atalk_aton( av[ optind ], &target.sat_addr )) {
 	if ( nbp_name( av[ optind ], &obj, &type, &zone ) || !obj ) {

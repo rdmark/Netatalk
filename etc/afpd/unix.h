@@ -29,10 +29,10 @@
 #endif /* __svr4__ || HAVE_SYS_MNTTAB_H */
 
 
-#if defined(HAVE_SYS_MOUNT_H) || defined(BSD4_4) || \
+#if defined(HAVE_SYS_MOUNT_H) || defined(__NetBSD__) || \
     defined(linux)
 #include <sys/mount.h>
-#endif /* HAVE_SYS_MOUNT_H || BSD4_4 || linux */
+#endif /* HAVE_SYS_MOUNT_H || __NetBSD__ || linux */
 
 #if defined(linux) || defined(HAVE_MNTENT_H)
 #include <mntent.h>

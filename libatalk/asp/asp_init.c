@@ -45,9 +45,9 @@ ASP asp_init(ATP atp)
 	}
 
 	asp->asp_atp = atp;
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	asp->asp_sat.sat_len = sizeof(struct sockaddr_at);
-#endif				/* BSD4_4 */
+#endif				/* __NetBSD__ */
 	asp->asp_sat.sat_family = AF_APPLETALK;
 	asp->asp_sat.sat_addr.s_net = ATADDR_ANYNET;
 	asp->asp_sat.sat_addr.s_node = ATADDR_ANYNODE;

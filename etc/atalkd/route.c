@@ -19,7 +19,7 @@
 #include "rtmp.h"
 #include "route.h"
 
-#ifndef BSD4_4
+#ifndef __NetBSD__
 int route( int message, struct sockaddr *dst, struct sockaddr *gate, int flags)
 {
     struct rtentry	rtent;
@@ -31,7 +31,7 @@ int route( int message, struct sockaddr *dst, struct sockaddr *gate, int flags)
     return( ioctl( rtfd, message, &rtent ));
 }
 
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 
 struct sockaddr_m {
     u_char	sam_len;
@@ -76,4 +76,4 @@ route( int message, struct sockaddr_at	*dst, struct sockaddr_at *gate, int flags
     }
     return( 0 );
 }
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */

@@ -174,9 +174,9 @@ ASP asp_getsession(ASP asp, server_child * server_children,
     }
 		    
     memset( &sat, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	sat.sat_len = sizeof(struct sockaddr_at);
-#endif				/* BSD4_4 */
+#endif				/* __NetBSD__ */
 	sat.sat_family = AF_APPLETALK;
 	sat.sat_addr.s_net = ATADDR_ANYNET;
 	sat.sat_addr.s_node = ATADDR_ANYNODE;

@@ -5,9 +5,9 @@
  * All Rights Reserved.
  */
 
-# if defined( BSD4_4 )
+# if defined( __NetBSD__ )
 #include <net/if_llc.h>
-# else /* BSD4_4 */
+# else /* __NetBSD__ */
 
 #include <net/if_ieee802.h>
 
@@ -70,4 +70,4 @@ struct llc {
 
 #define SIOCPHASE1	_IOW('i', 100, struct ifreq)	/* AppleTalk phase 1 */
 #define SIOCPHASE2	_IOW('i', 101, struct ifreq)	/* AppleTalk phase 2 */
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */

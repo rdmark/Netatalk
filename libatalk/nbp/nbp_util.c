@@ -44,9 +44,9 @@ int nbp_parse(char *data, struct nbpnve *nn, int len)
 	return( -1 );
     }
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     nn->nn_sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     nn->nn_sat.sat_family = AF_APPLETALK;
     nn->nn_sat.sat_addr.s_net = nt.nt_net;
     nn->nn_sat.sat_addr.s_node = nt.nt_node;

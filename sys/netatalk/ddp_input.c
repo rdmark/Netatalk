@@ -41,11 +41,11 @@ atintr()
     for (;;) {
 	s = splimp();
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	IF_DEQUEUE( &atintrq2, m );
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	IF_DEQUEUEIF( &atintrq2, m, ifp );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
 	splx( s );
 
@@ -53,9 +53,9 @@ atintr()
 	    break;
 	}
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	ifp = m->m_pkthdr.rcvif;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	for ( aa = at_ifaddr; aa; aa = aa->aa_next ) {
 	    if ( aa->aa_ifp == ifp && ( aa->aa_flags & AFA_PHASE2 )) {
 		break;
@@ -72,11 +72,11 @@ atintr()
     for (;;) {
 	s = splimp();
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	IF_DEQUEUE( &atintrq1, m );
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	IF_DEQUEUEIF( &atintrq1, m, ifp );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
 	splx( s );
 
@@ -84,9 +84,9 @@ atintr()
 	    break;
 	}
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	ifp = m->m_pkthdr.rcvif;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	for ( aa = at_ifaddr; aa; aa = aa->aa_next ) {
 	    if ( aa->aa_ifp == ifp && ( aa->aa_flags & AFA_PHASE2 ) == 0 ) {
 		break;
@@ -128,9 +128,9 @@ ddp_input( m, ifp, elh, phase )
     struct ddpshdr	*dsh, ddps;
     struct at_ifaddr	*aa;
     struct ddpehdr	*deh, ddpe;
-#ifndef BSD4_4
+#ifndef __NetBSD__
     struct mbuf		*mp;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     struct ddpcb	*ddp;
     int			dlen, mlen;
     u_short		cksum;
@@ -234,13 +234,13 @@ ddp_input( m, ifp, elh, phase )
      * at a link layer.  We do this before we attempt to forward a packet,
      * possibly on a different media.
      */
-#ifdef BSD4_4
+#ifdef __NetBSD__
     mlen = m->m_pkthdr.len;
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     for ( mlen = 0, mp = m; mp; mp = mp->m_next ) {
 	mlen += mp->m_len;
     }
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     if ( mlen < dlen ) {
 	ddpstat.ddps_toosmall++;
 	m_freem( m );
@@ -269,9 +269,9 @@ ddp_input( m, ifp, elh, phase )
 	}
 	if ( forwro.ro_rt == (struct rtentry *)0 ||
 	     forwro.ro_rt->rt_ifp == (struct ifnet *)0 ) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	    forwro.ro_dst.sa_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	    forwro.ro_dst.sa_family = AF_APPLETALK;
 	    satosat( &forwro.ro_dst )->sat_addr.s_net = to.sat_addr.s_net;
 	    satosat( &forwro.ro_dst )->sat_addr.s_node = to.sat_addr.s_node;
@@ -302,9 +302,9 @@ ddp_input( m, ifp, elh, phase )
 	return;
     }
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     from.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     from.sat_family = AF_APPLETALK;
 
     if ( elh ) {

@@ -90,9 +90,9 @@ int nbp_unrgstr(const char *obj,const char *type,const char  *zone, const struct
     to.sat_family = AF_APPLETALK;
     if (addr) 
       memcpy(&to.sat_addr, addr, sizeof(struct at_addr));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     to.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
     if ( nbp_port == 0 ) {
 	if (( se = getservbyname( "nbp", "ddp" )) == NULL ) {

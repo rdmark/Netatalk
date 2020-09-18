@@ -7,10 +7,10 @@
 
 #include <sys/cdefs.h>
 
-#ifndef BSD4_4
+#ifndef __NetBSD__
 int route ( int, struct sockaddr *, struct sockaddr *, int );
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 int route ( int, struct sockaddr_at *, struct sockaddr_at *, int);
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
 #endif /* ATALKD_ROUTE_H */

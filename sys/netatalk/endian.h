@@ -49,10 +49,10 @@ typedef unsigned long u_int64_t;
 #ifdef linux
 #include <endian.h> /* i think this is here for libc4 */
 #else /* linux */
-#if defined(HAVE_32BIT_LONGS) && !(defined(BSD4_4) || \
+#if defined(HAVE_32BIT_LONGS) && !(defined(__NetBSD__) || \
 				  defined(NO_LARGE_VOL_SUPPORT))
 typedef unsigned long long  u_int64_t;
-#endif /* HAVE_32BIT_LONGS || !BSD4_4 || NO_LARGE_VOL_SUPPORT */
+#endif /* HAVE_32BIT_LONGS || !__NetBSD__ || NO_LARGE_VOL_SUPPORT */
 #endif /* linux */
 #endif /* HAVE_64BIT_LONGS */
 #endif /* ISOC9X */

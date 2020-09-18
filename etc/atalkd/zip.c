@@ -926,9 +926,9 @@ int zip_getnetinfo(struct interface *iface)
      */
     *data++ = 0;
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     sat.sat_family = AF_APPLETALK;
     sat.sat_addr.s_net = 0;
     sat.sat_addr.s_node = ATADDR_BCAST;

@@ -34,18 +34,18 @@ ddp_output( ddp, m )
     struct ddpcb	*ddp;
     struct mbuf		*m;
 {
-#ifndef BSD4_4
+#ifndef __NetBSD__
     struct mbuf		*m0;
     int			len;
-#endif /* ! BSD4_4 */
+#endif /* ! __NetBSD__ */
     struct ifnet	*ifp;
     struct at_ifaddr	*aa = NULL;
     struct ddpehdr	*deh;
     u_short		net;
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     M_PREPEND( m, sizeof( struct ddpehdr ), M_WAIT );
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     for ( len = 0, m0 = m; m; m = m->m_next ) {
 	len += m->m_len;
     }
@@ -55,23 +55,23 @@ ddp_output( ddp, m )
 	return( ENOBUFS );
     }
     m->m_next = m0;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
-#ifndef BSD4_4
+#ifndef __NetBSD__
 # define align(a)	(((a)+3)&0xfc)
     m->m_off = MMINOFF + align( SZ_ELAPHDR );
     m->m_len = sizeof( struct ddpehdr );
-#endif /* ! BSD4_4 */
+#endif /* ! __NetBSD__ */
 
     deh = mtod( m, struct ddpehdr *);
     deh->deh_pad = 0;
     deh->deh_hops = 0;
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     deh->deh_len = m->m_pkthdr.len;
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     deh->deh_len = len + sizeof( struct ddpehdr );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
     deh->deh_dnet = ddp->ddp_fsat.sat_addr.s_net;
     deh->deh_dnode = ddp->ddp_fsat.sat_addr.s_node;
@@ -136,11 +136,11 @@ ddp_route( m, ro )
     u_short		net;
 
     if ( ro->ro_rt && ( ifp = ro->ro_rt->rt_ifp )) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	net = satosat( ro->ro_rt->rt_gateway )->sat_addr.s_net;
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	net = satosat( &ro->ro_rt->rt_gateway )->sat_addr.s_net;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	for ( aa = at_ifaddr; aa; aa = aa->aa_next ) {
 	    if ( aa->aa_ifp == ifp &&
 		    ntohs( net ) >= ntohs( aa->aa_firstnet ) &&
@@ -169,15 +169,15 @@ ddp_route( m, ro )
 	}
     } else {
 # ifdef notdef
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	M_PREPEND( m, SZ_ELAPHDR, M_DONTWAIT );
 	if ( m == NULL ) {
 	    return( ENOBUFS );
 	}
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	m->m_off -= SZ_ELAPHDR;
 	m->m_len += SZ_ELAPHDR;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 # endif /* notdef */
 
 	MGET( m0, M_WAIT, MT_HEADER );
@@ -199,11 +199,11 @@ ddp_route( m, ro )
 		ntohs( aa->aa_lastnet )) {
 	    elh->el_dnode = satosat( &ro->ro_dst )->sat_addr.s_node;
 	} else {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	    elh->el_dnode = satosat( ro->ro_rt->rt_gateway )->sat_addr.s_node;
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	    elh->el_dnode = satosat( &ro->ro_rt->rt_gateway )->sat_addr.s_node;
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	}
     }
 
@@ -213,11 +213,11 @@ ddp_route( m, ro )
 	    ntohs( aa->aa_lastnet )) {
 	gate = *satosat( &ro->ro_dst );
     } else {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	gate = *satosat( ro->ro_rt->rt_gateway );
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	gate = *satosat( &ro->ro_rt->rt_gateway );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     }
     ro->ro_rt->rt_use++;
 

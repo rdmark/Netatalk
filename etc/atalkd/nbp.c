@@ -100,9 +100,9 @@ int nbp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len)
     data += SZ_NBPTUPLE;
 
     memset( &nn.nn_sat, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     nn.nn_sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     nn.nn_sat.sat_family = AF_APPLETALK;
     nn.nn_sat.sat_addr.s_net = nt.nt_net;
     nn.nn_sat.sat_addr.s_node = nt.nt_node;
@@ -367,9 +367,9 @@ int nbp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len)
          * Otherwise, look through the zone table.
          */
         if ( zt == NULL ) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
             sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
             sat.sat_family = AF_APPLETALK;
             sat.sat_port = ap->ap_port;
 
@@ -404,9 +404,9 @@ int nbp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len)
 
             locallkup = 1;
         } else {
-#ifdef BSD4_4
+#ifdef __NetBSD__
             sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
             sat.sat_family = AF_APPLETALK;
             sat.sat_port = ap->ap_port;
             for ( l = zt->zt_rt; l; l = l->l_next ) {

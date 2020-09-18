@@ -228,16 +228,16 @@ at_pcbsetaddr( ddp, addr )
 		    sat->sat_port >= ATPORT_LAST ) {
 		return( EINVAL );
 	    }
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	    if ( sat->sat_port < ATPORT_RESERVED &&
 		    suser( u.u_cred, &u.u_acflag )) {
 		return( EACCES );
 	    }
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 	    if ( sat->sat_port < ATPORT_RESERVED && ( !suser())) {
 		return( EACCES );
 	    }
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	}
     } else {
 	bzero( (caddr_t)&lsat, sizeof( struct sockaddr_at ));
@@ -354,9 +354,9 @@ at_pcbconnect( ddp, addr )
      */
     if ( ro->ro_rt == (struct rtentry *)0 ||
 	 ro->ro_rt->rt_ifp == (struct ifnet *)0 ) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	ro->ro_dst.sa_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	ro->ro_dst.sa_family = AF_APPLETALK;
 	if ( hintnet != 0 ) {
 	    satosat( &ro->ro_dst )->sat_addr.s_net = hintnet;
