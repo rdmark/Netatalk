@@ -67,7 +67,7 @@ static struct vol volume;	/* fake it for ea_open */
 static char pname[MAXPATHLEN] = "../";
 
 /*
-  Taken form afpd/desktop.c
+  Taken from afpd/desktop.c
 */
 static char *utompath(char *upath)
 {
@@ -108,7 +108,7 @@ static char *utompath(char *upath)
 }
 
 /*
-  Taken form afpd/desktop.c
+  Taken from afpd/desktop.c
 */
 static char *mtoupath(char *mpath)
 {
@@ -697,7 +697,7 @@ static int read_addir(void)
 			}
 			/* Orphaned ad-file */
 			dbd_log(LOGSTD,
-				"Orphaned AppleDoube file '%s/%s/%s'",
+				"Orphaned AppleDouble file '%s/%s/%s'",
 				cwdbuf, ADv2_DIRNAME, ep->d_name);
 
 			if (dbd_flags & DBD_FLAGS_SCAN)
@@ -706,7 +706,7 @@ static int read_addir(void)
 
 			if ((unlink(ep->d_name)) != 0) {
 				dbd_log(LOGSTD,
-					"Error unlinking orphaned AppleDoube file '%s/%s/%s'",
+					"Error unlinking orphaned AppleDouble file '%s/%s/%s'",
 					cwdbuf, ADv2_DIRNAME, ep->d_name);
 
 			}
