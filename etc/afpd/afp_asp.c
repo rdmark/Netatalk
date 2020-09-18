@@ -50,11 +50,18 @@ static void afp_asp_close(AFPObj * obj)
 {
 	ASP asp = obj->handle;
 
-	if (seteuid(obj->uid) < 0) {
-		LOG(log_error, logtype_afpd, "can't seteuid back %s",
-		    strerror(errno));
-		exit(EXITERR_SYS);
+	if ( obj->uid != geteuid() ) {
+		if (seteuid(obj->uid) < 0) {
+			LOG(log_error,
+			    logtype_afpd,
+			    "afp_asp_close: can't seteuid back to %i from %i (%s)",
+		            obj->uid,
+		            geteuid(),
+		            strerror(errno));
+			exit(EXITERR_SYS);
+		}
 	}
+
 	close_all_vol();
 	if (obj->options.authprintdir)
 		afp_authprint_remove(obj);
