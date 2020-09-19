@@ -435,11 +435,10 @@ int afp_geticon(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 {
 	struct vol *vol;
 	off_t offset;
-	ssize_t rc, buflen;
+	ssize_t rc;
 	u_char fcreator[4], ftype[4], itype, ih[12];
 	u_int16_t vid, bsize, rsize;
 
-	buflen = *rbuflen;
 	*rbuflen = 0;
 	ibuf += 2;
 
