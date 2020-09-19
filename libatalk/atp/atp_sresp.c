@@ -124,11 +124,9 @@ int atp_sresp(ATP ah,		/* open atp handle */
 			    resp_buf->atpbuf_dlen) {
 				if (ah->atph_rxo) {
 					for (; i >= 0; --i) {
-						atp_free_buf(save_buf->
-							     atpbuf_info.
-							     atpbuf_xo.
-							     atpxo_packet
-							     [i]);
+						atp_free_buf
+						    (save_buf->atpbuf_info.atpbuf_xo.atpxo_packet
+						     [i]);
 					}
 					atp_free_buf(save_buf);
 				}
