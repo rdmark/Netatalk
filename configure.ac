@@ -1012,10 +1012,8 @@ AC_OUTPUT([Makefile
 	libatalk/atp/Makefile
 	libatalk/bstring/Makefile
 	libatalk/cnid/Makefile
-	libatalk/cnid/cdb/Makefile
 	libatalk/cnid/last/Makefile
 	libatalk/cnid/dbd/Makefile
-	libatalk/cnid/tdb/Makefile
 	libatalk/compat/Makefile
 	libatalk/dsi/Makefile
 	libatalk/nbp/Makefile
