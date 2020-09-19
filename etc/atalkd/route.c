@@ -48,7 +48,7 @@ struct rt_msg_at {
     struct sockaddr_m	rtma_mask;
 } rtma;
 
-route( int message, struct sockaddr_at	*dst, struct sockaddr_at *gate, int flags)
+int route( int message, struct sockaddr_at	*dst, struct sockaddr_at *gate, int flags)
 {
     int			rc;
 
