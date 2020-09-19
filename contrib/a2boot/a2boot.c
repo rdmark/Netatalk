@@ -284,7 +284,7 @@ int main( int ac, char **av )
 long a2bootreq(fname)
 	char	*fname;
 {
-	int f,m;
+	int f;
 	int32_t readlen;
 /*
     LOG(log_info, logtype_default, "          a2bootreq( %s )",fname );
