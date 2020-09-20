@@ -905,7 +905,8 @@ int setfilparams(struct vol *vol,
 	char *upath;
 	u_char achar, xyy[4];
 	u_char *fdType = NULL;	/* "uninitialized, OK 310105" -- yeah, no */
-	u_int16_t ashort, bshort, oshort;
+	u_int16_t ashort = 0;
+	u_int16_t bshort, oshort;
 	u_int32_t aint;
 	u_int32_t upriv;
 	u_int16_t upriv_bit = 0;
