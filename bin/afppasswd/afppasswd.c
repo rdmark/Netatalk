@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
-#ifdef HAVE_FCNTL_H
+#if defined(HAVE_FCNTL_H)
 #include <fcntl.h>
 #endif				/* HAVE_FCNTL_H */
 #include <pwd.h>
@@ -38,7 +38,7 @@
 
 #include <openssl/des.h>
 
-#ifdef USE_CRACKLIB
+#if defined(USE_CRACKLIB)
 #include <crack.h>
 #endif				/* USE_CRACKLIB */
 
@@ -180,7 +180,7 @@ static int update_passwd(const char *path, const char *name, int flags)
 	passwd = getpass("Enter NEW AFP password: ");
 	memcpy(password, passwd, sizeof(password));
 	password[PASSWDLEN] = '\0';
-#ifdef USE_CRACKLIB
+#if defined(USE_CRACKLIB)
 	if (!(flags & OPT_NOCRACK)) {
 		if (passwd = FascistCheck(password, _PATH_CRACKLIB)) {
 			fprintf(stderr, "Error: %s\n", passwd);
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
 		fprintf(stderr,
 			"  -c        create and initialize password file or specific user\n");
 		fprintf(stderr, "  -f        force an action\n");
-#ifdef USE_CRACKLIB
+#if defined(USE_CRACKLIB)
 		fprintf(stderr,
 			"  -n        disable cracklib checking of passwords\n");
 #endif				/* USE_CRACKLIB */
@@ -302,7 +302,7 @@ int main(int argc, char **argv)
 		case 'u':	/* minimum uid to use. default is 100 */
 			uid_min = atoi(optarg);
 			break;
-#ifdef USE_CRACKLIB
+#if defined(USE_CRACKLIB)
 		case 'n':	/* disable CRACKLIB check */
 			flags |= OPT_NOCRACK;
 			break;
@@ -318,7 +318,7 @@ int main(int argc, char **argv)
 
 	if (err || (optind + ((flags & OPT_CREATE) ? 0 :
 			      (flags & OPT_ISROOT)) != argc)) {
-#ifdef USE_CRACKLIB
+#if defined(USE_CRACKLIB)
 		fprintf(stderr,
 			"Usage: afppasswd [-acfn] [-u minuid] [-p path] [username]\n");
 #else				/* USE_CRACKLIB */
@@ -329,7 +329,7 @@ int main(int argc, char **argv)
 		fprintf(stderr,
 			"  -c        create and initialize password file or specific user\n");
 		fprintf(stderr, "  -f        force an action\n");
-#ifdef USE_CRACKLIB
+#if defined(USE_CRACKLIB)
 		fprintf(stderr,
 			"  -n        disable cracklib checking of passwords\n");
 #endif				/* USE_CRACKLIB */
