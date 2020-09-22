@@ -410,9 +410,9 @@ static void volset(struct vol_option *options, struct vol_option *save,
 		volname[vlen] = 0;
 		return;
 	}
-#if 0
+
 	LOG(log_debug, logtype_afpd, "Parsing volset %s", val);
-#endif
+
 	if (optionok(tmp, "allow:", val)) {
 		setoption(options, save, VOLOPT_ALLOW, val);
 
@@ -1300,37 +1300,6 @@ static int readvolfile(AFPObj * obj, struct afp_volume_name *p1, char *p2,
 	if (fd != -1 && !fstat(fd, &st)) {
 		p1->mtime = st.st_mtime;
 	}
-
-	/* This used to fail if we can't lock the volume file.
-	   Problem is that this will prevent afpd from presenting volumes to
-	   a client if, say, someone is editing the volume file with vi.
-
-	   Since we're only reading it, it's safe to skip this.
-	 */
-
-#if 0
-	/* try putting a read lock on the volume file twice, sleep 1 second if first attempt fails */
-	int retries = 2;
-	while (1) {
-		if ((read_lock(fd, 0, SEEK_SET, 0)) != 0) {
-			retries--;
-			if (!retries) {
-				LOG(log_error, logtype_afpd,
-				    "readvolfile: can't lock volume file \"%s\"",
-				    path);
-				if (fclose(fp) != 0) {
-					LOG(log_error, logtype_afpd,
-					    "readvolfile: fclose: %s",
-					    strerror(errno));
-				}
-				return -1;
-			}
-			sleep(1);
-			continue;
-		}
-		break;
-	}
-#endif
 
 	memset(default_options, 0, sizeof(default_options));
 
