@@ -129,7 +129,8 @@
 .iff      "ILBM"  "GKON"      Amiga IFF Image                GraphicConverter
 .ilbm     "ILBM"  "GKON"      Amiga ILBM Image               GraphicConverter
 .image    "dImg"  "ddsk"      Apple DiskCopy Image           Disk Copy
-.img      "IMGg"  "GKON"      GEM bit image/XIMG             GraphicConverter
+.img      "dImg"  "ddsk"      Apple DiskCopy Image           Disk Copy
+#.img      "IMGg"  "GKON"      GEM bit image/XIMG             GraphicConverter
 .ini      "TEXT"  "ttxt"      Windows INI File               SimpleText
 .iso      "rodh"  "ddsk"      Apple ISO Image                Disk Copy
 .iss  "ISS "  "GKON"  ISS                            GraphicConverter
