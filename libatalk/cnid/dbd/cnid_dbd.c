@@ -41,10 +41,6 @@
 
 #include "cnid_dbd.h"
 
-#ifndef SOL_TCP
-#define SOL_TCP IPPROTO_TCP
-#endif				/* ! SOL_TCP */
-
 /* Wait MAX_DELAY seconds before a request to the CNID server times out */
 #define MAX_DELAY 20
 #define ONE_DELAY 5
@@ -100,7 +96,7 @@ static int tsock_getfd(const char *host, const char *port)
 
 		attr = 1;
 		if (setsockopt
-		    (sock, SOL_TCP, TCP_NODELAY, &attr,
+		    (sock, IPPROTO_TCP, TCP_NODELAY, &attr,
 		     sizeof(attr)) == -1) {
 			LOG(log_error, logtype_cnid,
 			    "getfd: set TCP_NODELAY CNID server %s: %s",
