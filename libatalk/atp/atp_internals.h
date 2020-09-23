@@ -39,23 +39,20 @@
 #define ATP_TIDANY	0xffff
 
 /* in atp_bufs.c */
-extern struct atpbuf *atp_alloc_buf (void);
-extern void atp_print_bufuse        (ATP, char *);
-extern int atp_free_buf             (struct atpbuf *);
+extern struct atpbuf *atp_alloc_buf(void);
+extern void atp_print_bufuse(ATP, char *);
+extern int atp_free_buf(struct atpbuf *);
 
 /* in atp_packet.c */
-extern int at_addr_eq               (struct sockaddr_at *, 
-					 struct sockaddr_at *);
-extern void atp_build_req_packet    (struct atpbuf *, u_int16_t, 
-					 u_int8_t, struct atp_block *);
-extern void atp_build_resp_packet   (struct atpbuf *, u_int16_t,
-					 u_int8_t, struct atp_block *,
-					 u_int8_t);
-extern int atp_recv_atp             (ATP, struct sockaddr_at *, 
-					 u_int8_t *, u_int16_t, char *,
-					 int);
+extern int at_addr_eq(struct sockaddr_at *, struct sockaddr_at *);
+extern void atp_build_req_packet(struct atpbuf *, u_int16_t,
+				 u_int8_t, struct atp_block *);
+extern void atp_build_resp_packet(struct atpbuf *, u_int16_t,
+				  u_int8_t, struct atp_block *, u_int8_t);
+extern int atp_recv_atp(ATP, struct sockaddr_at *,
+			u_int8_t *, u_int16_t, char *, int);
 #ifdef EBUG
-extern void atp_print_addr          (char *, struct sockaddr_at *);
-#endif /* EBUG */
+extern void atp_print_addr(char *, struct sockaddr_at *);
+#endif				/* EBUG */
 
-#endif /* ATP_INTERNALS_H */
+#endif				/* ATP_INTERNALS_H */
