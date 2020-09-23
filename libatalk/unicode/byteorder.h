@@ -107,7 +107,7 @@ it also defines lots of intermediate macros, just ignore those :-)
 #endif
 
 #define CVAL(buf,pos) ((unsigned)(((const unsigned char *)(buf))[pos]))
-#define CVAL_NC(buf,pos) (((unsigned char *)(buf))[pos]) /* Non-const version of CVAL */
+#define CVAL_NC(buf,pos) (((unsigned char *)(buf))[pos])	/* Non-const version of CVAL */
 #define PVAL(buf,pos) (CVAL(buf,pos))
 #define SCVAL(buf,pos,val) (CVAL_NC(buf,pos) = (val))
 
@@ -142,7 +142,7 @@ it also defines lots of intermediate macros, just ignore those :-)
 
 #endif
 
-#else /* CAREFUL_ALIGNMENT */
+#else				/* CAREFUL_ALIGNMENT */
 
 /* this handles things for architectures like the 386 that can handle
    alignment errors */
@@ -153,13 +153,13 @@ it also defines lots of intermediate macros, just ignore those :-)
 
 /* get single value from an SMB buffer */
 #define SVAL(buf,pos) (*(const u_int16_t *)((const char *)(buf) + (pos)))
-#define SVAL_NC(buf,pos) (*(u_int16_t *)((char *)(buf) + (pos))) /* Non const version of above. */
+#define SVAL_NC(buf,pos) (*(u_int16_t *)((char *)(buf) + (pos)))	/* Non const version of above. */
 #define IVAL(buf,pos) (*(const u_int32_t *)((const char *)(buf) + (pos)))
-#define IVAL_NC(buf,pos) (*(u_int32_t *)((char *)(buf) + (pos))) /* Non const version of above. */
+#define IVAL_NC(buf,pos) (*(u_int32_t *)((char *)(buf) + (pos)))	/* Non const version of above. */
 #define SVALS(buf,pos) (*(const int16_t *)((const char *)(buf) + (pos)))
-#define SVALS_NC(buf,pos) (*(int16 *)((char *)(buf) + (pos))) /* Non const version of above. */
+#define SVALS_NC(buf,pos) (*(int16 *)((char *)(buf) + (pos)))	/* Non const version of above. */
 #define IVALS(buf,pos) (*(const int32_t *)((const char *)(buf) + (pos)))
-#define IVALS_NC(buf,pos) (*(int32_t *)((char *)(buf) + (pos))) /* Non const version of above. */
+#define IVALS_NC(buf,pos) (*(int32_t *)((char *)(buf) + (pos)))	/* Non const version of above. */
 
 /* store single value in an SMB buffer */
 #define SSVAL(buf,pos,val) SVAL_NC(buf,pos)=((u_int16_t)(val))
@@ -167,7 +167,7 @@ it also defines lots of intermediate macros, just ignore those :-)
 #define SSVALS(buf,pos,val) SVALS_NC(buf,pos)=((int16)(val))
 #define SIVALS(buf,pos,val) IVALS_NC(buf,pos)=((int32_t)(val))
 
-#endif /* CAREFUL_ALIGNMENT */
+#endif				/* CAREFUL_ALIGNMENT */
 
 /* now the reverse routines - these are used in nmb packets (mostly) */
 #define SREV(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
@@ -186,4 +186,4 @@ it also defines lots of intermediate macros, just ignore those :-)
 #define ALIGN4(p,base) ((p) + ((4 - (PTR_DIFF((p), (base)) & 3)) & 3))
 #define ALIGN2(p,base) ((p) + ((2 - (PTR_DIFF((p), (base)) & 1)) & 1))
 
-#endif /* _BYTEORDER_H */
+#endif				/* _BYTEORDER_H */
