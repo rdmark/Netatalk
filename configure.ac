@@ -926,6 +926,8 @@ NETATALK_WEBMIN
 
 dnl --------------------- last minute substitutions
 
+dnl Comment/change this to deal with gcc "helpful" warnings
+
 CFLAGS="-Wall -Werror $CFLAGS"
 
 AC_SUBST(LIBS)
