@@ -750,7 +750,7 @@ void set_signature(struct afp_options *options)
 
 	/* retrun */
 	LOG(log_info, logtype_afpd,
-	    " \"%s\"'s signature is  %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+	    "\"%s\"'s signature is %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
 	    server_tmp,
 	    (options->signature)[0], (options->signature)[1],
 	    (options->signature)[2], (options->signature)[3],
