@@ -311,7 +311,10 @@ static int login(AFPObj * obj, struct passwd *pwd, void (*logout)(void),
 					fprintf(fp, "%s:%d\n",
 						pwd->pw_name, mypid);
 					fclose(fp);
-					chown(nodename, pwd->pw_uid, -1);
+					if (chown(nodename, pwd->pw_uid, -1) < 0)
+						LOG(log_error,
+						    logtype_afpd,
+						    "could not chown %s (%s)", nodename, strerror(errno));
 				}
 			}	/* if (addr_net && addr_node ) */
 		}		/* if (options->authprintdir) */
