@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <time.h>
 
-#if defined(linux) /* for program_invocation_short_name */
+#if defined(linux)		/* for program_invocation_short_name */
 #include <errno.h>
 extern char *program_invocation_short_name;
 #endif
@@ -229,6 +229,22 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 		"uams",
 		"end-of-list"
 	};
+
+	char *loglevel_names[] = {
+		"none",
+		"severe",
+		"error",
+		"warning",
+		"note",
+		"info",
+		"debug",
+		"debug6",
+		"debug7",
+		"debug8",
+		"debug9",
+		"maxdebug"
+	};
+
 	time_t now;
 	char timestring[256];
 
@@ -246,16 +262,23 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 		}
 #else
 #if defined(linux)
-	snprintf(logpath, 255, "/var/log/netatalk/%s.log", program_invocation_short_name);
+	snprintf(logpath, 255, "/var/log/netatalk/%s.log",
+		 program_invocation_short_name);
 #else
 	snprintf(logpath, 255, "/var/log/netatalk/%s.log", getprogname());
 #endif
-	now = time(NULL);
-	strftime (timestring, sizeof(timestring)-1, "%Y-%m-%d %H:%M:%S", gmtime(&now));
-	logfile = fopen(logpath, "a");
-	if (logfile != NULL) {
-		fprintf(logfile, "%s %s: %s\n", timestring, lognames[type], buffer);
-		fclose(logfile);
+
+	if (log_level <= type_configs[type].level) {
+		now = time(NULL);
+		strftime(timestring, sizeof(timestring) - 1,
+			 "%Y-%m-%d %H:%M:%S", gmtime(&now));
+		logfile = fopen(logpath, "a");
+		if (logfile != NULL) {
+			fprintf(logfile, "%s %s: (%s) %s\n", timestring,
+				lognames[type], loglevel_names[log_level],
+				buffer);
+			fclose(logfile);
+		}
 	}
 #endif
 }
