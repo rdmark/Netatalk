@@ -15,20 +15,20 @@
 #define _AARP_H 1
 
 union aapa {
-    u_char		ap_pa[4];
-    struct ap_node {
-	u_char		an_zero;
-	u_char		an_net[2];
-	u_char		an_node;
-    } ap_node;
+	u_char ap_pa[4];
+	struct ap_node {
+		u_char an_zero;
+		u_char an_net[2];
+		u_char an_node;
+	} ap_node;
 };
 
 struct ether_aarp {
-    struct arphdr	eaa_hdr;
-    u_char		aarp_sha[6];
-    union aapa		aarp_spu;
-    u_char		aarp_tha[6];
-    union aapa		aarp_tpu;
+	struct arphdr eaa_hdr;
+	u_char aarp_sha[6];
+	union aapa aarp_spu;
+	u_char aarp_tha[6];
+	union aapa aarp_tpu;
 };
 #define aarp_hrd	eaa_hdr.ar_hrd
 #define aarp_pro	eaa_hdr.ar_pro
@@ -43,11 +43,11 @@ struct ether_aarp {
 #define aarp_tpnode	aarp_tpu.ap_node.an_node
 
 struct aarptab {
-    struct at_addr	aat_ataddr;
-    u_char		aat_enaddr[ 6 ];
-    u_char		aat_timer;
-    u_char		aat_flags;
-    struct mbuf		*aat_hold;
+	struct at_addr aat_ataddr;
+	u_char aat_enaddr[6];
+	u_char aat_timer;
+	u_char aat_flags;
+	struct mbuf *aat_hold;
 };
 
 #define AARPHRD_ETHER	0x0001
@@ -57,8 +57,8 @@ struct aarptab {
 #define AARPOP_PROBE	0x03
 
 #ifdef KERNEL
-struct aarptab		*aarptnew();
-int			aarpprobe();
-#endif /* KERNEL */
+struct aarptab *aarptnew();
+int aarpprobe();
+#endif				/* KERNEL */
 
-#endif /* _AARP_H */
+#endif				/* _AARP_H */

@@ -20,11 +20,11 @@
 #include <inttypes.h>
 #ifndef __BIT_TYPES_DEFINED__
 #define __BIT_TYPES_DEFINED__
-typedef uint8_t        u_int8_t;
-typedef uint16_t       u_int16_t;
-typedef uint32_t       u_int32_t;
-typedef uint64_t       u_int64_t;
-#endif /* ! __BIT_TYPES_DEFINED__ */
+typedef uint8_t u_int8_t;
+typedef uint16_t u_int16_t;
+typedef uint32_t u_int32_t;
+typedef uint64_t u_int64_t;
+#endif				/* ! __BIT_TYPES_DEFINED__ */
 #else
 
 /* luckily ultrix is dead. as a result, we know what the sizes of
@@ -33,31 +33,31 @@ typedef uint64_t       u_int64_t;
 #if defined(HAVE_32BIT_LONGS) || defined(HAVE_64BIT_LONGS)
 #ifndef __BIT_TYPES_DEFINED__
 #define __BIT_TYPES_DEFINED__
-typedef unsigned char  u_int8_t;
+typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
-typedef unsigned int   u_int32_t;
-typedef int            int32_t;
+typedef unsigned int u_int32_t;
+typedef int int32_t;
 #endif
-#endif /* HAVE_32BIT_LONGS || HAVE_64BIT_LONGS */
+#endif				/* HAVE_32BIT_LONGS || HAVE_64BIT_LONGS */
 
 
 #ifdef HAVE_64BIT_LONGS
 typedef unsigned long u_int64_t;
-#else /* HAVE_64BIT_LONGS */
+#else				/* HAVE_64BIT_LONGS */
 /* check for long long support. currently, i assume that if 64-bit
  * ints exist that their made available via long long */
 #ifdef linux
-#include <endian.h> /* i think this is here for libc4 */
-#else /* linux */
+#include <endian.h>		/* i think this is here for libc4 */
+#else				/* linux */
 #if defined(HAVE_32BIT_LONGS) && !(defined(__NetBSD__) || \
 				  defined(NO_LARGE_VOL_SUPPORT))
-typedef unsigned long long  u_int64_t;
-#endif /* HAVE_32BIT_LONGS || !__NetBSD__ || NO_LARGE_VOL_SUPPORT */
-#endif /* linux */
-#endif /* HAVE_64BIT_LONGS */
-#endif /* ISOC9X */
+typedef unsigned long long u_int64_t;
+#endif				/* HAVE_32BIT_LONGS || !__NetBSD__ || NO_LARGE_VOL_SUPPORT */
+#endif				/* linux */
+#endif				/* HAVE_64BIT_LONGS */
+#endif				/* ISOC9X */
 
-# ifndef BYTE_ORDER
+#ifndef BYTE_ORDER
 #define LITTLE_ENDIAN	1234
 #define BIG_ENDIAN	4321
 #define PDP_ENDIAN	3412
@@ -67,9 +67,8 @@ typedef unsigned long long  u_int64_t;
 #define BYTE_ORDER	BIG_ENDIAN
 #else
 #define BYTE_ORDER	LITTLE_ENDIAN
-#endif /* WORDS_BIGENDIAN */
+#endif				/* WORDS_BIGENDIAN */
 
-#endif /* BYTE_ORDER */
+#endif				/* BYTE_ORDER */
 
-#endif /* _ATALK_ENDIAN_H_ */
-
+#endif				/* _ATALK_ENDIAN_H_ */
