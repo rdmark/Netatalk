@@ -51,7 +51,6 @@ afpd_LDADD =  \
 afpd_LDFLAGS = -export-dynamic 
 
 afpd_CFLAGS = \
-	-Wno-nonnull \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/sys \
 	@SLP_CFLAGS@ @ZEROCONF_CFLAGS@ \
