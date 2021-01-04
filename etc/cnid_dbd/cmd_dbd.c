@@ -397,7 +397,7 @@ int main(int argc, char **argv)
 		if ((db_locked = get_lock(LOCK_FREE, NULL)) != 0)
 			goto exit_noenv;
 
-		snprintf(cmd, 8 + (MAXPATHLEN + 1), "rm -rf \"%s\"", dbpath);
+		snprintf(cmd, 8 + (MAXPATHLEN + 2), "rm -rf \"%s\"", dbpath);
 		dbd_log(LOGDEBUG, "Removing old database of volume: '%s'",
 			volpath);
 		if (system(cmd) < 0)
