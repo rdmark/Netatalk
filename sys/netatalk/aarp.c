@@ -71,7 +71,7 @@ u_char aarp_org_code[3] = {
 	0x00, 0x00, 0x00,
 };
 
-aarptimer()
+void aarptimer(void)
 {
 	struct aarptab *aat;
 	int i, s;
@@ -90,9 +90,7 @@ aarptimer()
 	}
 }
 
-struct ifaddr *at_ifawithnet(sat, ifa)
-struct sockaddr_at *sat;
-struct ifaddr *ifa;
+struct ifaddr *at_ifawithnet(struct sockaddr_at *sat, struct ifaddr *ifa)
 {
 	struct at_ifaddr *aa;
 
@@ -119,9 +117,7 @@ struct ifaddr *ifa;
 	return (ifa);
 }
 
-aarpwhohas(ac, sat)
-struct arpcom *ac;
-struct sockaddr_at *sat;
+void aarpwhohas(struct arpcom *ac, struct sockaddr_at *sat)
 {
 	struct mbuf *m;
 	struct ether_header *eh;
@@ -214,11 +210,7 @@ struct sockaddr_at *sat;
 	(*ac->ac_if.if_output) (&ac->ac_if, m, &sa);
 }
 
-aarpresolve(ac, m, destsat, desten)
-struct arpcom *ac;
-struct mbuf *m;
-struct sockaddr_at *destsat;
-u_char *desten;
+int aarpresolve(struct arpcom *ac, struct mbuf *m, struct sockaddr_at *destsat, u_char *desten)
 {
 	struct at_ifaddr *aa;
 	struct ifaddr ifa;
@@ -275,9 +267,7 @@ u_char *desten;
 	return (0);
 }
 
-aarpinput(ac, m)
-struct arpcom *ac;
-struct mbuf *m;
+void aarpinput(struct arpcom *ac, struct mbuf *m)
 {
 	struct arphdr *ar;
 
@@ -316,9 +306,7 @@ struct mbuf *m;
 }
 
 
-at_aarpinput(ac, m)
-struct arpcom *ac;
-struct mbuf *m;
+void at_aarpinput(struct arpcom *ac, struct mbuf *m)
 {
 	struct mbuf *m0;
 	struct ether_aarp *ea;
@@ -521,8 +509,7 @@ struct mbuf *m;
 	return;
 }
 
-aarptfree(aat)
-struct aarptab *aat;
+void aarptfree(struct aarptab *aat)
 {
 
 	if (aat->aat_hold)
@@ -533,8 +520,7 @@ struct aarptab *aat;
 	aat->aat_ataddr.s_node = 0;
 }
 
-struct aarptab *aarptnew(addr)
-struct at_addr *addr;
+struct aarptab *aarptnew(struct at_addr *addr)
 {
 	int n;
 	int oldest = -1;
@@ -566,8 +552,7 @@ struct at_addr *addr;
 	return (aat);
 }
 
-aarpprobe(ac)
-struct arpcom *ac;
+void aarpprobe(struct arpcom *ac)
 {
 	struct mbuf *m;
 	struct ether_header *eh;
@@ -670,7 +655,7 @@ struct arpcom *ac;
 	aa->aa_probcnt--;
 }
 
-aarp_clean()
+void aarp_clean(void)
 {
 	struct aarptab *aat;
 	int i;

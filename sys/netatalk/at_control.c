@@ -38,9 +38,7 @@
 		    (a)->sat_addr.s_net == (b)->sat_addr.s_net && \
 		    (a)->sat_addr.s_node == (b)->sat_addr.s_node )
 #else				/* __NetBSD__ */
-atalk_hash(sat, hp)
-struct sockaddr_at *sat;
-struct afhash *hp;
+void atalk_hash(struct sockaddr_at *sat, struct afhash *hp)
 {
 	hp->afh_nethash = sat->sat_addr.s_net;
 	hp->afh_hosthash = (sat->sat_addr.s_net << 8) +
@@ -51,8 +49,7 @@ struct afhash *hp;
  * Note the magic to get ifa_ifwithnet() to work without adding an
  * ifaddr entry for each net in our local range.
  */
-atalk_netmatch(sat1, sat2)
-struct sockaddr_at *sat1, *sat2;
+int atalk_netmatch(struct sockaddr_at *sat1, struct sockaddr_at *sat2)
 {
 	struct at_ifaddr *aa;
 
