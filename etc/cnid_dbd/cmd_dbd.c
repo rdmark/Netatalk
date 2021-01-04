@@ -393,7 +393,7 @@ int main(int argc, char **argv)
 	/* Check if -f is requested and wipe db if yes */
 	if ((flags & DBD_FLAGS_FORCE) && rebuild
 	    && (volinfo.v_flags & AFPVOL_CACHE)) {
-		char cmd[8 + MAXPATHLEN];
+		char cmd[8 + MAXPATHLEN + 2];
 		if ((db_locked = get_lock(LOCK_FREE, NULL)) != 0)
 			goto exit_noenv;
 
