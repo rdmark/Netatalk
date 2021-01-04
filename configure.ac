@@ -413,7 +413,7 @@ dnl ac_cv_target_os is now host_os, ac_cv_target_cpu is now host_cpu
 dnl --------------------- determine operating system from "target"
 case "$host_os" in
 	*linux*)   			this_os=linux ;;
-	*netbsd*) 			this_os=netbsd ;;
+	*netbsd*) 			this_os=netbsd; CFLAGS="${CFLAGS} -I/usr/pkg/include"; LIBS="${LIBS} -L/usr/pkg/lib" ;;
 	*solaris*) 			this_os=solaris ;;
 esac
 
