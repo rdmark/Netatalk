@@ -926,6 +926,7 @@ int zip_getnetinfo(struct interface *iface)
      */
     *data++ = 0;
 
+    memset(&sat, 0, sizeof( struct sockaddr_at ));
 #ifdef __NetBSD__
     sat.sat_len = sizeof( struct sockaddr_at );
 #endif /* __NetBSD__ */
