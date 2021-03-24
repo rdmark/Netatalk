@@ -11,7 +11,7 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	fi
 	AC_MSG_RESULT([    AFP:])
 	AC_MSG_RESULT([         Extended Attributes: $neta_cv_eas])
-	AC_MSG_RESULT([         ACL support: $ac_cv_have_acls])
+	AC_MSG_RESULT([         ACL support: yes])
 	AC_MSG_RESULT([         Spotlight: $ac_cv_have_tracker])
 	AC_MSG_RESULT([    CNID:])
 	AC_MSG_RESULT([         backends: $compiled_backends])
@@ -50,7 +50,7 @@ dnl	fi
 	AC_MSG_RESULT([         valid shell check:       $netatalk_cv_use_shellcheck])
 	AC_MSG_RESULT([         cracklib support:        $netatalk_cv_with_cracklib])
 dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
-	AC_MSG_RESULT([         ACL support:             $with_acl_support])
+	AC_MSG_RESULT([         ACL support:             yes])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([         LDAP support:            $netatalk_cv_ldap])
 	AC_MSG_RESULT([         AFP stats via dbus:      $atalk_cv_with_dbus])

@@ -19,6 +19,6 @@ ad_CFLAGS = -D_PATH_AD=\"$(bindir)/ad\"
 
 ad_LDADD = \
 	$(top_builddir)/libatalk/libatalk.la \
-	@ACL_LIBS@ @MYSQL_LIBS@
+	@MYSQL_LIBS@
 
 endif

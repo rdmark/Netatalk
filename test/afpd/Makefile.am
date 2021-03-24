@@ -55,13 +55,9 @@ test_CFLAGS = \
 
 test_LDADD = \
 	$(top_builddir)/libatalk/libatalk.la \
-	@LIBGCRYPT_LIBS@ @QUOTA_LIBS@ @WRAP_LIBS@ @LIBADD_DL@ @ACL_LIBS@ @PTHREAD_LIBS@ @GSSAPI_LIBS@ @KRB5_LIBS@ @MYSQL_LIBS@
+	@LIBGCRYPT_LIBS@ @GSSAPI_LIBS@ @KRB5_LIBS@ @MYSQL_LIBS@
 
 test_LDFLAGS = -export-dynamic
-
-if HAVE_ACLS
-test_SOURCES += $(top_srcdir)/etc/afpd/acls.c
-endif
 
 if HAVE_TRACKER
 test_SOURCES += $(top_srcdir)/etc/afpd/spotlight.c

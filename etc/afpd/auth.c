@@ -26,15 +26,6 @@
 #include <pwd.h>
 #include <grp.h>
 
-#ifdef TRU64
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <sia.h>
-#include <siad.h>
-
-extern void afp_get_cmdline( int *ac, char ***av );
-#endif /* TRU64 */
-
 #include <atalk/logger.h>
 #include <atalk/server_ipc.h>
 #include <atalk/uuid.h>
@@ -49,9 +40,6 @@ extern void afp_get_cmdline( int *ac, char ***av );
 #include "status.h"
 #include "fork.h"
 #include "extattrs.h"
-#ifdef HAVE_ACLS
-#include "acls.h"
-#endif
 
 static int afp_version_index;
 static struct uam_mod uam_modules = {NULL, NULL, &uam_modules, &uam_modules};
@@ -174,11 +162,6 @@ static int set_auth_switch(const AFPObj *obj, int expired)
         case 34:
         case 33:
         case 32:
-#ifdef HAVE_ACLS
-            uam_afpserver_action(AFP_GETACL, UAM_AFPSERVER_POSTAUTH, afp_getacl, NULL);
-            uam_afpserver_action(AFP_SETACL, UAM_AFPSERVER_POSTAUTH, afp_setacl, NULL);
-            uam_afpserver_action(AFP_ACCESS, UAM_AFPSERVER_POSTAUTH, afp_access, NULL);
-#endif /* HAVE_ACLS */
             uam_afpserver_action(AFP_GETEXTATTR, UAM_AFPSERVER_POSTAUTH, afp_getextattr, NULL);
             uam_afpserver_action(AFP_SETEXTATTR, UAM_AFPSERVER_POSTAUTH, afp_setextattr, NULL);
             uam_afpserver_action(AFP_REMOVEATTR, UAM_AFPSERVER_POSTAUTH, afp_remextattr, NULL);

@@ -677,10 +677,6 @@ VFS_MFUNC(setdirowner, VFS_FUNC_ARGS_SETDIROWNER, VFS_FUNC_VARS_SETDIROWNER)
 VFS_MFUNC(deletefile, VFS_FUNC_ARGS_DELETEFILE, VFS_FUNC_VARS_DELETEFILE)
 VFS_MFUNC(renamefile, VFS_FUNC_ARGS_RENAMEFILE, VFS_FUNC_VARS_RENAMEFILE)
 VFS_MFUNC(copyfile, VFS_FUNC_ARGS_COPYFILE, VFS_FUNC_VARS_COPYFILE)
-#ifdef HAVE_ACLS
-VFS_MFUNC(acl, VFS_FUNC_ARGS_ACL, VFS_FUNC_VARS_ACL)
-VFS_MFUNC(remove_acl, VFS_FUNC_ARGS_REMOVE_ACL, VFS_FUNC_VARS_REMOVE_ACL)
-#endif
 VFS_MFUNC(ea_getsize, VFS_FUNC_ARGS_EA_GETSIZE, VFS_FUNC_VARS_EA_GETSIZE)
 VFS_MFUNC(ea_getcontent, VFS_FUNC_ARGS_EA_GETCONTENT, VFS_FUNC_VARS_EA_GETCONTENT)
 VFS_MFUNC(ea_list, VFS_FUNC_ARGS_EA_LIST, VFS_FUNC_VARS_EA_LIST)
@@ -708,10 +704,6 @@ static struct vfs_ops vfs_master_funcs = {
     vfs_deletefile,
     vfs_renamefile,
     vfs_copyfile,
-#ifdef HAVE_ACLS
-    vfs_acl,
-    vfs_remove_acl,
-#endif
     vfs_ea_getsize,
     vfs_ea_getcontent,
     vfs_ea_list,
@@ -769,10 +761,6 @@ static struct vfs_ops netatalk_ea_adouble = {
     /* vfs_deletefile:    */ ea_deletefile,
     /* vfs_renamefile:    */ ea_renamefile,
     /* vfs_copyfile       */ ea_copyfile,
-#ifdef HAVE_ACLS
-    /* vfs_acl:           */ NULL,
-    /* vfs_remove_acl     */ NULL,
-#endif
     /* vfs_getsize        */ get_easize,
     /* vfs_getcontent     */ get_eacontent,
     /* vfs_list           */ list_eas,
@@ -792,58 +780,12 @@ static struct vfs_ops netatalk_ea_sys = {
     /* rf_deletefile:     */ NULL,
     /* rf_renamefile:     */ NULL,
     /* vfs_copyfile:      */ sys_ea_copyfile,
-#ifdef HAVE_ACLS
-    /* rf_acl:            */ NULL,
-    /* rf_remove_acl      */ NULL,
-#endif
     /* ea_getsize         */ sys_get_easize,
     /* ea_getcontent      */ sys_get_eacontent,
     /* ea_list            */ sys_list_eas,
     /* ea_set             */ sys_set_ea,
     /* ea_remove          */ sys_remove_ea
 };
-
-/* 
- * Tertiary VFS modules for ACLs
- */
-
-#ifdef HAVE_NFSV4_ACLS
-static struct vfs_ops netatalk_solaris_acl_adouble = {
-    /* validupath:        */ NULL,
-    /* rf_chown:          */ NULL,
-    /* rf_renamedir:      */ NULL,
-    /* rf_deletecurdir:   */ NULL,
-    /* rf_setfilmode:     */ NULL,
-    /* rf_setdirmode:     */ NULL,
-    /* rf_setdirunixmode: */ NULL,
-    /* rf_setdirowner:    */ NULL,
-    /* rf_deletefile:     */ NULL,
-    /* rf_renamefile:     */ NULL,
-    /* vfs_copyfile       */ NULL,
-    /* rf_acl:            */ RF_solaris_acl,
-    /* rf_remove_acl      */ RF_solaris_remove_acl,
-    NULL
-};
-#endif
-
-#ifdef HAVE_POSIX_ACLS
-static struct vfs_ops netatalk_posix_acl_adouble = {
-    /* validupath:        */ NULL,
-    /* rf_chown:          */ NULL,
-    /* rf_renamedir:      */ NULL,
-    /* rf_deletecurdir:   */ NULL,
-    /* rf_setfilmode:     */ NULL,
-    /* rf_setdirmode:     */ NULL,
-    /* rf_setdirunixmode: */ NULL,
-    /* rf_setdirowner:    */ NULL,
-    /* rf_deletefile:     */ NULL,
-    /* rf_renamefile:     */ NULL,
-    /* vfs_copyfile       */ NULL,
-    /* rf_acl:            */ RF_posix_acl,
-    /* rf_remove_acl      */ RF_posix_remove_acl,
-    NULL
-};
-#endif
 
 /* ---------------- */
 void initvol_vfs(struct vol *vol)
@@ -873,13 +815,4 @@ void initvol_vfs(struct vol *vol)
     } else {
         LOG(log_debug, logtype_afpd, "initvol_vfs: volume without EA support");
     }
-
-    /* ACLs */
-#ifdef HAVE_NFSV4_ACLS
-    vol->vfs_modules[2] = &netatalk_solaris_acl_adouble;
-#endif
-#ifdef HAVE_POSIX_ACLS
-    vol->vfs_modules[2] = &netatalk_posix_acl_adouble;
-#endif
-
 }

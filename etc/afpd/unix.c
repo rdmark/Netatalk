@@ -27,9 +27,6 @@
 #include "volume.h"
 #include "unix.h"
 #include "fork.h"
-#ifdef HAVE_ACLS
-#include "acls.h"
-#endif
 
 /*
  * Get the free space on a partition.
@@ -164,9 +161,6 @@ void accessmode(const AFPObj *obj, const struct vol *vol, char *path, struct mac
         st = &sb;
     }
     utommode(obj, st, ma );
-#ifdef HAVE_ACLS
-    acltoownermode(obj, vol, path, st, ma);
-#endif
 }
 
 static mode_t mtoubits(u_char bits)

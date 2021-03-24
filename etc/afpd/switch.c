@@ -43,9 +43,6 @@
 #include "filedir.h"
 #include "status.h"
 #include "misc.h"
-#ifdef HAVE_ACLS
-#include "acls.h"
-#endif
 
 static int afp_null(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,  size_t *rbuflen)
 {
