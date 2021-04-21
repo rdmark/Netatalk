@@ -6,8 +6,9 @@
     <manvolnum>8</manvolnum>
 
     <refmiscinfo class="date">23 Mar 2012</refmiscinfo>
-
-    <refmiscinfo class="source">@NETATALK_VERSION@</refmiscinfo>
+    <refmiscinfo class="source">Netatalk</refmiscinfo>
+    <refmiscinfo class="manual">Netatalk AFP fileserver Manual</refmiscinfo>
+    <refmiscinfo class="version">@NETATALK_VERSION@</refmiscinfo>
   </refmeta>
 
   <refnamediv>
@@ -70,7 +71,7 @@
         <listitem>
           <para>Use <emphasis remap="I">configuration file</emphasis> as the
             configuration file. The default is
-            <emphasis remap="I">@pkgconfdir@/afp.conf</emphasis>.</para>
+            <emphasis remap="I">@prefix@/etc/afp.conf</emphasis>.</para>
         </listitem>
       </varlistentry>
 
@@ -121,5 +122,11 @@
 
         <manvolnum>5</manvolnum>
       </citerefentry></para>
+  </refsect1>
+  
+  <refsect1>
+      <title>AUTHOR</title>
+      
+      <para>See <ulink url='https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS'>https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS</ulink></para>
   </refsect1>
 </refentry>

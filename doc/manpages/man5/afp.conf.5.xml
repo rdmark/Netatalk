@@ -6,8 +6,9 @@
     <manvolnum>5</manvolnum>
 
     <refmiscinfo class="date">02 Apr 2023</refmiscinfo>
-
-    <refmiscinfo class="source">@NETATALK_VERSION@</refmiscinfo>
+    <refmiscinfo class="source">Netatalk</refmiscinfo>
+    <refmiscinfo class="manual">Netatalk AFP fileserver Manual</refmiscinfo>
+    <refmiscinfo class="version">@NETATALK_VERSION@</refmiscinfo>
   </refmeta>
 
   <refnamediv>
@@ -392,39 +393,6 @@
             <para>The most commonly used UAMs are:</para>
 
             <variablelist>
-              <varlistentry>
-                <term>uams_guest.so</term>
-
-                <listitem>
-                  <para>allows guest logins</para>
-                </listitem>
-              </varlistentry>
-
-              <varlistentry>
-                <term>uams_clrtxt.so</term>
-
-                <listitem>
-                  <para>(uams_pam.so or uams_passwd.so) Allow logins with
-                  passwords transmitted in the clear. (legacy)</para>
-                </listitem>
-              </varlistentry>
-
-              <varlistentry>
-                <term>uams_randnum.so</term>
-
-                <listitem>
-                  <para>allows Random Number and Two-Way Random Number
-                  Exchange for authentication (requires a separate file
-                  containing the passwords, either @pkgconfdir@/afppasswd file or
-                  the one specified via "<option>passwd file</option>"). See
-                  <citerefentry>
-                      <refentrytitle>afppasswd</refentrytitle>
-
-                      <manvolnum>1</manvolnum>
-                    </citerefentry> for details. (legacy)</para>
-                </listitem>
-              </varlistentry>
-
               <varlistentry>
                 <term>uams_dhx.so</term>
 
@@ -2326,5 +2294,11 @@
 
         <manvolnum>8</manvolnum>
       </citerefentry></para>
+  </refsect1>
+
+  <refsect1>
+      <title>AUTHOR</title>
+
+      <para>See <ulink url='https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS'>https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS</ulink></para>
   </refsect1>
 </refentry>

@@ -9,6 +9,7 @@ man_MANS = \
 	asip-status.pl.1 \
 	dbd.1 \
 	macusers.1 \
+	megatron.1 \
 	netatalk-config.1 \
 	uniconv.1
 

@@ -7,8 +7,9 @@
     <manvolnum>1</manvolnum>
 
     <refmiscinfo class="date">19 Jan 2013</refmiscinfo>
-
-    <refmiscinfo class="source">@NETATALK_VERSION@</refmiscinfo>
+    <refmiscinfo class="source">Netatalk</refmiscinfo>
+    <refmiscinfo class="manual">Netatalk AFP fileserver Manual</refmiscinfo>
+    <refmiscinfo class="version">@NETATALK_VERSION@</refmiscinfo>
   </refmeta>
 
   <refnamediv>
@@ -51,10 +52,9 @@
         <term>-c</term>
 
         <listitem>
-          <para>CNID backend used on this volume, usually cdb or dbd. Should
+          <para>CNID backend used on this volume, dbd, last or mysql. Should
           match the backend selected with afpd for this volume. If not
-          specified, the default CNID backend "@DEFAULT_CNID_SCHEME@" is
-          used</para>
+          specified, the default CNID backend dbd is used</para>
         </listitem>
       </varlistentry>
 
@@ -223,5 +223,11 @@
     <title>See also</title>
 
     <para><citerefentry><refentrytitle>afp.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,<citerefentry><refentrytitle>afpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>,<citerefentry><refentrytitle>iconv</refentrytitle><manvolnum>1</manvolnum></citerefentry>,<citerefentry><refentrytitle>cnid_metad</refentrytitle><manvolnum>8</manvolnum></citerefentry>,<citerefentry><refentrytitle>cnid_dbd</refentrytitle><manvolnum>8</manvolnum></citerefentry></para>
+  </refsect1>
+  
+  <refsect1>
+      <title>AUTHOR</title>
+      
+      <para>See <ulink url='https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS'>https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS</ulink></para>
   </refsect1>
 </refentry>

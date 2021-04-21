@@ -129,13 +129,6 @@
 
       <para><itemizedlist>
           <listitem>
-            <para>New service controller daemon <link
-            linkend="netatalk.8">netatalk</link> which is responsible for
-            starting and restarting the AFP and CNID daemons. All bundled
-            start scripts have been updated, make sure to update yours!</para>
-          </listitem>
-
-          <listitem>
             <para>The CNID databases are now stored under
               <filename>/var/netatalk/CNID/</filename>
               by default. You can use configure --localstatedir=PATH at
@@ -174,11 +167,6 @@
         <listitem>
           <para>Manually recreate configuration in
           <option>afp.conf</option> and <option>extmap.conf</option></para>
-        </listitem>
-
-        <listitem>
-          <para>Update your Netatalk start script (SMF, systemd, whatever...)
-          to only start <link linkend="netatalk.8">netatalk</link></para>
         </listitem>
 
         <listitem>

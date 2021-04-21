@@ -3,8 +3,8 @@
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
 .\"      Date: 02 Apr 2023
-.\"    Manual: @NETATALK_VERSION@
-.\"    Source: @NETATALK_VERSION@
+.\"    Manual: Netatalk AFP fileserver Manual
+.\"    Source: Netatalk
 .\"  Language: English
 .\"
 .TH "AFP\&.CONF" "5" "02 Apr 2023" "@NETATALK_VERSION@" "@NETATALK_VERSION@"
@@ -310,23 +310,6 @@ Space or comma separated list of UAMs\&. (The default is "uams_dhx\&.so uams_dhx
 .sp
 The most commonly used UAMs are:
 .PP
-uams_guest\&.so
-.RS 4
-allows guest logins
-.RE
-.PP
-uams_clrtxt\&.so
-.RS 4
-(uams_pam\&.so or uams_passwd\&.so) Allow logins with passwords transmitted in the clear\&. (legacy)
-.RE
-.PP
-uams_randnum\&.so
-.RS 4
-allows Random Number and Two\-Way Random Number Exchange for authentication (requires a separate file containing the passwords, either @pkgconfdir@/afppasswd file or the one specified via "\fBpasswd file\fR")\&. See
-\fBafppasswd\fR(1)
-for details\&. (legacy)
-.RE
-.PP
 uams_dhx\&.so
 .RS 4
 (uams_dhx_pam\&.so or uams_dhx_passwd\&.so) Allow Diffie\-Hellman eXchange (DHX) for authentication\&.
@@ -533,11 +516,6 @@ service registration if Avahi or mDNSResponder were compiled in\&.
 afp read locks = \fIBOOLEAN\fR (default: \fIno\fR) \fB(G)\fR
 .RS 4
 Whether to apply locks to the byte region read in FPRead calls\&. The AFP spec mandates this, but it\*(Aqs not really in line with UNIX semantics and is a performance hug\&.
-.RE
-.PP
-afpstats = \fIBOOLEAN\fR (default: \fIno\fR) \fB(G)\fR
-.RS 4
-Whether to provide AFP runtime statistics (connected users, open volumes) via dbus\&.
 .RE
 .PP
 basedir regex = \fIregex\fR \fB(H)\fR
@@ -1526,3 +1504,7 @@ provided charset\&. It is highly recommended to stick to the default UTF\-8\&.
 \fBafp_signature.conf\fR(5),
 \fBextmap.conf\fR(5),
 \fBcnid_metad\fR(8)
+.SH "AUTHOR"
+.PP
+See
+\m[blue]\fBhttps://sourceforge\&.net/p/netatalk/code/ci/master/tree/AUTHORS\fR\m[]

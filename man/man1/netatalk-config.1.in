@@ -3,11 +3,11 @@
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
 .\"      Date: 10 Nov 2015
-.\"    Manual: @NETATALK_VERSION@
-.\"    Source: @NETATALK_VERSION@
+.\"    Manual: Netatalk AFP fileserver Manual
+.\"    Source: Netatalk
 .\"  Language: English
 .\"
-.TH "NETATALK\-CONFIG" "1" "10 Nov 2015" "@NETATALK_VERSION@" "@NETATALK_VERSION@"
+.TH "NETATALK\-CONFIG" "1" "10 Nov 2015" "Netatalk" "Netatalk AFP fileserver Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -108,3 +108,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 Man page adapted for
 \fBnetatalk\-config\fR
 by Sebastian Rittau in 2001\&.
+.SH "AUTHOR"
+.PP
+See
+\m[blue]\fBhttps://sourceforge\&.net/p/netatalk/code/ci/master/tree/AUTHORS\fR\m[]

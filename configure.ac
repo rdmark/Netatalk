@@ -266,6 +266,7 @@ AC_CONFIG_FILES([
   man/man1/asip-status.pl.1
   man/man1/dbd.1
   man/man1/macusers.1
+  man/man1/megatron.1
   man/man1/netatalk-config.1
   man/man1/uniconv.1
   man/man5/Makefile

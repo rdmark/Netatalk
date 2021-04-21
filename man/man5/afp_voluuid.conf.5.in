@@ -3,11 +3,11 @@
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
 .\"      Date: 27 June 2016
-.\"    Manual: @NETATALK_VERSION@
-.\"    Source: @NETATALK_VERSION@
+.\"    Manual: Netatalk AFP fileserver Manual
+.\"    Source: Netatalk
 .\"  Language: English
 .\"
-.TH "AFP_VOLUUID\&.CONF" "5" "27 June 2016" "@NETATALK_VERSION@" "@NETATALK_VERSION@"
+.TH "AFP_VOLUUID\&.CONF" "5" "27 June 2016" "Netatalk" "Netatalk AFP fileserver Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,7 +31,7 @@
 afp_voluuid.conf \- Configuration file used by afpd(8) to specify UUID for AFP volumes
 .SH "DESCRIPTION"
 .PP
-@localstatedir@/netatalk/afp_voluuid\&.conf
+@prefix@/var/netatalk/afp_voluuid\&.conf
 is the configuration file used by
 \fBafpd\fR
 to specify UUID of all AFP volumes\&. The configuration lines are composed like:
@@ -85,3 +85,7 @@ mary 6331E2D1\-446C\-B68C\-3066\-D685AADBE911
 \fBafp.conf\fR(5),
 \fBavahi-daemon\fR(8),
 \fBmDNSResponder\fR(8)
+.SH "AUTHOR"
+.PP
+See
+\m[blue]\fBhttps://sourceforge\&.net/p/netatalk/code/ci/master/tree/AUTHORS\fR\m[]

@@ -678,35 +678,6 @@ basedir regex = /usr/home</programlisting></para>
 
         <itemizedlist>
           <listitem>
-            <para>"No User Authent"<indexterm>
-                <primary>No User Authent</primary>
-
-                <secondary>"No User Authent" UAM (guest access)</secondary>
-              </indexterm> UAM (guest access without authentication)</para>
-          </listitem>
-
-          <listitem>
-            <para>"Cleartxt Passwrd"<indexterm>
-                <primary>Cleartxt Passwrd</primary>
-
-                <secondary>"Cleartxt Passwrd" UAM</secondary>
-              </indexterm> UAM (no password encryption)</para>
-          </listitem>
-
-          <listitem>
-            <para>"Randnum exchange"<indexterm>
-                <primary>Randnum exchange</primary>
-
-                <secondary>"Randnum exchange" UAM</secondary>
-              </indexterm>/"2-Way Randnum exchange"<indexterm>
-                <primary>2-Way Randnum exchange</primary>
-
-                <secondary>"2-Way Randnum exchange" UAM</secondary>
-              </indexterm> UAMs (weak password encryption, separate password
-            storage)</para>
-          </listitem>
-
-          <listitem>
             <para>"DHCAST128"<indexterm>
                 <primary>DHCAST128</primary>
 
@@ -726,24 +697,6 @@ basedir regex = /usr/home</programlisting></para>
         <para>There exist other optional UAMs as well:</para>
 
         <itemizedlist>
-          <listitem>
-            <para>"PGPuam 1.0"<indexterm>
-                <primary>PGPuam 1.0</primary>
-
-                <secondary>"PGPuam 1.0" UAM</secondary>
-              </indexterm><indexterm>
-                <primary>uams_pgp.so</primary>
-
-                <secondary>"PGPuam 1.0" UAM</secondary>
-              </indexterm> UAM (PGP-based authentication for pre-Mac OS X
-            clients. You'll also need the <ulink
-            url="http://www.vmeng.com/vinnie/papers/pgpuam.html">PGPuam
-            client</ulink> to let this work)</para>
-
-            <para>You'll have to add <filename>"--enable-pgp-uam"</filename>
-            to your configure switches to have this UAM available.</para>
-          </listitem>
-
           <listitem>
             <para>"Kerberos IV"<indexterm>
                 <primary>Kerberos IV</primary>
