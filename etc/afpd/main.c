@@ -335,8 +335,8 @@ int main(int ac, char **av)
         afp_exit(EXITERR_CONF);
     }
 
-    /* set limits */
-    (void)setlimits();
+    /* set limits - file descriptor numbers are unlimited on macOS */
+    //(void)setlimits();
 
     afp_child_t *child;
     int saveerrno;

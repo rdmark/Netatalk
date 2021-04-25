@@ -493,7 +493,8 @@ int main(int argc, char *argv[])
     if (afp_config_parse(&obj, "cnid_metad") != 0)
         daemon_exit(1);
 
-    (void)setlimits();
+    /* set limits - file descriptor numbers are unlimited on macOS */
+    //(void)setlimits();
 
     host = atalk_iniparser_getstrdup(obj.iniconfig, INISEC_GLOBAL, "cnid listen", "localhost:4700");
     if ((port = strrchr(host, ':')))
