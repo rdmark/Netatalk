@@ -490,7 +490,7 @@ static int pam_logincont(void *obj, struct passwd **uam_pwd,
     PAM_password = rbuf;
 
     err = AFPERR_NOTAUTH;
-    PAM_error = pam_start("netatalk", PAM_username, &PAM_conversation,
+    PAM_error = pam_start("chkpasswd", PAM_username, &PAM_conversation,
 			  &pamh);
     if (PAM_error != PAM_SUCCESS) {
     /* Log Entry */
@@ -686,7 +686,7 @@ static int pam_changepw(void *obj, char *username,
     ibuf[PASSWDLEN + PASSWDLEN] = '\0';
     PAM_password = ibuf + PASSWDLEN;
 
-    PAM_error = pam_start("netatalk", username, &PAM_conversation,
+    PAM_error = pam_start("chkpasswd", username, &PAM_conversation,
 			  &lpamh);
     if (PAM_error != PAM_SUCCESS) {
     /* Log Entry */

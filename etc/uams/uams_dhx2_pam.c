@@ -550,7 +550,7 @@ static int loginasroot(const char *adminauthuser, const char **hostname, int sta
         goto exit;
     pamh = NULL;
 
-    if ((PAM_error = pam_start("netatalk", adminauthuser, &PAM_conversation, &pamh)) != PAM_SUCCESS) {
+    if ((PAM_error = pam_start("chkpasswd", adminauthuser, &PAM_conversation, &pamh)) != PAM_SUCCESS) {
         LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s", pam_strerror(pamh,PAM_error));
         goto exit;
     }
@@ -648,7 +648,7 @@ static int logincont2(void *obj_in, struct passwd **uam_pwd,
     /* Set these things up for the conv function */
 
     ret = AFPERR_NOTAUTH;
-    PAM_error = pam_start("netatalk", PAM_username, &PAM_conversation, &pamh);
+    PAM_error = pam_start("chkpasswd", PAM_username, &PAM_conversation, &pamh);
     if (PAM_error != PAM_SUCCESS) {
         LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s", pam_strerror(pamh,PAM_error));
         goto error_ctx;
@@ -850,7 +850,7 @@ static int changepw_3(void *obj _U_,
 
     /* Set these things up for the conv function. PAM_username was set in changepw_1 */
     PAM_password = ibuf + 256;
-    PAM_error = pam_start("netatalk", PAM_username, &PAM_conversation, &lpamh);
+    PAM_error = pam_start("chkpasswd", PAM_username, &PAM_conversation, &lpamh);
     if (PAM_error != PAM_SUCCESS) {
         LOG(log_info, logtype_uams, "DHX2 Chgpwd: PAM error in pam_start");
         ret = AFPERR_PARAM;
