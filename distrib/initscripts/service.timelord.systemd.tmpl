@@ -8,7 +8,7 @@ Requires=netatalk-atalkd.service
 [Service]
 Type=forking
 GuessMainPID=no
-ExecStart=:SBINDIR:/timelord
+ExecStart=:SBINDIR:/timelord -l
 Restart=always
 RestartSec=1
 
