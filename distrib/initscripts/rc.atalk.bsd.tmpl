@@ -69,4 +69,8 @@ if [ -x :SBINDIR:/timelord -a X"${TIMELORD_RUN}" != X"no" ]; then
 	:SBINDIR:/timelord;		echo -n ' timelord'
 fi
 
+if [ -x :SBINDIR:/a2boot -a X"${A2BOOT_RUN}" != X"no" ]; then
+	:SBINDIR:/a2boot;		echo -n ' a2boot'
+fi
+
 					echo '.'
