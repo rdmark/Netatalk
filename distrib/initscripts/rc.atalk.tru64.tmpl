@@ -63,6 +63,10 @@ case "$1" in
 	if [ ${ATALK_START_TIMELORD} -eq 1 -a -x ${ATALK_SBIN}/timelord ]; then
 		${ATALK_SBIN}/timelord;		echo ' timelord\c'
 	fi
+	
+	if [ ${ATALK_START_A2BOOT} -eq 1 -a -x ${ATALK_SBIN}/a2boot ]; then
+		${ATALK_SBIN}/a2boot;		echo ' a2boot\c'
+	fi
 
 	echo '.'
 
@@ -90,6 +94,10 @@ case "$1" in
 
 	if [ -x ${ATALK_SBIN}/timelord ]; then
 		killproc timelord;		echo ' timelord\c'
+	fi
+	
+	if [ -x ${ATALK_SBIN}/a2boot ]; then
+		killproc a2boot;		echo ' a2boot\c'
 	fi
 
 	# kill atalkd last, since without it the plumbing goes away.
