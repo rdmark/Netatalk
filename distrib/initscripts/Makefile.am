@@ -237,7 +237,7 @@ endif
 if USE_NETBSD
 
 sysvdir = /etc/rc.d
-sysv_SCRIPTS = afpd atalkd cnid_metad papd timelord
+sysv_SCRIPTS = afpd atalkd cnid_metad papd timelord a2boot
 
 afpd: rc.afpd.netbsd
 	cp -f $< $@
