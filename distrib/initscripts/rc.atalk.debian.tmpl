@@ -84,10 +84,15 @@ atalk_startup() {
             :SBINDIR:/papd
             echo -n " papd"
         fi
-
+	
         if [ x"$TIMELORD_RUN" = x"yes" ]; then
             :SBINDIR:/timelord
             echo -n " timelord"
+        fi
+	
+        if [ x"$A2BOOT_RUN" = x"yes" ]; then
+            :SBINDIR:/a2boot
+            echo -n " a2boot"
         fi
     fi
 }
@@ -120,6 +125,11 @@ case "$1" in
 		if test -x :SBINDIR:/timelord; then
                     echo -n " timelord"
 		    start-stop-daemon --stop --quiet --oknodo --exec :SBINDIR:/timelord
+	        fi
+		
+		if test -x :SBINDIR:/a2boot; then
+                    echo -n " a2boot"
+		    start-stop-daemon --stop --quiet --oknodo --exec :SBINDIR:/a2boot
 	        fi
 
 		if test -x :SBINDIR:/atalkd; then
