@@ -41,6 +41,5 @@ int markline ( struct papfile *, char **, int *, int * );
 void morespace ( struct papfile *, const char *, int );
 void append ( struct papfile *, const char *, int );
 void spoolerror ( struct papfile *, char * );
-void spoolreply ( struct papfile *, char * );
 
 #endif /* PAPD_FILE_H */
