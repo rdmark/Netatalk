@@ -166,7 +166,6 @@ int cm_psadobe( struct papfile *in, struct papfile *out, struct sockaddr_at *sat
 	    return( CH_DONE );
 
 	case -1 :
-	    spoolreply( out, "Processing..." );
 	    return( CH_MORE );
 
         case -2 :
