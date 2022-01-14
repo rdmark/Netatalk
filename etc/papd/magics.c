@@ -78,7 +78,6 @@ int ps( struct papfile *infile, struct papfile *outfile, struct sockaddr_at *sat
 		return( 0 );
 
 	    case -1 :
-		spoolreply( outfile, "Processing..." );
 		return( 0 );
 	    }
 
@@ -107,7 +106,6 @@ int ps( struct papfile *infile, struct papfile *outfile, struct sockaddr_at *sat
 	    CONSUME( infile, linelength + crlflength );
 	}
     }
-    return 0;
 }
 
 int cm_psquery( struct papfile *in, struct papfile *out, struct sockaddr_at *sat _U_)
@@ -131,7 +129,6 @@ int cm_psquery( struct papfile *in, struct papfile *out, struct sockaddr_at *sat
 	    return( CH_DONE );
 
 	case -1 :
-	    spoolreply( out, "Processing..." );
 	    return( CH_MORE );
 
         case -2 :
@@ -166,7 +163,6 @@ int cm_psadobe( struct papfile *in, struct papfile *out, struct sockaddr_at *sat
 	    return( CH_DONE );
 
 	case -1 :
-	    spoolreply( out, "Processing..." );
 	    return( CH_MORE );
 
         case -2 :
