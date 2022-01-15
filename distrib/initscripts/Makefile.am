@@ -28,6 +28,7 @@ GENERATED_FILES = \
 	rc.cnid_metad.netbsd	\
 	rc.papd.netbsd		\
 	rc.timelord.netbsd	\
+	rc.a2boot.netbsd	\
 	rc.atalk.sysv		\
 	rc.atalk.gentoo		\
 	rc.atalk.debian		\
@@ -49,6 +50,7 @@ TEMPLATES = \
 	rc.cnid_metad.netbsd.tmpl	\
 	rc.papd.netbsd.tmpl		\
 	rc.timelord.netbsd.tmpl		\
+	rc.a2boot.netbsd.tmpl		\
 	rc.atalk.sysv.tmpl		\
 	rc.atalk.gentoo.tmpl		\
 	rc.atalk.debian.tmpl		\
@@ -235,7 +237,7 @@ endif
 if USE_NETBSD
 
 sysvdir = /etc/rc.d
-sysv_SCRIPTS = afpd atalkd cnid_metad papd timelord
+sysv_SCRIPTS = afpd atalkd cnid_metad papd timelord a2boot
 
 afpd: rc.afpd.netbsd
 	cp -f $< $@
@@ -254,6 +256,10 @@ papd: rc.papd.netbsd
 	chmod a+x $@
 
 timelord: rc.timelord.netbsd
+	cp -f $< $@
+	chmod a+x $@
+	
+a2boot: rc.a2boot.netbsd
 	cp -f $< $@
 	chmod a+x $@
 
