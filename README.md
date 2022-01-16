@@ -8,9 +8,9 @@ As of Netatalk 3.0, support for Apple's legacy AppleTalk (DDP) protocol was drop
 # Installation
 Follow the installation steps in the [official Netatalk 2.2 documenation](http://netatalk.sourceforge.net/2.2/htmldocs/installation.html) to configure and install Netatalk.
 
-As supplementary information when installing on Debian derivate Linux distros, you need at least these apt package:
+As supplementary information when installing on Debian derivate Linux distros, you need at least these apt packages:
 ```
-$ sudo apt install libssl-dev libdb-dev libcups2-dev autotools-dev automake libtool
+libssl-dev libdb-dev libcups2-dev autotools-dev automake libtool
 ```
 
 An example configuration that enables systemd, all the AppleTalk daemons, while disabling features that are irrelevant for classic Mac OS:
