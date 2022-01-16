@@ -5,5 +5,18 @@ The primary focus of this fork is to have a version of Netatalk 2.2.x that runs 
 
 As of Netatalk 3.0, support for Apple's legacy AppleTalk (DDP) protocol was dropped. AppleTalk is required for Macs running System 6.0 through Mac OS 7.6, as well as supported Apple II systems, to be able to connect to a Netatalk AppleShare out of the box. Additionally, AppleTalk support brings the convenience of auto-detection of available shares on a network, as well as the ability to netboot an Apple II. Hence, the demand among the vintage Apple community to keep maintaining the Netatalk 2.2 codebase.
 
+# Installation
+Follow the installation steps in the [official Netatalk 2.2 documenation](http://netatalk.sourceforge.net/2.2/htmldocs/installation.html) to configure and install Netatalk.
+
+As supplementary information when installing on Debian derivate Linux distros, you need at least these apt package:
+```
+$ sudo apt install libssl-dev libdb-dev libcups2-dev autotools-dev automake libtool
+```
+
+An example configuration that enables systemd, all the AppleTalk daemons, while disabling features that are irrelevant for classic Mac OS:
+```
+$ ./configure --enable-systemd --enable-ddp --enable-a2boot --enable-cups --enable-timelord --disable-zeroconf --disable-quota
+```
+
 # Documentation
 Comprehensive [documentation for Netatalk 2.2](http://netatalk.sourceforge.net/2.2/htmldocs/) can be found on SourceForge.net
