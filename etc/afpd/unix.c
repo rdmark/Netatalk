@@ -125,10 +125,6 @@ void utommode(struct stat *stat, struct maccess *ma)
 	}
 }
 
-#ifdef accessmode
-
-#undef accessmode
-#endif
 /*
  * Calculate the mode for a directory using a stat() call to
  * estimate permission.
