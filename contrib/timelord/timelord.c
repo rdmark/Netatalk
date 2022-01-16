@@ -38,7 +38,6 @@
 #endif /* HAVE_SGTTY_H */
 #include <errno.h>
 #include <signal.h>
-#pragma warn "testing 123"
 #include <atalk/logger.h>
 #include <stdio.h>
 #include <string.h>
