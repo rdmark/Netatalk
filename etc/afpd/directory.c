@@ -2361,8 +2361,6 @@ int afp_createdir(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 	ad_setid(&ad, s_path->st.st_dev, s_path->st.st_ino, dir->d_did,
 		 did, vol->v_stamp);
 
-	fce_register_new_dir(s_path);
-
 	ad_flush(&ad);
 	ad_close_metadata(&ad);
 

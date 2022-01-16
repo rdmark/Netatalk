@@ -551,8 +551,7 @@ int afp_delete(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 			bstring dname;
 			if ((dname = bstrcpy(curdir->d_u_name)) == NULL)
 				return AFPERR_MISC;
-			if ((rc = deletecurdir(vol)) == AFP_OK)
-				fce_register_delete_dir(cfrombstr(dname));
+			rc = deletecurdir(vol);
 			bdestroy(dname);
 		}
 	} else if (of_findname(vol, s_path)) {
@@ -566,7 +565,6 @@ int afp_delete(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 			rc = AFPERR_NOOBJ;
 		} else {
 			if ((rc = deletefile(vol, -1, upath, 1)) == AFP_OK) {
-				fce_register_delete_file(s_path);
 				if (vol->v_tm_used < s_path->st.st_size)
 					vol->v_tm_used = 0;
 				else

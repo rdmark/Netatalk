@@ -823,8 +823,6 @@ int afp_createfile(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 
 	ad_flush(adp);
 
-	fce_register_new_file(s_path);
-
 	ad_close(adp, ADFLAGS_DF | ADFLAGS_HF);
 
       createfile_done:
