@@ -38,17 +38,6 @@
 #include <sys/param.h>
 #include <string.h>
 
-/* FIXME */
-#ifdef linux
-#ifndef USE_SETRESUID
-#define USE_SETRESUID 1
-#endif
-#else
-#ifndef USE_SETEUID
-#define USE_SETEUID 1
-#endif
-#endif
-
 #include <atalk/logger.h>
 
 /**************************************************************************n
@@ -125,7 +114,7 @@ static void become_user_permanently(uid_t uid, gid_t gid)
 	gain_root_privilege();
 	gain_root_group_privilege();
 
-#if USE_SETRESUID
+#if defined(__linux__)
 	if ( setresgid(gid, gid, gid) < 0)
 		LOG(log_error, logtype_afpd, "could not setresgid(%i, %i, %i)",
 		    gid, gid, gid);
@@ -137,26 +126,28 @@ static void become_user_permanently(uid_t uid, gid_t gid)
 	if ( setuid(uid) < 0 )
 		LOG(log_error, logtype_afpd, "could not setuid(%i)", uid);
 
-#elif USE_SETREUID
-	setregid(gid, gid);
-	setgid(gid);
-	setreuid(uid, uid);
-	setuid(uid);
-
-#elif USE_SETEUID
+#elif defined(__NetBSD__)
 	setegid(gid);
 	setgid(gid);
 	setuid(uid);
 	seteuid(uid);
 	setuid(uid);
 
-#elif USE_SETUIDX
+#elif defined(USE_SETREUID)
+	setregid(gid, gid);
+	setgid(gid);
+	setreuid(uid, uid);
+	setuid(uid);
+
+#elif defined(USE_SETUIDX)
 	setgidx(ID_REAL, gid);
 	setgidx(ID_EFFECTIVE, gid);
 	setgid(gid);
 	setuidx(ID_REAL, uid);
 	setuidx(ID_EFFECTIVE, uid);
 	setuid(uid);
+#else
+	#error How to setuid()?
 #endif
 }
 
