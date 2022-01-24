@@ -3,8 +3,8 @@
 [Unit]
 Description=Netatalk CNID database daemon for AFP fileserver
 After=syslog.target network.target
-Before=netatalk.service
-Requires=netatalk.service
+Before=afpd.service
+Requires=afpd.service
 
 [Service]
 Type=forking
@@ -15,4 +15,4 @@ RestartSec=1
 
 [Install]
 WantedBy=multi-user.target
-Also=netatalk.service
+Also=afpd.service

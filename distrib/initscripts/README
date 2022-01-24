@@ -6,33 +6,33 @@ that were enabled.
 After installation, you may start the services as per the below. They will
 also be started automatically on the next system boot.
 
-The following systemd unit configurations are mandatory and enable AFP over TCP.
+The following services are mandatory and enable AFP over TCP.
 
-    netatalk.service
-    netatalk-cnid.service
+    afpd.service
+    cnid.service
 
-Optional systemd unit configurations for legacy services.
+Optional services for legacy AppleTalk daemons.
 
-    netatalk-atalkd.service
-    netatalk-papd.service
-    netatalk-a2boot.service
-    netatalk-timelord.service
+    atalkd.service
+    papd.service
+    a2boot.service
+    timelord.service
 
-You must control the Netatalk service by starting/stopping netatalk.service only,
-because netatalk-cnid.service is controlled automatically.
+You must control the Netatalk service by starting/stopping afpd.service.
+The cnid.service is controlled automatically.
 
-    # systemctl start|stop|restart netatalk.service
+    # systemctl start|stop|restart afpd.service
 
-The netatalk-atalkd.service unit is requried for the remaining three,
+The atalkd.service unit is requried for the remaining three,
 however those three are independent from each other.
 
 These unit configurations start daemons directly and do not read "netatalk.conf".
 Therefore, you need to edit files for setting certain options.
 
-    ATALK_NAME:         set in afpd.conf instead
-    AFPD_MAX_CLIENTS:   set in netatalk.service by using -c
-    AFPD_UAMLIST:       set in afpd.conf instead with -uamlist
-    AFPD_GUEST:         set in afpd.conf instead with -guestname
-    ATALK_MAC_CHARSET:  set in afpd.conf instead with -maccodepage
-    ATALK_UNIX_CHARSET: set in afpd.conf instead with -unixcodepage
-    CNID_CONFIG:        set in netatalk-cnid.service by using -l and -f options
+    ATALK_NAME:         set in afpd.conf
+    AFPD_MAX_CLIENTS:   set in afpd.service by starting the daemon with -c
+    AFPD_UAMLIST:       set in afpd.conf with -uamlist
+    AFPD_GUEST:         set in afpd.conf with -guestname
+    ATALK_MAC_CHARSET:  set in afpd.conf with -maccodepage
+    ATALK_UNIX_CHARSET: set in afpd.conf with -unixcodepage
+    CNID_CONFIG:        set in cnid.service by starting the daemon with -l and -f
