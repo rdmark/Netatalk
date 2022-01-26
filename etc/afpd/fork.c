@@ -525,7 +525,7 @@ int afp_setforkparams(AFPObj *obj _U_, char *ibuf, size_t ibuflen, char *rbuf _U
     struct vol      *vol;
     struct dir      *dir;
     off_t       size;
-    uint16_t       ofrefnum, bitmap;
+    u_int16_t       ofrefnum, bitmap;
     int                 err;
     int                 is64;
     int                 eid;
