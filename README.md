@@ -13,9 +13,9 @@ As supplementary information when installing on Debian derivate Linux distros, y
 libssl-dev libdb-dev libcups2-dev autotools-dev automake libtool
 ```
 
-An example configuration that enables systemd, all the AppleTalk daemons, while disabling features that are irrelevant for classic Mac OS:
+An example configuration that enables systemd and all the AppleTalk daemons, plus zeroconf for service discovery on Mac OS X (requires libavahi):
 ```
-$ ./configure --enable-systemd --enable-ddp --enable-a2boot --enable-cups --enable-timelord --disable-zeroconf --disable-quota
+$ ./configure --enable-systemd --enable-ddp --enable-a2boot --enable-cups --enable-timelord --enable-zeroconf
 ```
 
 # Documentation
