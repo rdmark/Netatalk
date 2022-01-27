@@ -1,11 +1,57 @@
+Changes in 2.2.x
+================
+
+* NEW: Stable systemd service unit configurations for all daemons.
+       Use '--enable-systemd' to configure and install.
+* NEW: Init script templates for the a2boot daemon for all supported
+       platforms.
+* FIX: CVE-2018-1160: libatalk/dsi: add correct bound checking
+       to dsi_opensession
+* FIX: CVE-2018-1160: libatalk/dsi: avoid double use of variable i
+* FIX: Compatibility with OpenSSL 1.1. Bug #653.
+* UPD: Add OpenSSL 1.0 backwards compatibility layer.
+* FIX: Resolve gcc 10 compile time errors and warnings.
+* FIX: Remove bitrotted inline prototype for a libc function
+       which caused build error on NetBSD.
+* FIX: Update configure and Makefile syntax to avoid autoconf
+       deprecation warnings.
+* FIX: Restore LDAP support when ACLs are unavailable.
+* UPD: afpd: Preserve file dates when copying folders in GS/OS.
+* FIX: afpd: Saving from applications like Photoshop may fail, because
+       removing the resource fork AppleDouble file failed. Bug #542.
+       (Netatalk 3 backport.)
+* FIX: afpd: Return the correct error for non-existent volume
+       (Netatalk 3 backport.)
+* FIX: atalkd: Fixed compatibility with Linux and routerless networks.
+* FIX: atalkd: Improve compatibility with LocalTalk bridges in GS/OS.
+* FIX: atalkd: Set interface address correctly for phase 1 networks on NetBSD.
+* UPD: macusers: make the script work on NetBSD.
+* FIX: papd: make it compile and run when using post-1.7 CUPS.
+* UPD: papd: compatibility with LaserWriter 7 and 8 on GS/OS and Mac OS.
+* FIX: timelord: Make it work on non-big-endian and 64bit systems.
+* UPD: timelord: Introduce an '-l' option sync localtime (time zone aware)
+       instead of GMT.
+* FIX: cnid_dbd: Allow non-Unicode volumes to be scanned by the repair tool.
+* FIX: zeroconf: Native avahi API should be the default choice.
+       (Netatalk 3 backport.)
+* FIX: Fix possible alignment violations due to bad casts.
+       (Netatalk 3 backport.)
+
 Changes in 2.2.6
 ================
-* FIX: Saving from applications like Photoshop may fail, because
-       removing the resource fork AppleDouble file failed. Bug #542.
+
 * FIX: Fix handling of large number of volumes. Bug #527.
+* FIX: Made AppleTalk systems function properly when coexisting with
+       TCP systems.
+* FIX: papd: make it work better with post-1.6 CUPS.
+* FIX: Various fixes for building and running on NetBSD.
+* FIX: Better compatibility with OpenSSL.
+* BUG: Broke compatibility with Linux and routerless networks.
+* BUG: Broke support for LDAP when ACLs are unavailable.
 
 Changes in 2.2.5
 ================
+
 * FIX: Fix errors searching volumes
 * NEW: Configurable symlink handling with a new volume option
        'followsymlinks'. Setting the option causes afpd to follow
