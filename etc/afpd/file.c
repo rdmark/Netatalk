@@ -879,7 +879,7 @@ int afp_setfilparams(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 		return (AFPERR_NOOBJ);
 	}
 
-	if ((u_long) ibuf & 1) {
+	if ((intptr_t)ibuf & 1) {
 		ibuf++;
 	}
 

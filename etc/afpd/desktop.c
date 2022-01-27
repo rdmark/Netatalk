@@ -746,7 +746,7 @@ int afp_addcomment(AFPObj * obj _U_, char *ibuf, size_t ibuflen _U_,
 		return get_afp_errno(AFPERR_NOOBJ);
 	}
 
-	if ((u_long) ibuf & 1) {
+	if ((intptr_t) ibuf & 1) {
 		ibuf++;
 	}
 
