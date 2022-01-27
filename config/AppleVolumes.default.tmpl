@@ -9,7 +9,6 @@
 # path [name] [casefold:x] [options:z,l,j] \
 #   [allow:a,@b,c,d] [deny:a,@b,c,d] [dbpath:path] [password:p] \
 #   [rwlist:a,@b,c,d] [rolist:a,@b,c,d] [limitsize:value in bytes] \
-#   [preexec:cmd] [root_preexec:cmd] [postexec:cmd]  [root_postexec:cmd] \
 #   [allowed_hosts:IPv4 address[/IPv4 netmask bits]] \
 #   [denied_hosts:IPv4 address[/IPv4 netmask bits]] \
 #   ... more, see below ...
@@ -57,14 +56,6 @@
 # denied_hosts        -> Listed hosts and nets are rejected,
 #                        all others are allowed. Example:
 #                        denied_hosts: 192.168.100/24,10.1.1.1
-# preexec             -> command to be run when the volume is mounted,
-#                        ignore for user defined volumes
-# root_preexec        -> command to be run as root when the volume is mounted,
-#                        ignore for user defined volumes
-# postexec            -> command to be run when the volume is closed,
-#                        ignore for user defined volumes
-# root_postexec       -> command to be run as root when the volume is closed,
-#                        ignore for user defined volumes
 # veto                -> hide files and directories,where the path matches
 #                        one of the "/" delimited vetoed names. Matches are
 #                        partial, e.g. path is /abc/def/file and veto:/abc/
