@@ -456,9 +456,6 @@ void afp_over_asp(AFPObj * obj)
 		}
 
 		if (obj->options.flags & OPTION_DEBUG) {
-#ifdef notdef
-			pdesc(stdout);
-#endif				/* notdef */
 			of_pforkdesc(stdout);
 			fflush(stdout);
 		}
