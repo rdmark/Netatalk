@@ -22,6 +22,8 @@ Changes in 2.2.x
        (Netatalk 3 backport.)
 * FIX: afpd: Return the correct error for non-existent volume
        (Netatalk 3 backport.)
+* FIX: afpd: Update Netatalk volume capacity reporting to match Samba behavior
+       (Netatalk 3 backport.)
 * FIX: atalkd: Fixed compatibility with Linux and routerless networks.
 * FIX: atalkd: Improve compatibility with LocalTalk bridges in GS/OS.
 * FIX: atalkd: Set interface address correctly for phase 1 networks on NetBSD.
