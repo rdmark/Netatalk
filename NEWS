@@ -16,6 +16,7 @@ Changes in 2.2.x
 * FIX: Update configure and Makefile syntax to avoid autoconf
        deprecation warnings.
 * FIX: Restore LDAP support when ACLs are unavailable.
+* NEW: afpd: Add option to disable afp session timeouts.
 * UPD: afpd: Preserve file dates when copying folders in GS/OS.
 * FIX: afpd: Saving from applications like Photoshop may fail, because
        removing the resource fork AppleDouble file failed. Bug #542.
@@ -30,11 +31,12 @@ Changes in 2.2.x
 * FIX: atalkd: Improve compatibility with LocalTalk bridges in GS/OS.
 * FIX: atalkd: Set interface address correctly for phase 1 networks on NetBSD.
 * UPD: macusers: make the script work on NetBSD.
-* FIX: papd: make it compile and run when using post-1.7 CUPS.
 * UPD: papd: compatibility with LaserWriter 7 and 8 on GS/OS and Mac OS.
-* FIX: timelord: Make it work on non-big-endian and 64bit systems.
+* UPD: papd: Send replies to client when printing to prompt more data to be sent.
+* FIX: papd: make it compile and run when using post-1.7 CUPS.
 * UPD: timelord: Introduce an '-l' option sync localtime (time zone aware)
        instead of GMT.
+* FIX: timelord: Make it work on non-big-endian and 64-bit systems.
 * FIX: cnid_dbd: Allow non-Unicode volumes to be scanned by the repair tool.
 * FIX: zeroconf: Native avahi API should be the default choice.
        (Netatalk 3 backport.)
