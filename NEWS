@@ -12,7 +12,7 @@ Changes in 2.2.x
 * UPD: Add OpenSSL 1.0 backwards compatibility layer.
 * FIX: Resolve gcc 10 compile time errors and warnings.
 * FIX: Remove bitrotted inline prototype for a libc function
-       which caused build error on NetBSD.
+       which caused a build error on NetBSD.
 * FIX: Update configure and Makefile syntax to avoid autoconf
        deprecation warnings.
 * FIX: Restore LDAP support when ACLs are unavailable.
@@ -27,14 +27,15 @@ Changes in 2.2.x
        (Netatalk 3 backport.)
 * FIX: afpd: Fix crash when moving files that used to have long names.
        (Netatalk 3 backport.)
-* FIX: atalkd: Fixed compatibility with Linux and routerless networks.
-* FIX: atalkd: Improve compatibility with LocalTalk bridges in GS/OS.
+* FIX: atalkd: Restore compatibility with Linux and routerless networks.
+* FIX: atalkd: Improve compatibility with LocalTalk bridge hardware
+       in GS/OS.
 * FIX: atalkd: Set interface address correctly for phase 1 networks on NetBSD.
-* UPD: macusers: make the script work on NetBSD.
-* UPD: papd: compatibility with LaserWriter 7 and 8 on GS/OS and Mac OS.
+* UPD: macusers: Make the script work on NetBSD.
+* UPD: papd: Compatibility with LaserWriter 7 and 8 drivers on GS/OS and Mac OS.
 * UPD: papd: Send replies to client when printing to prompt more data to be sent.
-* FIX: papd: make it compile and run when using post-1.7 CUPS.
-* UPD: timelord: Introduce an '-l' option sync localtime (time zone aware)
+* FIX: papd: Make it compile and run when using post-1.7 CUPS.
+* UPD: timelord: Introduce an '-l' option to sync localtime (time zone aware)
        instead of GMT.
 * FIX: timelord: Make it work on non-big-endian and 64-bit systems.
 * FIX: cnid_dbd: Allow non-Unicode volumes to be scanned by the repair tool.
