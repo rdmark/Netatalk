@@ -14,13 +14,13 @@ Follow the installation steps in the [official Netatalk 2.2 documentation](http:
 
 As supplementary information when installing on Debian derivate Linux distros, you need at least these apt packages:
 ```
-libssl-dev libdb-dev libcups2-dev libavahi-client-dev libgcrypt20-dev autotools-dev automake libtool
+libssl-dev libdb-dev autotools-dev automake libtool
 ```
 
 A breakdown of optional packages:
-- libcups2-dev -- Needed for the papd printer server
-- libavahi-client-dev -- Needed for zeroconf service discovery on Mac OS X / macOS
-- libgcrypt20-dev -- Needed for the DHX2 UAM
+- ``` libcups2-dev ``` -- Needed for the papd printer server
+- ``` libavahi-client-dev ``` -- Needed for zeroconf service discovery on Mac OS X / macOS
+- ``` libgcrypt20-dev ``` -- Needed for the DHX2 UAM
 
 An example configuration that enables systemd and all the AppleTalk daemons, plus zeroconf for service discovery on Mac OS X:
 ```
