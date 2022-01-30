@@ -1,4 +1,4 @@
-Changes in 2.2.x v220101
+Changes in 2.x v220101
 ================
 
 * NEW: Stable systemd service unit configurations for all daemons.
