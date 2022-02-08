@@ -37,13 +37,13 @@
 
 struct nbphdr {
 #if BYTE_ORDER == BIG_ENDIAN
-    u_int32_t	nh_op : 4,
+    u_int8_t	nh_op : 4,
     		nh_cnt : 4;
 #else /* BYTE_ORDER != BIG_ENDIAN */
-    u_int32_t	nh_cnt : 4,
+    u_int8_t	nh_cnt : 4,
     		nh_op : 4;
 #endif /* BYTE_ORDER */
-    u_int32_t	nh_id : 8;
+    u_int8_t	nh_id;
 };
 
 #define SZ_NBPHDR	2
