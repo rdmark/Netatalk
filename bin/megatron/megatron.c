@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <libgen.h>
 #include <netatalk/endian.h>
 #include "asingle.h"
 #include "megatron.h"
@@ -304,11 +305,11 @@ int main(int argc, char **argv)
     *newname = '\0';
     for ( c = 1 ; c < argc ; ++c ) {
         if ( strcmp( argv [ c ], "--version" ) == 0 ) {
-	    printf("%s (Netatalk %s megatron)\n", argv[0], VERSION);
+	    printf("%s (%s %s megatron)\n", basename(argv[0]), PACKAGE, VERSION);
 	    return( -1 );
 	}
         if ( strcmp( argv [ c ], "-v" ) == 0 ) {
-	    printf("%s (Netatalk %s megatron)\n", argv[0], VERSION);
+	    printf("%s (%s %s megatron)\n", basename(argv[0]), PACKAGE, VERSION);
 	    return( -1 );
 	}
         if ( strcmp( argv [ c ], "--header" ) == 0 ) {

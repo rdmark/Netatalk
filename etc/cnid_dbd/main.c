@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
         switch (ret) {
         case 'v':
         case 'V':
-            printf("cnid_dbd (Netatalk %s)\n", VERSION);
+            printf("cnid_dbd (%s %s)\n", PACKAGE, VERSION);
             return -1;
         case 'd':
             delete_bdb = 1;

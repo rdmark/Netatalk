@@ -168,7 +168,7 @@ static void set_signal(void)
 
 static void usage (void)
 {
-    printf("dbd (Netatalk %s)\n"
+    printf("dbd (%s %s)\n"
            "Usage: dbd [-e|-t|-v|-x] -d [-i] | -s [-c|-n]| -r [-c|-f] | -u <path to netatalk volume>\n"
            "dbd can dump, scan, reindex and rebuild Netatalk dbd CNID databases.\n"
            "dbd must be run with appropiate permissions i.e. as root.\n\n"
@@ -210,7 +210,7 @@ static void usage (void)
            "WARNING:\n"
            "For -r -f restore of the CNID database from the adouble files,\n"
            "the CNID must of course be synched to them files first with a plain -r rebuild!\n"
-           , VERSION
+           , PACKAGE, VERSION
         );
 }
 

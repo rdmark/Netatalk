@@ -457,7 +457,7 @@ int main(int argc, char *argv[])
         switch (cc) {
         case 'v':
         case 'V':
-            printf("cnid_metad (Netatalk %s)\n", VERSION);
+            printf("cnid_metad (%s %s)\n", PACKAGE, VERSION);
             return -1;
         case 'd':
             debug = 1;

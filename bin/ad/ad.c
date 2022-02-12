@@ -39,7 +39,7 @@ static void usage_main(void)
 
 static void show_version(void)
 {
-    printf("ad (Netatalk %s)\n", VERSION);
+    printf("ad (%s %s)\n", PACKAGE, VERSION);
 }
 
 int main(int argc, char **argv)

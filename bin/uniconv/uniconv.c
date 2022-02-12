@@ -411,7 +411,7 @@ static void usage( char * name )
 
 static void print_version (void)
 {
-    fprintf( stderr, "uniconv - Netatalk %s\n", VERSION );
+    fprintf( stderr, "uniconv - %s %s\n", PACKAGE, VERSION );
 }
 
 static void help (void)
