@@ -27,9 +27,7 @@ if HAVE_LDAP
 CONFFILES += afp_ldap.conf
 endif
 
-if USE_APPLETALK
 CONFFILES += atalkd.conf papd.conf
-endif
 
 pkgconfdir = @PKGCONFDIR@
 webminpath = @WEBMIN_PATH@

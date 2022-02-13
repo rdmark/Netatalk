@@ -1,6 +1,6 @@
 # Makefile.am for contrib/
 
-SUBDIRS = macusers misc shell_utils
+SUBDIRS = macusers misc shell_utils printing
 
 if COMPILE_TIMELORD
 SUBDIRS += timelord
@@ -10,6 +10,3 @@ if COMPILE_A2BOOT
 SUBDIRS += a2boot
 endif
 
-if USE_APPLETALK
-SUBDIRS += printing
-endif

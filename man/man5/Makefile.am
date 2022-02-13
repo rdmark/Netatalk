@@ -29,10 +29,8 @@ TEMPLATE_FILES = AppleVolumes.default.5.tmpl \
 
 ATALK_MANS = atalkd.conf.5.tmpl papd.conf.5.tmpl
 
-if USE_APPLETALK
 GENERATED_MANS += atalkd.conf.5 papd.conf.5
 TEMPLATE_FILES += $(ATALK_MANS)
-endif
 
 NONGENERATED_MANS = AppleVolumes.5 AppleVolumes.system.5
 
