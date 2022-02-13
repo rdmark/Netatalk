@@ -194,8 +194,9 @@ ASP asp_getsession(ASP asp, server_child * server_children,
     switch ( asp->cmdbuf[ 0 ] ) {
         case ASPFUNC_TICKLE:
             sid = asp->cmdbuf[1];
-            if ((asp_ac[sid] != NULL) && (asp_ac[sid]->ac_state != ACSTATE_DEAD))
-                asp_ac[sid]->ac_state = ACSTATE_OK;
+            if ((asp_ac[sid] != NULL)
+                    && (asp_ac[sid]->ac_state != ACSTATE_DEAD))
+                        asp_ac[sid]->ac_state = ACSTATE_OK;
                 break;
 
         case ASPFUNC_STAT :
