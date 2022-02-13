@@ -169,20 +169,14 @@ static int dhx2_setup(void *obj, char *ibuf _U_, size_t ibuflen _U_,
 	gcry_mpi_t g, Ma;
 	char *Ra_binary = NULL;
 #ifdef SHADOWPW
-<<<<<<< HEAD
     struct spwd *sp;
-#endif /* SHADOWPW */
-    uint16_t uint16;
-=======
-	struct spwd *sp;
 #endif				/* SHADOWPW */
->>>>>>> 70b59bc5 (Just indent first -- saves a lot of heartache.)
+    uint16_t uint16;
 
 	*rbuflen = 0;
 
 	/* Initialize passwd/shadow */
 #ifdef SHADOWPW
-<<<<<<< HEAD
     if (( sp = getspnam( dhxpwd->pw_name )) == NULL ) {
         LOG(log_info, logtype_uams, "DHX2: no shadow passwd entry for this user");
         return AFPERR_NOTAUTH;
@@ -268,97 +262,6 @@ error:              /* We exit here anyway */
     gcry_mpi_release(g);
     gcry_mpi_release(Ma);
     return ret;
-=======
-	if ((sp = getspnam(dhxpwd->pw_name)) == NULL) {
-		LOG(log_info, logtype_uams,
-		    "DHX2: no shadow passwd entry for this user");
-		return AFPERR_NOTAUTH;
-	}
-	dhxpwd->pw_passwd = sp->sp_pwdp;
-#endif				/* SHADOWPW */
-
-	if (!dhxpwd->pw_passwd)
-		return AFPERR_NOTAUTH;
-
-	/* Initialize DH params */
-
-	p = gcry_mpi_new(0);
-	g = gcry_mpi_new(0);
-	Ra = gcry_mpi_new(0);
-	Ma = gcry_mpi_new(0);
-
-	/* Generate p and g for DH */
-	ret = dh_params_generate(&p, &g, PRIMEBITS);
-	if (ret != 0) {
-		LOG(log_info, logtype_uams,
-		    "DHX2: Couldn't generate p and g");
-		ret = AFPERR_MISC;
-		goto error;
-	}
-
-	/* Generate our random number Ra. */
-	Ra_binary = calloc(1, PRIMEBITS / 8);
-	if (Ra_binary == NULL) {
-		ret = AFPERR_MISC;
-		goto error;
-	}
-	gcry_randomize(Ra_binary, PRIMEBITS / 8, GCRY_STRONG_RANDOM);
-	gcry_mpi_scan(&Ra, GCRYMPI_FMT_USG, Ra_binary, PRIMEBITS / 8,
-		      NULL);
-	free(Ra_binary);
-	Ra_binary = NULL;
-
-	/* Ma = g^Ra mod p. This is our "public" key */
-	gcry_mpi_powm(Ma, g, Ra, p);
-
-	/* ------- DH Init done ------ */
-	/* Start building reply packet */
-
-	/* Session ID first */
-	ID = dhxhash(obj);
-	*(u_int16_t *) rbuf = htons(ID);
-	rbuf += 2;
-	*rbuflen += 2;
-
-	/* g is next */
-	gcry_mpi_print(GCRYMPI_FMT_USG, (unsigned char *) rbuf, 4,
-		       &nwritten, g);
-	if (nwritten < 4) {
-		memmove(rbuf + 4 - nwritten, rbuf, nwritten);
-		memset(rbuf, 0, 4 - nwritten);
-	}
-	rbuf += 4;
-	*rbuflen += 4;
-
-	/* len = length of p = PRIMEBITS/8 */
-	*(u_int16_t *) rbuf = htons((u_int16_t) PRIMEBITS / 8);
-	rbuf += 2;
-	*rbuflen += 2;
-
-	/* p */
-	gcry_mpi_print(GCRYMPI_FMT_USG, (unsigned char *) rbuf,
-		       PRIMEBITS / 8, NULL, p);
-	rbuf += PRIMEBITS / 8;
-	*rbuflen += PRIMEBITS / 8;
-
-	/* Ma */
-	gcry_mpi_print(GCRYMPI_FMT_USG, (unsigned char *) rbuf,
-		       PRIMEBITS / 8, &nwritten, Ma);
-	if (nwritten < PRIMEBITS / 8) {
-		memmove(rbuf + (PRIMEBITS / 8) - nwritten, rbuf, nwritten);
-		memset(rbuf, 0, (PRIMEBITS / 8) - nwritten);
-	}
-	rbuf += PRIMEBITS / 8;
-	*rbuflen += PRIMEBITS / 8;
-
-	ret = AFPERR_AUTHCONT;
-
-      error:			/* We exit here anyway */
-	/* We will only need p and Ra later, but mustn't forget to release it ! */
-	gcry_mpi_release(g);
-	gcry_mpi_release(Ma);
-	return ret;
->>>>>>> 70b59bc5 (Just indent first -- saves a lot of heartache.)
 }
 
 /* -------------------------------- */
@@ -712,7 +615,6 @@ static int passwd_logincont(void *obj, struct passwd **uam_pwd,
 			    char *ibuf, size_t ibuflen,
 			    char *rbuf, size_t *rbuflen)
 {
-<<<<<<< HEAD
     u_int16_t retID;
     int ret;
 
@@ -728,24 +630,6 @@ static int passwd_logincont(void *obj, struct passwd **uam_pwd,
         ret = AFPERR_PARAM;
     }
     return ret;
-=======
-	u_int16_t retID;
-	int ret;
-
-	/* check for session id */
-	retID = ntohs(*(u_int16_t *) ibuf);
-	if (retID == ID)
-		ret =
-		    logincont1(obj, uam_pwd, ibuf, ibuflen, rbuf, rbuflen);
-	else if (retID == ID + 1)
-		ret =
-		    logincont2(obj, uam_pwd, ibuf, ibuflen, rbuf, rbuflen);
-	else {
-		LOG(log_info, logtype_uams, "DHX2: Session ID Mismatch");
-		ret = AFPERR_PARAM;
-	}
-	return ret;
->>>>>>> 70b59bc5 (Just indent first -- saves a lot of heartache.)
 }
 
 static int uam_setup(const char *path)
