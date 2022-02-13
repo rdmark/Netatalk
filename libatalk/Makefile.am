@@ -8,7 +8,9 @@ lib_LTLIBRARIES = libatalk.la
 libatalk_la_SOURCES = dummy.c
 
 libatalk_la_LIBADD  = \
+	asp/libasp.la \
 	acl/libacl.la \
+	atp/libatp.la \
 	adouble/libadouble.la	\
 	bstring/libbstring.la \
 	compat/libcompat.la	\
@@ -20,7 +22,9 @@ libatalk_la_LIBADD  = \
 	vfs/libvfs.la
 
 libatalk_la_DEPENDENCIES = \
+	asp/libasp.la \
 	acl/libacl.la \
+	atp/libatp.la \
 	adouble/libadouble.la	\
 	bstring/libbstring.la \
 	compat/libcompat.la	\
