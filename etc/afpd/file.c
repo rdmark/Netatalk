@@ -2437,6 +2437,7 @@ int afp_exchangefiles(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
     path->u_name = upath;
 
     setfilunixmode(vol, path, destst.st_mode);
+    LOG(log_error, logtype_afpd, "set %s mode to %i", path, srcst.st_mode);
     setfilowner(vol, destst.st_uid, destst.st_gid, path);
 
     path->st = destst;
@@ -2447,10 +2448,19 @@ int afp_exchangefiles(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
     setfilunixmode(vol, path, srcst.st_mode);
     setfilowner(vol, srcst.st_uid, srcst.st_gid, path);
 
-    if ( setegid(gid) < 0 || seteuid(uid) < 0) {
-        LOG(log_error, logtype_afpd, "can't seteuid back %s", strerror(errno));
-        exit(EXITERR_SYS);
-    }
+    if (setegid(gid) < 0) {
+		LOG(log_error, logtype_afpd, "can't setegid back to %i (%s)",
+		    gid,
+		    strerror(errno));
+		exit(EXITERR_SYS);
+	}
+
+	if (seteuid(uid) < 0) {
+		LOG(log_error, logtype_afpd, "can't seteuid back to %i (%s)",
+		    uid,
+		    strerror(errno));
+		exit(EXITERR_SYS);
+	}
 
     err = AFP_OK;
     goto err_exchangefile;
