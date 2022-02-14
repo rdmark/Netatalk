@@ -1,7 +1,7 @@
 
 # Makefile.am for libatalk/
 
-SUBDIRS = acl adouble bstring compat cnid dsi tdb util unicode vfs
+SUBDIRS = acl adouble bstring compat cnid dsi tdb util unicode vfs asp atp nbp netddp
 
 lib_LTLIBRARIES = libatalk.la
 
@@ -18,7 +18,11 @@ libatalk_la_LIBADD  = \
 	util/libutil.la		\
 	tdb/libtdb.la       \
 	unicode/libunicode.la \
-	vfs/libvfs.la
+	vfs/libvfs.la \
+	asp/libasp.la		\
+	atp/libatp.la		\
+	nbp/libnbp.la		\
+	netddp/libnetddp.la
 
 libatalk_la_DEPENDENCIES = \
 	asp/libasp.la \
@@ -31,20 +35,10 @@ libatalk_la_DEPENDENCIES = \
 	util/libutil.la		\
 	tdb/libtdb.la       \
 	unicode/libunicode.la \
-	vfs/libvfs.la
+	vfs/libvfs.la \
+	asp/libasp.la		\
+	atp/libatp.la		\
+	nbp/libnbp.la		\
+	netddp/libnetddp.la
 
 libatalk_la_LDFLAGS = -static
-
-if USE_APPLETALK
-SUBDIRS +=  asp atp nbp netddp
-libatalk_la_LIBADD += \
-	asp/libasp.la		\
-	atp/libatp.la		\
-	nbp/libnbp.la		\
-	netddp/libnetddp.la
-libatalk_la_DEPENDENCIES += \
-	asp/libasp.la		\
-	atp/libatp.la		\
-	nbp/libnbp.la		\
-	netddp/libnetddp.la
-endif
