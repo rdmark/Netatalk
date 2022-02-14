@@ -95,6 +95,7 @@ q_t *invalid_dircache_entries;
 static int netatalk_mkdir(const struct vol *vol, const char *name)
 {
 	int ret;
+	struct stat st;
 
 	if (vol->v_flags & AFPVOL_UNIX_PRIV) {
 		if (lstat(".", &st) < 0)
@@ -150,9 +151,10 @@ static int deletedir(const struct vol *vol, int dirfd, char *dir)
 	if ((dp = opendirat(dirfd, dir)) == NULL)
 		return AFP_OK;
 
-	snprintf(path, MAXPATHLEN, "%s/", dir);
+	strcpy(path, dir);
+	strcat(path, "/");
 	len++;
-	remain = strlen(path) - len - 1;
+	remain = sizeof(path) - len - 1;
 	while ((de = readdir(dp)) && err == AFP_OK) {
 		/* skip this and previous directory */
 		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, ".."))
@@ -207,13 +209,15 @@ static int copydir(const struct vol *vol, int dirfd, char *src, char *dst)
 	}
 
 	/* set things up to copy */
-	snprintf(spath, MAXPATHLEN, "%s/", src);
+	strcpy(spath, src);
+	strcat(spath, "/");
 	slen++;
-	srem = strlen(spath) - slen - 1;
+	srem = sizeof(spath) - slen - 1;
 
-	snprintf(dpath, MAXPATHLEN, "%s/", dst);
+	strcpy(dpath, dst);
+	strcat(dpath, "/");
 	dlen++;
-	drem = strlen(dpath) - dlen - 1;
+	drem = sizeof(dpath) - dlen - 1;
 
 	err = AFP_OK;
 	while ((de = readdir(dp))) {
