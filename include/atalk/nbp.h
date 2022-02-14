@@ -33,44 +33,38 @@
 #include <netatalk/at.h>
 #include <netatalk/endian.h>
 
-/* Described in IAT 7-14 */
-
 struct nbphdr {
 #if BYTE_ORDER == BIG_ENDIAN
-    u_int8_t	nh_op : 4,
-    		nh_cnt : 4;
+    unsigned	nh_op : 4,
+		nh_cnt : 4,
 #else /* BYTE_ORDER != BIG_ENDIAN */
-    u_int8_t	nh_cnt : 4,
-    		nh_op : 4;
+    unsigned	nh_cnt : 4,
+		nh_op : 4,
 #endif /* BYTE_ORDER */
-    u_int8_t	nh_id;
+		nh_id : 8;
 };
 
 #define SZ_NBPHDR	2
 
-/* NBP tuple described in IAT 7-16 */
-/* struct nbptuple is misnamed; describes only the entity address */
 struct nbptuple {
     u_int16_t   nt_net;
     u_int8_t    nt_node;
     u_int8_t    nt_port;
     u_int8_t    nt_enum;
 };
-
-#define SZ_NBPTUPLE	sizeof(struct nbptuple)
+#define SZ_NBPTUPLE	5
 
 #define NBPSTRLEN	32
 /*
  * Name Binding Protocol Network Visible Entity
- * This is the rest of NBP tuple in IAT 7-16
  */
 struct nbpnve {
     struct sockaddr_at	nn_sat;
-    u_int8_t		nn_objlen;
+    u_char		nn_objlen;
     char		nn_obj[ NBPSTRLEN ];
-    u_int8_t		nn_typelen;
+    u_char		nn_typelen;
     char		nn_type[ NBPSTRLEN ];
-    u_int8_t		nn_zonelen;
+    u_char		nn_zonelen;
     char		nn_zone[ NBPSTRLEN ];
 };
 
