@@ -4,11 +4,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#if defined(linux) /* for program_invocation_short_name */
-#include <errno.h>
-extern char *program_invocation_short_name;
-#endif
-
 /* 
  * logger LOG Macro Usage
  * ======================
@@ -243,11 +238,7 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 				       __LINE__, buffer);
 		}
 #else
-#if defined(linux)
-	snprintf(logpath, 255, "/var/log/netatalk/%s.log", program_invocation_short_name);
-#else
 	snprintf(logpath, 255, "/var/log/netatalk/%s.log", getprogname());
-#endif
 	logfile = fopen(logpath, "a");
 	if (logfile != NULL) {
 		fprintf(logfile, "%s: %s\n", lognames[type], buffer);
