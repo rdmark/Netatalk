@@ -108,19 +108,15 @@ service_cnid_DATA		= cnid.service
 $(service_cnid_DATA): service.cnid.systemd
 	cp -f service.cnid.systemd $(service_cnid_DATA)
 
-if USE_APPLETALK
 service_atalkddir		= $(systemddir)
 service_atalkd_DATA		= atalkd.service
 $(service_atalkd_DATA): service.atalkd.systemd
 	cp -f service.atalkd.systemd $(service_atalkd_DATA)
-endif
 
-if USE_CUPS
 service_papddir			= $(systemddir)
 service_papd_DATA		= papd.service
 $(service_papd_DATA): service.papd.systemd
 	cp -f service.papd.systemd $(service_papd_DATA)
-endif
 
 if COMPILE_TIMELORD
 service_timelorddir		= $(systemddir)
@@ -140,14 +136,8 @@ install-data-hook:
 	-systemctl daemon-reload
 	-systemctl enable $(service_cnid_DATA)
 	-systemctl enable $(service_afpd_DATA)
-
-if USE_APPLETALK
 	-systemctl enable $(service_atalkd_DATA)
-endif
-
-if USE_CUPS
 	-systemctl enable $(service_papd_DATA)
-endif
 
 if COMPILE_TIMELORD
 	-systemctl enable $(service_timelord_DATA)
@@ -162,16 +152,10 @@ uninstall-startup:
 	rm -f $(DESTDIR)$(service_afpddir)/$(service_afpd_DATA)
 	-systemctl disable $(service_cnid_DATA)
 	rm -f $(DESTDIR)$(service_cniddir)/$(service_cnid_DATA)
-
-if USE_APPLETALK
 	-systemctl disable $(service_atalkd_DATA)
 	rm -f $(DESTDIR)$(service_atalkddir)/$(service_atalkd_DATA)
-endif
-
-if USE_CUPS
 	-systemctl disable $(service_papd_DATA)
 	rm -f $(DESTDIR)$(service_papddir)/$(service_papd_DATA)
-endif
 
 if COMPILE_TIMELORD
 	-systemctl disable $(service_timelord_DATA)

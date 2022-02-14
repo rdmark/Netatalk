@@ -318,7 +318,10 @@ int cups_get_printer_status(struct printer *pr)
 			status = 0;
 	}
 
-        if ((attr = ippFindAttribute(response, "printer-state-message", IPP_TAG_TEXT)) != NULL)
+    snprintf(pr->p_status, 255, cups_status_msg[status],
+        pr->p_printer);
+
+    if ((attr = ippFindAttribute(response, "printer-state-message", IPP_TAG_TEXT)) != NULL)
 		strncat ( pr->p_status, ippGetString(attr, 0, NULL), 255-strlen(pr->p_status));
 
 	ippDelete(response);
