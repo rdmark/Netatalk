@@ -14,6 +14,7 @@ afpd_SOURCES = \
 	afp_options.c \
 	afp_util.c \
 	afp_zeroconf.c \
+	afprun.c \
 	appl.c \
 	auth.c \
 	catsearch.c \
