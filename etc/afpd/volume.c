@@ -658,7 +658,7 @@ static int creatvol(AFPObj * obj, struct passwd *pwd, char *path, char *name, st
 
     /* suffix for mangling use (lastvid + 1)   */
     /* because v_vid has not been decided yet. */
-    suffixlen = sprintf(suffix, "%c%X", MANGLE_CHAR, lastvid + 1 );
+    suffixlen = snprintf(suffix, sizeof(suffix), "%c%X", MANGLE_CHAR, lastvid + 1);
 
     vlen = strlen( name );
 
@@ -915,30 +915,34 @@ static int creatvol(AFPObj * obj, struct passwd *pwd, char *path, char *name, st
 			if (options[VOLOPT_PREEXEC].c_value)
 				volume->v_preexec =
 				    volxlate(obj, NULL, MAXPATHLEN,
-					     options[VOLOPT_PREEXEC].
-					     c_value, pwd, path, name);
+					     options
+					     [VOLOPT_PREEXEC].c_value, pwd,
+					     path, name);
 			volume->v_preexec_close =
 			    options[VOLOPT_PREEXEC].i_value;
 
 			if (options[VOLOPT_POSTEXEC].c_value)
 				volume->v_postexec =
 				    volxlate(obj, NULL, MAXPATHLEN,
-					     options[VOLOPT_POSTEXEC].
-					     c_value, pwd, path, name);
+					     options
+					     [VOLOPT_POSTEXEC].c_value,
+					     pwd, path, name);
 
 			if (options[VOLOPT_ROOTPREEXEC].c_value)
 				volume->v_root_preexec =
 				    volxlate(obj, NULL, MAXPATHLEN,
-					     options[VOLOPT_ROOTPREEXEC].
-					     c_value, pwd, path, name);
+					     options
+					     [VOLOPT_ROOTPREEXEC].c_value,
+					     pwd, path, name);
 			volume->v_root_preexec_close =
 			    options[VOLOPT_ROOTPREEXEC].i_value;
 
 			if (options[VOLOPT_ROOTPOSTEXEC].c_value)
 				volume->v_root_postexec =
 				    volxlate(obj, NULL, MAXPATHLEN,
-					     options[VOLOPT_ROOTPOSTEXEC].
-					     c_value, pwd, path, name);
+					     options
+					     [VOLOPT_ROOTPOSTEXEC].c_value,
+					     pwd, path, name);
 		}
 	}
 	volume->v_dperm |= volume->v_perm;
@@ -1302,7 +1306,7 @@ static int readvolfile(AFPObj * obj, struct afp_volume_name *p1, char *p2,
 	   a client if, say, someone is editing the volume file with vi.
 
 	   Since we're only reading it, it's safe to skip this.
-	*/
+	 */
 
 #if 0
 	/* try putting a read lock on the volume file twice, sleep 1 second if first attempt fails */
@@ -1451,15 +1455,16 @@ static int readvolfile(AFPObj * obj, struct afp_volume_name *p1, char *p2,
 				 * 3) rwlist exists -> ro unless user is in it. */
 				if (parent_or_child == 1
 				    &&
-				    ((options[VOLOPT_FLAGS].
-				      i_value & AFPVOL_RO) == 0)
+				    ((options[VOLOPT_FLAGS].i_value &
+				      AFPVOL_RO) == 0)
 				    &&
 				    ((accessvol
 				      (options[VOLOPT_ROLIST].c_value,
 				       obj->username) == 1)
-				     || !accessvol(options[VOLOPT_RWLIST].
-						   c_value,
-						   obj->username)))
+				     ||
+				     !accessvol(options
+						[VOLOPT_RWLIST].c_value,
+						obj->username)))
 					options[VOLOPT_FLAGS].i_value |=
 					    AFPVOL_RO;
 
@@ -1580,7 +1585,7 @@ static void volume_unlink(struct vol *volume)
  */
 static long long int get_tm_bandsize(const char *path)
 {
-	EC_INIT;
+    EC_INIT;
 	FILE *file = NULL;
 	char buf[512];
 	long long int bandsize = -1;
@@ -1603,11 +1608,13 @@ static long long int get_tm_bandsize(const char *path)
 		break;
 	}
 
-      EC_CLEANUP:
+EC_CLEANUP:
 	if (file)
 		fclose(file);
 	LOG(log_debug, logtype_afpd,
 	    "get_tm_bandsize(\"%s\"): bandsize: %lld", path, bandsize);
+	if (ret != 0)
+		return -1;
 	return bandsize;
 }
 
@@ -1630,7 +1637,7 @@ static long long int get_tm_bands(const char *path)
 		count++;
 	count -= 2;		/* All OSens I'm aware of return "." and "..", so just substract them, avoiding string comparison in loop */
 
-      EC_CLEANUP:
+EC_CLEANUP:
 	if (dir)
 		closedir(dir);
 	if (ret != 0)
@@ -1671,7 +1678,6 @@ static int get_tm_used(struct vol *restrict vol)
 	DIR *dir = NULL;
 	const struct dirent *entry;
 	const char *p;
-	struct stat st;
 	long int links;
 	time_t now = time(NULL);
 
@@ -1740,19 +1746,17 @@ static int getvolspace(struct vol *vol,
 		       VolSpace * xbfree, VolSpace * xbtotal,
 		       u_int32_t * bsize)
 {
-	int spaceflag, rc;
+    int rc;
 	u_int32_t maxsize;
-	VolSpace used;
 #ifndef NO_QUOTA_SUPPORT
 	VolSpace qfree, qtotal;
+	int spaceflag = AFPVOL_GVSMASK & vol->v_flags;
 #endif
 
-	spaceflag = AFPVOL_GVSMASK & vol->v_flags;
 	/* report up to 2GB if afp version is < 2.2 (4GB if not) */
 	maxsize = (vol->v_flags & AFPVOL_A2VOL) ? 0x01fffe00 :
 	    (((afp_version < 22) || (vol->v_flags & AFPVOL_LIMITSIZE))
 	     ? 0x7fffffffL : 0xffffffffL);
-
 
 	if ((rc =
 	     ustatfs_getvolspace(vol, xbfree, xbtotal, bsize)) != AFP_OK) {
@@ -1764,8 +1768,8 @@ static int getvolspace(struct vol *vol,
 		if (uquota_getvolspace(vol, &qfree, &qtotal, *bsize) ==
 		    AFP_OK) {
 			vol->v_flags =
-			    (~AFPVOL_GVSMASK & vol->
-			     v_flags) | AFPVOL_UQUOTA;
+			    (~AFPVOL_GVSMASK & vol->v_flags) |
+			    AFPVOL_UQUOTA;
 			*xbfree = MIN(*xbfree, qfree);
 			*xbtotal = MIN(*xbtotal, qtotal);
 			goto getvolspace_done;
@@ -1774,7 +1778,6 @@ static int getvolspace(struct vol *vol,
 #endif
 	vol->v_flags = (~AFPVOL_GVSMASK & vol->v_flags) | AFPVOL_USTATFS;
 
-      getvolspace_done:
 	if (vol->v_limitsize) {
 		if (get_tm_used(vol) != 0)
 			return AFPERR_MISC;
@@ -1918,16 +1921,17 @@ static int getvolparams(u_int16_t bitmap, struct vol *vol, struct stat *st,
 			if (afp_version > 20) {
 				if (0 == (vol->v_flags & AFPVOL_NOFILEID)
 				    && vol->v_cdb != NULL
-				    && (vol->v_cdb->
-					flags & CNID_FLAG_PERSISTENT)) {
+				    && (vol->
+					v_cdb->flags &
+					CNID_FLAG_PERSISTENT)) {
 					ashort |= VOLPBIT_ATTR_FILEID;
 				}
 				ashort |= VOLPBIT_ATTR_CATSEARCH;
 
 				if (afp_version >= 30) {
 					ashort |= VOLPBIT_ATTR_UTF8;
-					if (vol->
-					    v_flags & AFPVOL_UNIX_PRIV)
+					if (vol->v_flags &
+					    AFPVOL_UNIX_PRIV)
 						ashort |=
 						    VOLPBIT_ATTR_UNIXPRIV;
 					if (vol->v_flags & AFPVOL_TM)
@@ -1939,8 +1943,8 @@ static int getvolparams(u_int16_t bitmap, struct vol *vol, struct stat *st,
 						if (vol->v_vfs_ea)
 							ashort |=
 							    VOLPBIT_ATTR_EXT_ATTRS;
-						if (vol->
-						    v_flags & AFPVOL_ACLS)
+						if (vol->v_flags &
+						    AFPVOL_ACLS)
 							ashort |=
 							    VOLPBIT_ATTR_ACLS;
 					}
@@ -2228,8 +2232,9 @@ int afp_getsrvrparms(AFPObj * obj, char *ibuf _U_, size_t ibuflen _U_,
 						     volume->v_u8mname);
 		} else {
 			len =
-			    ucs2_to_charset_allocate(obj->options.
-						     maccharset, &namebuf,
+			    ucs2_to_charset_allocate(obj->
+						     options.maccharset,
+						     &namebuf,
 						     volume->v_macname);
 		}
 
@@ -2254,8 +2259,8 @@ int afp_getsrvrparms(AFPObj * obj, char *ibuf _U_, size_t ibuflen _U_,
 		   from the server.  Support for that function is a ways
 		   off.. <shirsch@ibm.net> */
 		*data |=
-		    (volume->
-		     v_flags & AFPVOL_A2VOL) ? AFPSRVR_CONFIGINFO : 0;
+		    (volume->v_flags & AFPVOL_A2VOL) ? AFPSRVR_CONFIGINFO :
+		    0;
 		*data++ |= 0;	/* UNIX PRIVS BIT ..., OSX doesn't seem to use it, so we don't either */
 		*data++ = len;
 		memcpy(data, namebuf, len);
@@ -2375,10 +2380,12 @@ static int volume_openDB(struct vol *volume)
 				  volume->v_umask,
 				  volume->v_cnidscheme,
 				  flags,
-				  volume->v_cnidserver ? volume->
-				  v_cnidserver : Cnid_srv,
-				  volume->v_cnidport ? volume->
-				  v_cnidport : Cnid_port);
+				  volume->
+				  v_cnidserver ? volume->v_cnidserver :
+				  Cnid_srv,
+				  volume->
+				  v_cnidport ? volume->v_cnidport :
+				  Cnid_port);
 
 	if (!volume->v_cdb && !(flags & CNID_FLAG_MEMORY)) {
 		/* The first attempt failed and it wasn't yet an attempt to open in-memory */
@@ -2458,8 +2465,7 @@ static void check_ea_sys_support(struct vol *vol)
 			if (seteuid(process_uid) == -1) {
 				LOG(log_error, logtype_afpd,
 				    "check_ea_sys_support: can't seteuid back to %i (%s)",
-				    process_uid,
-				    strerror(errno));
+				    process_uid, strerror(errno));
 				exit(EXITERR_SYS);
 			}
 		}
@@ -2670,10 +2676,10 @@ int afp_openvol(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 	if (ret == AFP_OK) {
 		handle_special_folders(volume);
 		savevolinfo(volume,
-			    volume->v_cnidserver ? volume->
-			    v_cnidserver : Cnid_srv,
-			    volume->v_cnidport ? volume->
-			    v_cnidport : Cnid_port);
+			    volume->
+			    v_cnidserver ? volume->v_cnidserver : Cnid_srv,
+			    volume->
+			    v_cnidport ? volume->v_cnidport : Cnid_port);
 
 
 		/*
@@ -2887,10 +2893,9 @@ int pollvoltime(AFPObj * obj)
 			if (!stat(vol->v_path, &st)
 			    && vol->v_mtime != st.st_mtime) {
 				vol->v_mtime = st.st_mtime;
-				if (!obj->
-				    attention(obj->handle,
-					      AFPATTN_NOTIFY |
-					      AFPATTN_VOLCHANGED))
+				if (!obj->attention(obj->handle,
+						    AFPATTN_NOTIFY |
+						    AFPATTN_VOLCHANGED))
 					return -1;
 				return 1;
 			}
@@ -3131,7 +3136,8 @@ static void handle_special_folders(const struct vol *vol)
 	if (process_uid) {
 		if (seteuid(process_uid) == -1) {
 			LOG(log_error, logtype_logger,
-			    "handle_special_folders: can't seteuid back to %i (%s)", process_uid, strerror(errno));
+			    "handle_special_folders: can't seteuid back to %i (%s)",
+			    process_uid, strerror(errno));
 			exit(EXITERR_SYS);
 		}
 	}
