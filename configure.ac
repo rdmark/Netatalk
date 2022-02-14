@@ -1020,7 +1020,6 @@ AC_OUTPUT([Makefile
 	libatalk/nbp/Makefile
 	libatalk/netddp/Makefile
 	libatalk/util/Makefile
-	libatalk/tdb/Makefile
 	libatalk/unicode/Makefile
 	libatalk/unicode/charsets/Makefile
 	libatalk/vfs/Makefile
