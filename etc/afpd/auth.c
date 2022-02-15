@@ -160,8 +160,7 @@ static int set_auth_switch(int expired)
 {
 	int i;
 
-	if (!expired) {
-		afp_switch = postauth_switch;
+	if (expired) {
 		/*
 		 * BF: expired password handling
 		 * to allow the user to change his/her password we have to allow login
