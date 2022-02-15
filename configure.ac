@@ -320,11 +320,11 @@ AC_ARG_ENABLE(systemd,
 
 dnl ----- timelord compilation (disabled by default)
 AC_MSG_CHECKING([whether timelord should be compiled])
-compile_timelord=no
+compile_timelord=yes
 AC_ARG_ENABLE(timelord,
 	[  --enable-timelord       enable compilation of timelord server],
 	[compile_timelord="$enableval"],
-	[compile_timelord="no"]
+	[compile_timelord="yes"]
 )
 AC_MSG_RESULT([$compile_timelord])
 
@@ -934,8 +934,6 @@ AC_SUBST(CFLAGS)
 AC_SUBST(OVERWRITE_CONFIG)
 
 AM_CONDITIONAL(SOLARIS_MODULE, test x$solaris_module = xyes)
-AM_CONDITIONAL(COMPILE_TIMELORD, test x$compile_timelord = xyes)
-AM_CONDITIONAL(COMPILE_A2BOOT, test x$compile_a2boot = xyes)
 AM_CONDITIONAL(HAVE_LIBGCRYPT, test x$neta_cv_have_libgcrypt = xyes)
 AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
 AM_CONDITIONAL(HAVE_ACLS, test x"$with_acl_support" = x"yes")

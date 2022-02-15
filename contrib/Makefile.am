@@ -1,12 +1,3 @@
 # Makefile.am for contrib/
 
-SUBDIRS = macusers misc shell_utils printing
-
-if COMPILE_TIMELORD
-SUBDIRS += timelord
-endif
-
-if COMPILE_A2BOOT
-SUBDIRS += a2boot
-endif
-
+SUBDIRS = a2boot macusers misc shell_utils printing timelord
