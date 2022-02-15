@@ -68,12 +68,19 @@
 #include <pwd.h>
 #include <grp.h>
 
-#if defined(__linux__)
+/* FIXME */
+#ifdef linux
+#ifndef USE_SETRESUID
+#define USE_SETRESUID 1
 #define SWITCH_TO_GID(gid)  ((setresgid(gid,gid,gid) < 0 || setgid(gid) < 0) ? -1 : 0)
 #define SWITCH_TO_UID(uid)  ((setresuid(uid,uid,uid) < 0 || setuid(uid) < 0) ? -1 : 0)
-#else
+#endif				/* USE_SETRESUID */
+#else				/* ! linux */
+#ifndef USE_SETEUID
+#define USE_SETEUID 1
 #define SWITCH_TO_GID(gid)  ((setegid(gid) < 0 || setgid(gid) < 0) ? -1 : 0)
 #define SWITCH_TO_UID(uid)  ((setuid(uid) < 0 || seteuid(uid) < 0 || setuid(uid) < 0) ? -1 : 0)
+#endif				/* USE_SETEUID */
 #endif				/* linux */
 
 #include <atalk/util.h>
