@@ -19,11 +19,7 @@ libatalk_la_LIBADD  = \
 	netddp/libnetddp.la \
 	util/libutil.la		\
 	unicode/libunicode.la \
-	vfs/libvfs.la \
-	asp/libasp.la		\
-	atp/libatp.la		\
-	nbp/libnbp.la		\
-	netddp/libnetddp.la
+	vfs/libvfs.la
 
 libatalk_la_DEPENDENCIES = \
 	asp/libasp.la \
@@ -37,10 +33,6 @@ libatalk_la_DEPENDENCIES = \
 	netddp/libnetddp.la \
 	util/libutil.la		\
 	unicode/libunicode.la \
-	vfs/libvfs.la \
-	asp/libasp.la		\
-	atp/libatp.la		\
-	nbp/libnbp.la		\
-	netddp/libnetddp.la
+	vfs/libvfs.la
 
 libatalk_la_LDFLAGS = -static
