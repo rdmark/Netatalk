@@ -32,3 +32,4 @@ test-driver
 *.orig
 *.rej
 *.diff
+*.swp
