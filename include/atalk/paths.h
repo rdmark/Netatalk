@@ -31,11 +31,7 @@
  * papd paths
  */
 #define _PATH_PAPDPRINTCAP	"/etc/printcap"
-#ifdef ultrix
-#define _PATH_PAPDSPOOLDIR	"/usr/spool/lpd"
-#else /* !ultrix */
 #define _PATH_PAPDSPOOLDIR	"/var/spool/lpd"
-#endif /* ultrix */
 #ifdef __NetBSD__
 #define _PATH_DEVPRINTER	"/var/run/printer"
 #else /* !__NetBSD__ */
