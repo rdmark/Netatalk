@@ -25,10 +25,6 @@
 #include <sys/types.h>
 #include <netinet/in.h>		/* so that we can deal with sun's s_net #define */
 
-#ifdef MACOSX_SERVER
-#include <netat/appletalk.h>
-#endif				/* MACOSX_SERVER */
-
 /*
  * Supported protocols
  */
@@ -66,7 +62,6 @@
 /*
  * AppleTalk address.
  */
-#ifndef MACOSX_SERVER
 struct at_addr {
 #ifdef s_net
 #undef s_net
@@ -74,7 +69,6 @@ struct at_addr {
 	u_short s_net;
 	u_char s_node;
 };
-#endif				/* MACOSX_SERVER */
 
 #define ATADDR_ANYNET	(u_short)0x0000
 #define ATADDR_ANYNODE	(u_char)0x00
@@ -88,7 +82,6 @@ struct at_addr {
  * interface.  IFACE may be filled in by the client, and is filled in
  * by the kernel.
  */
-#ifndef MACOSX_SERVER
 struct sockaddr_at {
 #ifdef __NetBSD__
 	u_char sat_len;
@@ -117,7 +110,6 @@ struct sockaddr_at {
 	char sat_zero[8];
 #endif				/* notdef */
 };
-#endif				/* MACOSX_SERVER */
 
 struct netrange {
 	u_char nr_phase;
