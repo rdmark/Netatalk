@@ -19,7 +19,7 @@ libcups2-dev libssl-dev libdb-dev autotools-dev automake libtool
 
 A breakdown of optional packages:
 - ``` libavahi-client-dev ``` -- Needed for zeroconf service discovery on Mac OS X / macOS
-- ``` libgcrypt20-dev ``` -- Needed for the DHX2 UAM
+- ``` libgcrypt20-dev ``` -- Needed for the DHX2 UAM that allows you to authenticate with a Mac OS X / macOS client
 
 An example configuration that enables systemd services, as well as Zeroconf for Bonjour service discovery on Mac OS X:
 ```
