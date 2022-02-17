@@ -11,5 +11,4 @@ netatalk
 atalk
 *.service
 netatalk.sh
-.gitignore
 *.o
