@@ -133,6 +133,23 @@ dnl specific configuration comes in here:
 dnl --------------------------------------------------------------------------
 
 
+netatalk_cv_systemd_enable=no
+AC_MSG_CHECKING([for enabling and starting systemd services with make install])
+AC_ARG_ENABLE(systemd-start,
+ 	[  --enable-systemd-start   make install also enables and starts systemd services],[
+        if test x"$enableval" = x"yes"; then
+		AC_DEFINE(SYSTEMD_START, 1, [Define if make install enables systemd services])
+		netatalk_systemd_start=yes
+		AC_MSG_RESULT([no])
+	else
+		AC_DEFINE(SYSTEMD_START, 0, [Define if make install enables systemd services])
+		AC_MSG_RESULT([yes])
+        fi],[
+		AC_DEFINE(SYSTEMD_START, 0, [Define if make install enables systemd services])
+		AC_MSG_RESULT([yes])
+	]
+)
+
 netatalk_cv_admin_group=yes
 AC_MSG_CHECKING([for administrative group support])
 AC_ARG_ENABLE(admin-group,
@@ -954,6 +971,7 @@ AM_CONDITIONAL(USE_DEBIAN, test x$sysv_style = xdebian)
 AM_CONDITIONAL(USE_SYSTEMD, test x$sysv_style = xsystemd || test x$sysv_style = xredhat-systemd || test x$sysv_style = xsuse-systemd)
 AM_CONDITIONAL(USE_UNDEF, test x$sysv_style = x)
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
+AM_CONDITIONAL(SYSTEMD_START, test x$netatalk_systemd_start = xyes)
 
 dnl --------------------- generate files
 
