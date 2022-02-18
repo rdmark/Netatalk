@@ -134,11 +134,9 @@ static char * srvloc_encode(const struct afp_options *options, const char *name)
 
 	return buf;
 }
-#endif /* USE_SRVLOC */
 
 static void dsi_cleanup(const AFPConfig *config)
 {
-#ifdef USE_SRVLOC
     SLPError err;
     SLPError callbackerr;
     SLPHandle hslp;
@@ -171,8 +169,8 @@ static void dsi_cleanup(const AFPConfig *config)
 srvloc_dereg_err:
     dsi->srvloc_url[0] = '\0';
     SLPClose(hslp);
-#endif /* USE_SRVLOC */
 }
+#endif /* USE_SRVLOC */
 
 static void asp_cleanup(const AFPConfig * config)
 {
