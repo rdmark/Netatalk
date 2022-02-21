@@ -19,9 +19,7 @@
  * Maybe somewhere in the future.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <atalk/cnid.h>
 #include <atalk/list.h>
@@ -60,30 +58,30 @@ extern struct _cnid_module cnid_tdb_module;
 void cnid_init(void)
 {
 #ifdef CNID_BACKEND_DB3
-    cnid_register(&cnid_db3_module);
+	cnid_register(&cnid_db3_module);
 #endif
 
 #ifdef CNID_BACKEND_HASH
-    cnid_register(&cnid_hash_module);
+	cnid_register(&cnid_hash_module);
 #endif
 
 #ifdef CNID_BACKEND_LAST
-    cnid_register(&cnid_last_module);
+	cnid_register(&cnid_last_module);
 #endif
 
 #ifdef CNID_BACKEND_MTAB
-    cnid_register(&cnid_mtab_module);
+	cnid_register(&cnid_mtab_module);
 #endif
 
 #ifdef CNID_BACKEND_CDB
-    cnid_register(&cnid_cdb_module);
+	cnid_register(&cnid_cdb_module);
 #endif
 
 #ifdef CNID_BACKEND_DBD
-    cnid_register(&cnid_dbd_module);
+	cnid_register(&cnid_dbd_module);
 #endif
 
 #ifdef CNID_BACKEND_TDB
-    cnid_register(&cnid_tdb_module);
+	cnid_register(&cnid_tdb_module);
 #endif
 }

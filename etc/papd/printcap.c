@@ -36,31 +36,27 @@
  * SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
-#endif /* HAVE_FCNTL_H */
+#endif				/* HAVE_FCNTL_H */
 #include <atalk/paths.h>
 
 #include "printcap.h"
 
 #ifndef BUFSIZ
 #define	BUFSIZ	1024
-#endif /* ! BUFSIZ */
-#define MAXHOP	32	/* max number of tc= indirections */
+#endif				/* ! BUFSIZ */
+#define MAXHOP	32		/* max number of tc= indirections */
 
 /*
  * termcap - routines for dealing with the terminal capability data base
@@ -89,11 +85,11 @@
 #define tnchktc	pnchktc
 #define	tnamatch pnamatch
 #define V6
-#endif /* PRINTCAP */
+#endif				/* PRINTCAP */
 
-static	FILE *pfp = NULL;	/* printcap data base file pointer */
-static	char *tbuf;
-static	int hopcount;		/* detect infinite loops in termcap, init 0 */
+static FILE *pfp = NULL;	/* printcap data base file pointer */
+static char *tbuf;
+static int hopcount;		/* detect infinite loops in termcap, init 0 */
 
 /*
  * Similar to tgetent except it returns the next entry instead of
@@ -102,24 +98,24 @@ static	int hopcount;		/* detect infinite loops in termcap, init 0 */
  * Added a "cap" parameter, so we can use these calls for printcap
  * and papd.conf.
  */
-int getprent( char *cap, char *bp, int bufsize)
+int getprent(char *cap, char *bp, int bufsize)
 {
 	register int c, skip = 0, i;
 
-	if (pfp == NULL && (pfp = fopen( cap, "r")) == NULL)
-		return(-1);
+	if (pfp == NULL && (pfp = fopen(cap, "r")) == NULL)
+		return (-1);
 	tbuf = bp;
 	i = 0;
 	for (;;) {
 		switch (c = getc(pfp)) {
 		case EOF:
-                        if (bp != tbuf) {
+			if (bp != tbuf) {
 				*bp = '\0';
-				return(1);
+				return (1);
 			}
 			fclose(pfp);
 			pfp = NULL;
-			return(0);
+			return (0);
 		case '\n':
 			if (bp == tbuf) {
 				skip = 0;
@@ -130,25 +126,25 @@ int getprent( char *cap, char *bp, int bufsize)
 				continue;
 			}
 			*bp = '\0';
-			return(1);
+			return (1);
 		case '#':
 			if (bp == tbuf)
 				skip++;
 		default:
 			if (skip)
 				continue;
-			if (bp >= tbuf+BUFSIZ) {
-				write(2, "Termcap entry too long\n", 23);
+			if (bp >= tbuf + BUFSIZ) {
+				fprintf(stderr, "Termcap entry too long\n");
 				*bp = '\0';
-				return(1);
+				return (1);
 			}
 			*bp++ = c;
 			if (++i >= bufsize) {
-				write(2, "config file too large\n", 22);
+				fprintf(stderr, "config file too large\n");
 				fclose(pfp);
 				pfp = NULL;
 				*bp = '\0';
-				return(1);
+				return (1);
 			}
 		}
 	}
@@ -190,22 +186,22 @@ int tgetent(char *cap, char *bp, char *name)
 	 * has to already have the newlines crunched out.
 	 */
 	if (cp && *cp) {
-		if (*cp!='/') {
+		if (*cp != '/') {
 			cp2 = getenv("TERM");
-			if (cp2==(char *) 0 || strcmp(name,cp2)==0) {
-				strcpy(bp,cp);
-				return(tnchktc(cap));
+			if (cp2 == (char *) 0 || strcmp(name, cp2) == 0) {
+				strcpy(bp, cp);
+				return (tnchktc(cap));
 			} else {
 				tf = open(cap, 0);
 			}
 		} else
 			tf = open(cp, 0);
 	}
-	if (tf==0)
+	if (tf == 0)
 		tf = open(cap, 0);
-#else /* V6 */
+#else				/* V6 */
 	tf = open(cap, 0);
-#endif /* V6 */
+#endif				/* V6 */
 	if (tf < 0)
 		return (-1);
 	for (;;) {
@@ -236,8 +232,8 @@ int tgetent(char *cap, char *bp, char *name)
 				skip++;
 			if (skip)
 				continue;
-			if (cp >= bp+BUFSIZ) {
-				write(2,"Termcap entry too long\n", 23);
+			if (cp >= bp + BUFSIZ) {
+				fprintf(stderr, "Termcap entry too long\n");
 				break;
 			} else
 				*cp++ = c;
@@ -249,7 +245,7 @@ int tgetent(char *cap, char *bp, char *name)
 		 */
 		if (tnamatch(name)) {
 			close(tf);
-			return(tnchktc(cap));
+			return (tnchktc(cap));
 		}
 	}
 }
@@ -264,7 +260,7 @@ int tgetent(char *cap, char *bp, char *name)
  * Added a "cap" parameter, so we can use these calls for printcap
  * and papd.conf.
  */
-int tnchktc( char *cap)
+int tnchktc(char *cap)
 {
 	register char *p, *q;
 	char tcname[16];	/* name of similar terminal */
@@ -274,35 +270,34 @@ int tnchktc( char *cap)
 
 	p = tbuf + strlen(tbuf) - 2;	/* before the last colon */
 	while (*--p != ':')
-		if (p<tbuf) {
-			write(2, "Bad termcap entry\n", 18);
+		if (p < tbuf) {
+			fprintf(stderr, "Bad termcap entry\n");
 			return (0);
 		}
 	p++;
 	/* p now points to beginning of last field */
 	if (p[0] != 't' || p[1] != 'c')
-		return(1);
-	strcpy(tcname,p+3);
+		return (1);
+	strcpy(tcname, p + 3);
 	q = tcname;
 	while (q && *q != ':')
 		q++;
 	*q = 0;
 	if (++hopcount > MAXHOP) {
-		write(2, "Infinite tc= loop\n", 18);
+		fprintf(stderr, "Infinite tc= loop\n");
 		return (0);
 	}
-	if (tgetent( cap, tcbuf, tcname) != 1)
-		return(0);
-	for (q=tcbuf; *q != ':'; q++)
-		;
+	if (tgetent(cap, tcbuf, tcname) != 1)
+		return (0);
+	for (q = tcbuf; *q != ':'; q++);
 	l = p - holdtbuf + strlen(q);
 	if (l > BUFSIZ) {
-		write(2, "Termcap entry too long\n", 23);
-		q[BUFSIZ - (p-tbuf)] = 0;
+		fprintf(stderr, "Termcap entry too long\n");
+		q[BUFSIZ - (p - tbuf)] = 0;
 	}
-	strcpy(p, q+1);
+	strcpy(p, q + 1);
 	tbuf = holdtbuf;
-	return(1);
+	return (1);
 }
 
 /*
@@ -317,7 +312,7 @@ int tnamatch(char *np)
 
 	Bp = tbuf;
 	if (*Bp == '#')
-		return(0);
+		return (0);
 	for (;;) {
 		for (Np = np; *Np && *Bp == *Np; Bp++, Np++)
 			continue;
@@ -366,7 +361,7 @@ int tgetnum(char *id)
 		if (*bp++ != id[0] || *bp == 0 || *bp++ != id[1])
 			continue;
 		if (*bp == '@')
-			return(-1);
+			return (-1);
 		if (*bp != '#')
 			continue;
 		bp++;
@@ -398,7 +393,7 @@ int tgetflag(char *id)
 			if (!*bp || *bp == ':')
 				return (1);
 			else if (*bp == '@')
-				return(0);
+				return (0);
 		}
 	}
 }
@@ -407,8 +402,7 @@ int tgetflag(char *id)
  * Tdecode does the grung work to decode the
  * string capability escapes.
  */
-static char *
-tdecode(char *str, char **area)
+static char *tdecode(char *str, char **area)
 {
 	register char *cp;
 	register int c;
@@ -426,7 +420,7 @@ tdecode(char *str, char **area)
 		case '\\':
 			dp = "E\033^^\\\\::n\nr\rt\tb\bf\f";
 			c = *str++;
-nextc:
+		      nextc:
 			if (*dp++ == c) {
 				c = *dp++;
 				break;
@@ -458,8 +452,7 @@ nextc:
  * placed in area, which is a ref parameter which is updated.
  * No checking on area overflow.
  */
-char *
-tgetstr(char *id, char **area)
+char *tgetstr(char *id, char **area)
 {
 	register char *bp = tbuf;
 
@@ -470,7 +463,7 @@ tgetstr(char *id, char **area)
 		if (*bp++ != id[0] || *bp == 0 || *bp++ != id[1])
 			continue;
 		if (*bp == '@')
-			return(NULL);
+			return (NULL);
 		if (*bp != '=')
 			continue;
 		bp++;
@@ -478,8 +471,7 @@ tgetstr(char *id, char **area)
 	}
 }
 
-static char *
-decodename(char *str, char **area, int bufsize)
+static char *decodename(char *str, char **area, int bufsize)
 {
 	register char *cp;
 	register int c;
@@ -487,7 +479,7 @@ decodename(char *str, char **area, int bufsize)
 	int i;
 
 	cp = *area;
-	while ((c = *str++) && --bufsize && c != ':' && c != '|' ) {
+	while ((c = *str++) && --bufsize && c != ':' && c != '|') {
 		switch (c) {
 
 		case '^':
@@ -497,7 +489,7 @@ decodename(char *str, char **area, int bufsize)
 		case '\\':
 			dp = "E\033^^\\\\::n\nr\rt\tb\bf\f";
 			c = *str++;
-nextc:
+		      nextc:
 			if (*dp++ == c) {
 				c = *dp++;
 				break;
@@ -521,8 +513,7 @@ nextc:
 	return (str);
 }
 
-char *
-getpname(char **area, int bufsize)
+char *getpname(char **area, int bufsize)
 {
-	return( decodename( tbuf, area, bufsize));
+	return (decodename(tbuf, area, bufsize));
 }

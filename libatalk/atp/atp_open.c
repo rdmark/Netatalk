@@ -23,9 +23,7 @@
  *	netatalk@itd.umich.edu
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>
 #include <string.h>
@@ -45,41 +43,41 @@
 
 ATP atp_open(u_int8_t port, const struct at_addr *saddr)
 {
-    struct sockaddr_at  addr;
-    int			s;
-    ATP			atp;
-    struct timeval	tv;
-    int			pid;
+	struct sockaddr_at addr;
+	int s;
+	ATP atp;
+	struct timeval tv;
+	int pid;
 
 #ifdef DEBUG
-    printf( "<%d> atp_open\n", getpid());
-#endif /* DEBUG */
+	printf("<%d> atp_open\n", getpid());
+#endif				/* DEBUG */
 
-    memset(&addr, 0, sizeof(addr));
-    addr.sat_port = port;
-    if (saddr) 
-      memcpy(&addr.sat_addr, saddr, sizeof(struct at_addr));
-    if ((s = netddp_open(&addr, NULL)) < 0)
-        return NULL;
+	memset(&addr, 0, sizeof(addr));
+	addr.sat_port = port;
+	if (saddr)
+		memcpy(&addr.sat_addr, saddr, sizeof(struct at_addr));
+	if ((s = netddp_open(&addr, NULL)) < 0)
+		return NULL;
 
-    if (( atp = (ATP) atp_alloc_buf()) == NULL ) {
-        netddp_close(s);
-	return NULL;
-    }
+	if ((atp = (ATP) atp_alloc_buf()) == NULL) {
+		netddp_close(s);
+		return NULL;
+	}
 
-    /* initialize the atp handle */
-    memset(atp, 0, sizeof( struct atp_handle ));
-    memcpy(&atp->atph_saddr, &addr, sizeof(addr));
+	/* initialize the atp handle */
+	memset(atp, 0, sizeof(struct atp_handle));
+	memcpy(&atp->atph_saddr, &addr, sizeof(addr));
 
-    atp->atph_socket = s;
-    atp->atph_reqto = -1;
-    gettimeofday( &tv, (struct timezone *) 0 );
-    pid = getpid();
-    atp->atph_tid = tv.tv_sec ^ ((( pid << 8 ) & 0xff00 ) | ( pid >> 8 ));
+	atp->atph_socket = s;
+	atp->atph_reqto = -1;
+	gettimeofday(&tv, (struct timezone *) 0);
+	pid = getpid();
+	atp->atph_tid = tv.tv_sec ^ (((pid << 8) & 0xff00) | (pid >> 8));
 
 #ifdef EBUG
-srandom( tv.tv_sec );
-#endif /* EBUG */
+	srandom(tv.tv_sec);
+#endif				/* EBUG */
 
-    return atp;
+	return atp;
 }

@@ -27,14 +27,12 @@
  * Stephen R. van den Berg, berg@pool.informatik.rwth-aachen.de	*/
 /* added strcasestr support, davidm@lineo.com */
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
-#ifndef HAVE_STRCASESTR 
+#ifndef HAVE_STRCASESTR
 
 #if  defined HAVE_STRING_H
-# include <string.h>
+#include <string.h>
 #endif
 
 typedef unsigned chartype;
@@ -44,7 +42,7 @@ typedef unsigned chartype;
 #define FUNC strcasestr
 #undef strcasestr
 
-char * FUNC ( const char *phaystack, const char *pneedle)
+char *FUNC(const char *phaystack, const char *pneedle)
 {
 	register const unsigned char *haystack, *needle;
 	register chartype b, c;
@@ -54,7 +52,7 @@ char * FUNC ( const char *phaystack, const char *pneedle)
 
 	b = *needle;
 	if (b != '\0') {
-		haystack--;				/* possible ANSI violation */
+		haystack--;	/* possible ANSI violation */
 		do {
 			c = *++haystack;
 			if (c == '\0')
@@ -81,10 +79,11 @@ char * FUNC ( const char *phaystack, const char *pneedle)
 				a = *++haystack;
 				if (a == '\0')
 					goto ret0;
-		  shloop:;}
+			      shloop:;
+			}
 			while (VAL(a) != VAL(b));
 
-		  jin:a = *++haystack;
+		      jin:a = *++haystack;
 			if (a == '\0')
 				goto ret0;
 
@@ -116,9 +115,9 @@ char * FUNC ( const char *phaystack, const char *pneedle)
 				break;
 		}
 	}
-  foundneedle:
+      foundneedle:
 	return (char *) haystack;
-  ret0:
+      ret0:
 	return 0;
 }
 #endif

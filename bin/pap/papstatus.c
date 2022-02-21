@@ -23,9 +23,7 @@
  *	netatalk@itd.umich.edu
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
 #include <sys/time.h>
@@ -49,156 +47,155 @@ static void getstatus(ATP atp, struct sockaddr_at *sat);
 
 static void usage(char *path)
 {
-    char	*p;
+	char *p;
 
-    if (( p = strrchr( path, '/' )) == NULL ) {
-	p = path;
-    } else {
-	p++;
-    }
-    fprintf( stderr,
-	"Usage:\t%s [ -A address ] [ -p printername ]\n", p );
-    exit( 1 );
-}
-
-static char *
-paprc(void)
-{
-    static char	s[ 32 + 1 + 32 + 1 + 32 ];
-    char	*name = NULL;
-    FILE	*f;
-
-    if (( f = fopen( _PATH_PAPRC, "r" )) == NULL ) {
-	return( NULL );
-    }
-    while ( fgets( s, sizeof( s ), f ) != NULL ) {
-	s[ strlen( s ) - 1 ] = '\0';	/* remove trailing newline */
-	if ( *s == '#' ) {
-	    continue;
-	}
-	name = s;
-	break;
-    }
-    fclose( f );
-    return( name );
-}
-
-static char			*printer = NULL;
-
-static char			cbuf[ 8 ];
-static struct nbpnve		nn;
-
-int main( int ac, char **av)
-{
-    ATP			atp;
-    int			wait, c, err = 0;
-    char		*obj = NULL, *type = "LaserWriter", *zone = "*";
-    struct at_addr      addr;
-
-    extern char		*optarg;
-    extern int		optind;
-
-    memset(&addr, 0, sizeof(addr));
-    while (( c = getopt( ac, av, "p:s:A:" )) != EOF ) {
-	switch ( c ) {
-	case 'A':
-  	    if (!atalk_aton(optarg, &addr)) {
-	      fprintf(stderr, "Bad address.\n");
-	      exit(1);
-	    }
-	    break;
-	case 'p' :
-	    printer = optarg;
-	    break;
-
-	default :
-	    fprintf( stderr, "Unknown option: '%c'\n", c );
-	    err++;
-	}
-    }
-    if ( err ) {
-	usage( *av );
-    }
-    if ( printer == NULL && (( printer = paprc()) == NULL )) {
-	usage( *av );
-    }
-
-    /*
-     * Open connection.
-     */
-    if ( nbp_name( printer, &obj, &type, &zone ) < 0 ) {
-	fprintf( stderr, "%s: Bad name\n", printer );
-	exit( 1 );
-    }
-    if ( obj == NULL ) {
-	fprintf( stderr, "%s: Bad name\n", printer );
-	exit( 1 );
-    }
-    if ( nbp_lookup( obj, type, zone, &nn, 1, &addr ) <= 0 ) {
-	if ( errno != 0 ) {
-	    perror( "nbp_lookup" );
+	if ((p = strrchr(path, '/')) == NULL) {
+		p = path;
 	} else {
-	    fprintf( stderr, "%s:%s@%s: NBP Lookup failed\n", obj, type, zone );
+		p++;
 	}
-	exit( 1 );
-    }
+	fprintf(stderr,
+		"Usage:\t%s [ -A address ] [ -p printername ]\n", p);
+	exit(1);
+}
 
-    if (( atp = atp_open( ATADDR_ANYPORT, &addr )) == NULL ) {
-	perror( "atp_open" );
-	exit( 1 );
-    }
+static char *paprc(void)
+{
+	static char s[32 + 1 + 32 + 1 + 32];
+	char *name = NULL;
+	FILE *f;
 
-    if ( optind == ac ) {
-	getstatus( atp, &nn.nn_sat );
-	exit( 0 );
-    }
-    if ( optind - ac > 1 ) {
-	usage( *av );
-    }
-    wait = atoi( av[ optind ] );
-    for (;;) {
-	getstatus( atp, &nn.nn_sat );
-	sleep( wait );
-    }
+	if ((f = fopen(_PATH_PAPRC, "r")) == NULL) {
+		return (NULL);
+	}
+	while (fgets(s, sizeof(s), f) != NULL) {
+		s[strlen(s) - 1] = '\0';	/* remove trailing newline */
+		if (*s == '#') {
+			continue;
+		}
+		name = s;
+		break;
+	}
+	fclose(f);
+	return (name);
+}
 
-    return 0;
+static char *printer = NULL;
+
+static char cbuf[8];
+static struct nbpnve nn;
+
+int main(int ac, char **av)
+{
+	ATP atp;
+	int wait, c, err = 0;
+	char *obj = NULL, *type = "LaserWriter", *zone = "*";
+	struct at_addr addr;
+
+	extern char *optarg;
+	extern int optind;
+
+	memset(&addr, 0, sizeof(addr));
+	while ((c = getopt(ac, av, "p:s:A:")) != EOF) {
+		switch (c) {
+		case 'A':
+			if (!atalk_aton(optarg, &addr)) {
+				fprintf(stderr, "Bad address.\n");
+				exit(1);
+			}
+			break;
+		case 'p':
+			printer = optarg;
+			break;
+
+		default:
+			fprintf(stderr, "Unknown option: '%c'\n", c);
+			err++;
+		}
+	}
+	if (err) {
+		usage(*av);
+	}
+	if (printer == NULL && ((printer = paprc()) == NULL)) {
+		usage(*av);
+	}
+
+	/*
+	 * Open connection.
+	 */
+	if (nbp_name(printer, &obj, &type, &zone) < 0) {
+		fprintf(stderr, "%s: Bad name\n", printer);
+		exit(1);
+	}
+	if (obj == NULL) {
+		fprintf(stderr, "%s: Bad name\n", printer);
+		exit(1);
+	}
+	if (nbp_lookup(obj, type, zone, &nn, 1, &addr) <= 0) {
+		if (errno != 0) {
+			perror("nbp_lookup");
+		} else {
+			fprintf(stderr, "%s:%s@%s: NBP Lookup failed\n",
+				obj, type, zone);
+		}
+		exit(1);
+	}
+
+	if ((atp = atp_open(ATADDR_ANYPORT, &addr)) == NULL) {
+		perror("atp_open");
+		exit(1);
+	}
+
+	if (optind == ac) {
+		getstatus(atp, &nn.nn_sat);
+		exit(0);
+	}
+	if (optind - ac > 1) {
+		usage(*av);
+	}
+	wait = atoi(av[optind]);
+	for (;;) {
+		getstatus(atp, &nn.nn_sat);
+		sleep(wait);
+	}
+
+	return 0;
 }
 
 static void getstatus(ATP atp, struct sockaddr_at *sat)
 {
-    struct iovec	iov;
-    struct atp_block	atpb;
-    char		rbuf[ ATP_MAXDATA ];
+	struct iovec iov;
+	struct atp_block atpb;
+	char rbuf[ATP_MAXDATA];
 
-    cbuf[ 0 ] = 0;
-    cbuf[ 1 ] = PAP_SENDSTATUS;
-    cbuf[ 2 ] = cbuf[ 3 ] = 0;
+	cbuf[0] = 0;
+	cbuf[1] = PAP_SENDSTATUS;
+	cbuf[2] = cbuf[3] = 0;
 
-    atpb.atp_saddr = sat;
-    atpb.atp_sreqdata = cbuf;
-    atpb.atp_sreqdlen = 4;		/* bytes in SendStatus request */
-    atpb.atp_sreqto = 2;		/* retry timer */
-    atpb.atp_sreqtries = 5;		/* retry count */
-    if ( atp_sreq( atp, &atpb, 1, ATP_XO ) < 0 ) {
-	perror( "atp_sreq" );
-	exit( 1 );
-    }
+	atpb.atp_saddr = sat;
+	atpb.atp_sreqdata = cbuf;
+	atpb.atp_sreqdlen = 4;	/* bytes in SendStatus request */
+	atpb.atp_sreqto = 2;	/* retry timer */
+	atpb.atp_sreqtries = 5;	/* retry count */
+	if (atp_sreq(atp, &atpb, 1, ATP_XO) < 0) {
+		perror("atp_sreq");
+		exit(1);
+	}
 
-    iov.iov_base = rbuf;
-    iov.iov_len = sizeof( rbuf );
-    atpb.atp_rresiov = &iov;
-    atpb.atp_rresiovcnt = 1;
-    if ( atp_rresp( atp, &atpb ) < 0 ) {
-	perror( "atp_rresp" );
-	exit( 1 );
-    }
+	iov.iov_base = rbuf;
+	iov.iov_len = sizeof(rbuf);
+	atpb.atp_rresiov = &iov;
+	atpb.atp_rresiovcnt = 1;
+	if (atp_rresp(atp, &atpb) < 0) {
+		perror("atp_rresp");
+		exit(1);
+	}
 
-    /* sanity */
-    if ( iov.iov_len < 8 ||
-	    rbuf[ 1 ] != PAP_STATUS ) {
-	fprintf( stderr, "Bad response!\n" );
-	return;	/* This is weird, since TIDs must match... */
-    }
+	/* sanity */
+	if (iov.iov_len < 8 || rbuf[1] != PAP_STATUS) {
+		fprintf(stderr, "Bad response!\n");
+		return;		/* This is weird, since TIDs must match... */
+	}
 
-    printf( "%.*s\n", (int)iov.iov_len - 9, (char *) iov.iov_base + 9 );
+	printf("%.*s\n", (int) iov.iov_len - 9, (char *) iov.iov_base + 9);
 }

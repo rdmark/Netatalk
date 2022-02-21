@@ -12,9 +12,7 @@
    GNU General Public License for more details.
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -585,7 +583,8 @@ static int ad_ls_r(char *path, afpvol_t *vol)
 
 exit:
     closedir(dp);
-    fchdir(cwd);
+    if (fchdir(cwd) < 0)
+	fprintf(stderr, "can't chdir to %i (%s)", cwd, strerror(errno));
     close(cwd);
 
     tmp = strrchr(cwdpath, '/');

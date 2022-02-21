@@ -37,9 +37,7 @@ ATALK_MANS = aecho.1 \
 				papstatus.1 \
 				psorder.1
 
-if USE_APPLETALK
 NONGENERATED_MANS += $(ATALK_MANS)
-endif
 
 man_MANS = $(GENERATED_MANS) $(NONGENERATED_MANS)
 CLEANFILES = $(GENERATED_MANS)

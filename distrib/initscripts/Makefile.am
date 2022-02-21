@@ -3,7 +3,6 @@
 SUFFIXES = .tmpl .
 
 pkgconfdir = @PKGCONFDIR@
-systemddir = /lib/systemd/system
 
 #
 # Template Generation
@@ -14,15 +13,13 @@ systemddir = /lib/systemd/system
 	    -e s@:SBINDIR:@${sbindir}@ \
 	    -e s@:ETCDIR:@${pkgconfdir}@ \
 	    -e s@:PKGLIBEXECDIR:@${pkglibexecdir}@ \
-	    -e s@:NETATALK_VERSION:@${NETATALK_VERSION}@ \
+	    -e s@:VERSION:@${VERSION}@ \
 	    <$< >$@
 
 GENERATED_FILES = \
 	rc.afpd.netbsd		\
 	rc.atalk.redhat-sysv	\
 	rc.atalk.systemd	\
-	rc.atalk.tru64		\
-	rc.atalk.bsd		\
 	rc.atalkd.netbsd	\
 	rc.atalk.suse-sysv	\
 	rc.cnid_metad.netbsd	\
@@ -43,8 +40,6 @@ TEMPLATES = \
 	rc.afpd.netbsd.tmpl		\
 	rc.atalk.redhat-sysv.tmpl	\
 	rc.atalk.systemd.tmpl		\
-	rc.atalk.tru64.tmpl		\
-	rc.atalk.bsd.tmpl		\
 	rc.atalkd.netbsd.tmpl		\
 	rc.atalk.suse-sysv.tmpl		\
 	rc.cnid_metad.netbsd.tmpl	\
@@ -98,91 +93,20 @@ endif
 
 if USE_SYSTEMD
 
-service_afpddir			= $(systemddir)
-service_afpd_DATA		= afpd.service
-$(service_afpd_DATA): service.afpd.systemd
-	cp -f service.afpd.systemd $(service_afpd_DATA)
+servicedir	= /lib/systemd/system
 
-service_cniddir			= $(systemddir)
-service_cnid_DATA		= cnid.service
-$(service_cnid_DATA): service.cnid.systemd
-	cp -f service.cnid.systemd $(service_cnid_DATA)
-
-if USE_APPLETALK
-service_atalkddir		= $(systemddir)
-service_atalkd_DATA		= atalkd.service
-$(service_atalkd_DATA): service.atalkd.systemd
-	cp -f service.atalkd.systemd $(service_atalkd_DATA)
-endif
-
-if USE_CUPS
-service_papddir			= $(systemddir)
-service_papd_DATA		= papd.service
-$(service_papd_DATA): service.papd.systemd
-	cp -f service.papd.systemd $(service_papd_DATA)
-endif
-
-if COMPILE_TIMELORD
-service_timelorddir		= $(systemddir)
-service_timelord_DATA	= timelord.service
-$(service_timelord_DATA): service.timelord.systemd
-	cp -f service.timelord.systemd $(service_timelord_DATA)
-endif
-
-if COMPILE_A2BOOT
-service_a2bootdir		= $(systemddir)
-service_a2boot_DATA		= a2boot.service
-$(service_a2boot_DATA): service.a2boot.systemd
-	cp -f service.a2boot.systemd $(service_a2boot_DATA)
-endif
+service_DATA	= a2boot.service afpd.service atalkd.service cnid.service papd.service timelord.service
 
 install-data-hook:
 	-systemctl daemon-reload
-	-systemctl enable $(service_cnid_DATA)
-	-systemctl enable $(service_afpd_DATA)
-
-if USE_APPLETALK
-	-systemctl enable $(service_atalkd_DATA)
-endif
-
-if USE_CUPS
-	-systemctl enable $(service_papd_DATA)
-endif
-
-if COMPILE_TIMELORD
-	-systemctl enable $(service_timelord_DATA)
-endif
-
-if COMPILE_A2BOOT
-	-systemctl enable $(service_a2boot_DATA)
+if SYSTEMD_START
+	-systemctl enable $(service_DATA)
+	-systemctl start $(service_DATA)
 endif
 
 uninstall-startup:
-	-systemctl disable $(service_afpd_DATA)
-	rm -f $(DESTDIR)$(service_afpddir)/$(service_afpd_DATA)
-	-systemctl disable $(service_cnid_DATA)
-	rm -f $(DESTDIR)$(service_cniddir)/$(service_cnid_DATA)
-
-if USE_APPLETALK
-	-systemctl disable $(service_atalkd_DATA)
-	rm -f $(DESTDIR)$(service_atalkddir)/$(service_atalkd_DATA)
-endif
-
-if USE_CUPS
-	-systemctl disable $(service_papd_DATA)
-	rm -f $(DESTDIR)$(service_papddir)/$(service_papd_DATA)
-endif
-
-if COMPILE_TIMELORD
-	-systemctl disable $(service_timelord_DATA)
-	rm -f $(DESTDIR)$(service_timelorddir)/$(service_timelord_DATA)
-endif
-
-if COMPILE_A2BOOT
-	-systemctl disable $(service_a2boot_DATA)
-	rm -f $(DESTDIR)$(service_a2bootdir)/$(service_a2boot_DATA)
-endif
-
+	-systemctl disable $(service_DATA)
+	rm -f $(addprefix $(DESTDIR)$(servicedir)/, $(service_DATA))
 	-systemctl daemon-reload
 
 endif
@@ -210,27 +134,6 @@ uninstall-startup:
 endif
 
 #
-# checking for "tru64" style sysv scripts:
-#
-
-if USE_TRU64
-
-sysvdir	= /etc/init.d
-sysv_SCRIPTS = netatalk
-
-$(sysv_SCRIPTS): rc.atalk.tru64
-	cp -f rc.atalk.tru64 $(sysv_SCRIPTS)
-	chmod a+x $(sysv_SCRIPTS)
-
-install-data-hook:
-
-uninstall-hook:
-
-uninstall-startup: uninstall-am
-
-endif
-
-#
 # checking for NetBSD init scripts
 #
 
@@ -240,23 +143,23 @@ sysvdir = /etc/rc.d
 sysv_SCRIPTS = afpd atalkd cnid_metad papd timelord a2boot
 
 afpd: rc.afpd.netbsd
-	cp -f $< $@
+	cp -f $? $@
 	chmod a+x $@
 
 atalkd: rc.atalkd.netbsd
-	cp -f $< $@
+	cp -f $? $@
 	chmod a+x $@
 
 cnid_metad: rc.cnid_metad.netbsd
-	cp -f $< $@
+	cp -f $? $@
 	chmod a+x $@
 
 papd: rc.papd.netbsd
-	cp -f $< $@
+	cp -f $? $@
 	chmod a+x $@
 
 timelord: rc.timelord.netbsd
-	cp -f $< $@
+	cp -f $? $@
 	chmod a+x $@
 	
 a2boot: rc.a2boot.netbsd

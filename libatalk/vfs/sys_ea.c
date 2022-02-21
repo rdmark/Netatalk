@@ -29,9 +29,7 @@
    
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -44,9 +42,6 @@
 #include <sys/xattr.h>
 #endif
 
-#ifdef HAVE_SYS_EA_H
-#include <sys/ea.h>
-#endif
 
 #ifdef HAVE_ATTROPEN
 

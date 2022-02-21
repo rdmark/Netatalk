@@ -66,13 +66,13 @@ struct rtmp_tuple {
 #define RTMPTAB_EXTENDED	0x04
 #define RTMPTAB_ROUTE		0x08
 
-#ifndef BSD4_4
+#ifndef __NetBSD__
 #define RTMP_ADD	SIOCADDRT
 #define RTMP_DEL	SIOCDELRT
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 #define RTMP_ADD	RTM_ADD
 #define RTMP_DEL	RTM_DELETE
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
 #ifndef __NetBSD__
 #define OS_STARTUP_FIRSTNET 	0

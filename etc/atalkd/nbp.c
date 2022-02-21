@@ -5,9 +5,7 @@
  * All Rights Reserved. See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,10 +15,6 @@
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-#ifdef TRU64
-#include <sys/mbuf.h>
-#include <net/route.h>
-#endif /* TRU64 */
 #include <net/if.h>
 #include <netatalk/at.h>
 #include <atalk/ddp.h>
@@ -79,6 +73,9 @@ int nbp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len)
     int         n, i, cc, locallkup;
     u_char      tmplen;
 
+    /* initialize per valgrind */
+    memset(&sat, 0, sizeof (struct sockaddr_at));
+
     end = data + len;
     if ( data >= end ) {
         LOG(log_info, logtype_atalkd, "nbp_packet malformed packet" );
@@ -106,9 +103,9 @@ int nbp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len)
     data += SZ_NBPTUPLE;
 
     memset( &nn.nn_sat, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     nn.nn_sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     nn.nn_sat.sat_family = AF_APPLETALK;
     nn.nn_sat.sat_addr.s_net = nt.nt_net;
     nn.nn_sat.sat_addr.s_node = nt.nt_node;
@@ -373,9 +370,9 @@ int nbp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len)
          * Otherwise, look through the zone table.
          */
         if ( zt == NULL ) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
             sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
             sat.sat_family = AF_APPLETALK;
             sat.sat_port = ap->ap_port;
 
@@ -410,9 +407,9 @@ int nbp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len)
 
             locallkup = 1;
         } else {
-#ifdef BSD4_4
+#ifdef __NetBSD__
             sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
             sat.sat_family = AF_APPLETALK;
             sat.sat_port = ap->ap_port;
             for ( l = zt->zt_rt; l; l = l->l_next ) {

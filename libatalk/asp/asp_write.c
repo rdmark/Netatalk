@@ -23,9 +23,7 @@
  *	netatalk@itd.umich.edu
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <string.h>
 #include <sys/types.h>
@@ -35,66 +33,62 @@
 #include <atalk/atp.h>
 #include <atalk/asp.h>
 
-#if defined(BSD) || defined(BSD4_3)
-#define memmove(a, b, n)   bcopy((b), (a), (n))
-#endif /* BSD || BSD4_3 */
-
 int asp_wrtcont(ASP asp, char *buf, size_t *buflen)
 {
-    struct iovec	iov[ ASP_MAXPACKETS ];
-    struct atp_block	atpb;
-    char	        *p;
-    int			iovcnt = ASP_MAXPACKETS;
-    u_int16_t		blen, seq;
-    u_int8_t		oport;
+	struct iovec iov[ASP_MAXPACKETS];
+	struct atp_block atpb;
+	char *p;
+	int iovcnt = ASP_MAXPACKETS;
+	u_int16_t blen, seq;
+	u_int8_t oport;
 
-    p = buf;
-    *p++ = ASPFUNC_WRTCONT;
-    *p++ = asp->asp_sid;
-    seq = htons( asp->asp_seq );
-    memcpy( p, &seq, sizeof(seq));
-    p += sizeof(seq);
-    blen = htons(*buflen);
-    memcpy( p, &blen, sizeof(blen));
-    p += sizeof(blen);
+	p = buf;
+	*p++ = ASPFUNC_WRTCONT;
+	*p++ = asp->asp_sid;
+	seq = htons(asp->asp_seq);
+	memcpy(p, &seq, sizeof(seq));
+	p += sizeof(seq);
+	blen = htons(*buflen);
+	memcpy(p, &blen, sizeof(blen));
+	p += sizeof(blen);
 
-    for ( iovcnt = 0; iovcnt < ASP_MAXPACKETS; iovcnt++ ) {
-        iov[iovcnt].iov_base = buf + iovcnt*ASP_CMDMAXSIZ;
-	iov[ iovcnt ].iov_len = ASP_CMDMAXSIZ;
-    }
+	for (iovcnt = 0; iovcnt < ASP_MAXPACKETS; iovcnt++) {
+		iov[iovcnt].iov_base = buf + iovcnt * ASP_CMDMAXSIZ;
+		iov[iovcnt].iov_len = ASP_CMDMAXSIZ;
+	}
 
-    oport = asp->asp_sat.sat_port;
-    atpb.atp_saddr = &asp->asp_sat;
-    atpb.atp_saddr->sat_port = asp->asp_wss;
-    atpb.atp_sreqdata = buf;
-    atpb.atp_sreqdlen = p - buf;
-    atpb.atp_sreqto = 2;
-    atpb.atp_sreqtries = 5;
+	oport = asp->asp_sat.sat_port;
+	atpb.atp_saddr = &asp->asp_sat;
+	atpb.atp_saddr->sat_port = asp->asp_wss;
+	atpb.atp_sreqdata = buf;
+	atpb.atp_sreqdlen = p - buf;
+	atpb.atp_sreqto = 2;
+	atpb.atp_sreqtries = 5;
 
-    if ( atp_sreq( asp->asp_atp, &atpb, iovcnt, ATP_XO ) < 0 ) {
+	if (atp_sreq(asp->asp_atp, &atpb, iovcnt, ATP_XO) < 0) {
+		asp->asp_sat.sat_port = oport;
+		return (-1);
+	}
+	asp->write_count += atpb.atp_sreqdlen;
+
+	atpb.atp_rresiov = iov;
+	atpb.atp_rresiovcnt = iovcnt;
+	if (atp_rresp(asp->asp_atp, &atpb) < 0) {
+		asp->asp_sat.sat_port = oport;
+		return (-1);
+	}
+
 	asp->asp_sat.sat_port = oport;
-	return( -1 );
-    }
-    asp->write_count += atpb.atp_sreqdlen;
 
-    atpb.atp_rresiov = iov;
-    atpb.atp_rresiovcnt = iovcnt;
-    if ( atp_rresp( asp->asp_atp, &atpb ) < 0 ) {
-	asp->asp_sat.sat_port = oport;
-	return( -1 );
-    }
+	/* get rid of the 4-byte headers */
+	p = buf;
+	for (iovcnt = 0; iovcnt < atpb.atp_rresiovcnt; iovcnt++) {
+		memmove(p, (char *) iov[iovcnt].iov_base + ASP_HDRSIZ,
+			iov[iovcnt].iov_len - ASP_HDRSIZ);
+		p += (iov[iovcnt].iov_len - ASP_HDRSIZ);
+	}
 
-    asp->asp_sat.sat_port = oport;
-
-    /* get rid of the 4-byte headers */
-    p = buf;
-    for ( iovcnt = 0; iovcnt < atpb.atp_rresiovcnt; iovcnt++ ) {
-   	memmove(p, (char *) iov[ iovcnt ].iov_base + ASP_HDRSIZ, 
-		iov[ iovcnt ].iov_len - ASP_HDRSIZ );
-	p += ( iov[ iovcnt ].iov_len - ASP_HDRSIZ );
-    }
-
-    *buflen = p - buf;
-    asp->read_count += *buflen;
-    return 0;
+	*buflen = p - buf;
+	asp->read_count += *buflen;
+	return 0;
 }

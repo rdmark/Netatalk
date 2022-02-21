@@ -16,9 +16,7 @@
  *	Copyright (c) 1990, The University of Melbourne.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/param.h>
 #include <sys/types.h>
@@ -40,7 +38,6 @@
 #endif /* HAVE_SGTTY_H */
 #include <errno.h>
 #include <signal.h>
-#pragma warn "testing 123"
 #include <atalk/logger.h>
 #include <stdio.h>
 #include <string.h>

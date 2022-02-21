@@ -1,7 +1,5 @@
 # Makefile.am for etc/uams/
 
-SUBDIRS = uams_krb4
-
 #
 # conditionally build some modules
 #
@@ -54,14 +52,6 @@ if USE_RANDNUM
 UAMS_RANDNUM = uams_randnum.la
 endif
 
-if USE_PGP
-UAMS_PGP = uams_pgp.la
-endif
-
-if USE_GSSAPI
-UAMS_GSSAPI = uams_gss.la
-endif
-
 # links
 
 if USE_PAM_SO
@@ -78,12 +68,10 @@ uams_guest_la_SOURCES      = uams_guest.c
 uams_randnum_la_SOURCES    = uams_randnum.c
 uams_passwd_la_SOURCES     = uams_passwd.c
 uams_pam_la_SOURCES        = uams_pam.c
-uams_pgp_la_SOURCES        = uams_pgp.c
 uams_dhx_passwd_la_SOURCES = uams_dhx_passwd.c
 uams_dhx_pam_la_SOURCES    = uams_dhx_pam.c
 uams_dhx2_passwd_la_SOURCES	= uams_dhx2_passwd.c
 uams_dhx2_pam_la_SOURCES	= uams_dhx2_pam.c
-uams_gss_la_SOURCES   = uams_gss.c
 
 #
 # flags
@@ -95,18 +83,15 @@ AM_CFLAGS = @SSL_CFLAGS@ @LIBGCRYPT_CFLAGS@
 uams_pam_la_CFLAGS         = @PAM_CFLAGS@
 uams_dhx_pam_la_CFLAGS     = @SSL_CFLAGS@ @PAM_CFLAGS@
 uams_dhx2_pam_la_CFLAGS    = @LIBGCRYPT_CFLAGS@ @PAM_CFLAGS@
-uams_gss_la_CFLAGS   	   = @GSSAPI_CFLAGS@
 
 uams_guest_la_LDFLAGS      = -module -avoid-version
 uams_randnum_la_LDFLAGS    = -module -avoid-version @SSL_LIBS@
 uams_passwd_la_LDFLAGS     = -module -avoid-version @CRYPT_LIBS@
 uams_pam_la_LDFLAGS        = -module -avoid-version @PAM_LIBS@
-uams_pgp_la_LDFLAGS        = -module -avoid-version @SSL_LIBS@
 uams_dhx_passwd_la_LDFLAGS = -module -avoid-version @CRYPT_LIBS@ @SSL_LIBS@
 uams_dhx_pam_la_LDFLAGS		= -module -avoid-version @CRYPT_LIBS@ @SSL_LIBS@ @PAM_LIBS@
 uams_dhx2_passwd_la_LDFLAGS	= -module -avoid-version @CRYPT_LIBS@ @LIBGCRYPT_LIBS@
 uams_dhx2_pam_la_LDFLAGS	= -module -avoid-version @LIBGCRYPT_LIBS@ @PAM_LIBS@
-uams_gss_la_LDFLAGS   	   = -module -avoid-version @GSSAPI_LIBS@ 
 
 #
 # module compilation
@@ -115,14 +100,12 @@ uams_gss_la_LDFLAGS   	   = -module -avoid-version @GSSAPI_LIBS@
 uamsdir = @UAMS_PATH@
 uams_LTLIBRARIES =		\
 	$(UAMS_GENERIC)		\
-	$(UAMS_PGP)		\
 	$(UAMS_PAM)		\
 	$(UAMS_RANDNUM)		\
 	$(UAMS_DHX)		\
 	$(UAMS_DHX_PAM)		\
 	$(UAMS_DHX2)		\
-	$(UAMS_DHX2_PAM)	\
-	$(UAMS_GSSAPI)
+	$(UAMS_DHX2_PAM)
 
 #
 # link creation

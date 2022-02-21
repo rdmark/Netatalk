@@ -4,9 +4,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #if defined (USE_PAM) && defined (UAM_DHX2)
 #include <stdio.h>
@@ -14,9 +12,7 @@
 #include <string.h>
 #include <atalk/logger.h>
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <errno.h>
 #ifdef HAVE_SECURITY_PAM_APPL_H
 #include <security/pam_appl.h>
@@ -28,7 +24,7 @@
 
 #ifdef HAVE_LIBGCRYPT
 #include <gcrypt.h>
-#endif /* HAVE_LIBGCRYPT */
+#endif				/* HAVE_LIBGCRYPT */
 
 #include <atalk/afp.h>
 #include <atalk/uam.h>
@@ -49,8 +45,10 @@ static int K_hash_len;
 static u_int16_t ID;
 
 /* The initialization vectors for CAST128 are fixed by Apple. */
-static unsigned char dhx_c2siv[] = { 'L', 'W', 'a', 'l', 'l', 'a', 'c', 'e' };
-static unsigned char dhx_s2civ[] = { 'C', 'J', 'a', 'l', 'b', 'e', 'r', 't' };
+static unsigned char dhx_c2siv[] =
+    { 'L', 'W', 'a', 'l', 'l', 'a', 'c', 'e' };
+static unsigned char dhx_s2civ[] =
+    { 'C', 'J', 'a', 'l', 'b', 'e', 'r', 't' };
 
 /* Static variables used to communicate between the conversation function
  * and the server_login function */
@@ -70,64 +68,69 @@ static struct passwd *dhxpwd;
  * the Diffie-Hellman key exchange.
  * The bits value should be one of 768, 1024, 2048, 3072 or 4096.
  **/
-static int dh_params_generate (unsigned int bits) {
+static int dh_params_generate(unsigned int bits)
+{
 
-    int result, times = 0, qbits;
-    gcry_mpi_t *factors = NULL;
-    gcry_error_t err;
+	int result, times = 0, qbits;
+	gcry_mpi_t *factors = NULL;
+	gcry_error_t err;
 
-    /* Version check should be the very first call because it
-       makes sure that important subsystems are intialized. */
-    if (!gcry_check_version (GCRYPT_VERSION)) {
-        LOG(log_error, logtype_uams, "PAM DHX2: libgcrypt versions mismatch. Need: %s", GCRYPT_VERSION);
-        result = AFPERR_MISC;
-        goto error;
-    }
+	/* Version check should be the very first call because it
+	   makes sure that important subsystems are intialized. */
+	if (!gcry_check_version(GCRYPT_VERSION)) {
+		LOG(log_error, logtype_uams,
+		    "PAM DHX2: libgcrypt versions mismatch. Need: %s",
+		    GCRYPT_VERSION);
+		result = AFPERR_MISC;
+		goto error;
+	}
 
-    if (bits < 256)
-        qbits = bits / 2;
-    else
-        qbits = (bits / 40) + 105;
+	if (bits < 256)
+		qbits = bits / 2;
+	else
+		qbits = (bits / 40) + 105;
 
-    if (qbits & 1) /* better have an even number */
-        qbits++;
+	if (qbits & 1)		/* better have an even number */
+		qbits++;
 
-    /* find a prime number of size bits. */
-    do {
-        if (times) {
-            gcry_mpi_release(p);
-            gcry_prime_release_factors (factors);
-        }
-        err = gcry_prime_generate(&p, bits, qbits, &factors, NULL, NULL,
-                                  GCRY_STRONG_RANDOM, GCRY_PRIME_FLAG_SPECIAL_FACTOR);
-        if (err != 0) {
-            result = AFPERR_MISC;
-            goto error;
-        }
-        err = gcry_prime_check(p, 0);
-        times++;
-    } while (err != 0 && times < 10);
+	/* find a prime number of size bits. */
+	do {
+		if (times) {
+			gcry_mpi_release(p);
+			gcry_prime_release_factors(factors);
+		}
+		err =
+		    gcry_prime_generate(&p, bits, qbits, &factors, NULL,
+					NULL, GCRY_STRONG_RANDOM,
+					GCRY_PRIME_FLAG_SPECIAL_FACTOR);
+		if (err != 0) {
+			result = AFPERR_MISC;
+			goto error;
+		}
+		err = gcry_prime_check(p, 0);
+		times++;
+	} while (err != 0 && times < 10);
 
-    if (err != 0) {
-        result = AFPERR_MISC;
-        goto error;
-    }
+	if (err != 0) {
+		result = AFPERR_MISC;
+		goto error;
+	}
 
-    /* generate the group generator. */
-    err = gcry_prime_group_generator(&g, p, factors, NULL);
-    if (err != 0) {
-        result = AFPERR_MISC;
-        goto error;
-    }
+	/* generate the group generator. */
+	err = gcry_prime_group_generator(&g, p, factors, NULL);
+	if (err != 0) {
+		result = AFPERR_MISC;
+		goto error;
+	}
 
-    gcry_prime_release_factors(factors);
+	gcry_prime_release_factors(factors);
 
-    return 0;
+	return 0;
 
-error:
-    gcry_prime_release_factors(factors);
+      error:
+	gcry_prime_release_factors(factors);
 
-    return result;
+	return result;
 }
 
 
@@ -135,108 +138,112 @@ error:
  * Here we assume (for now, at least) that echo on means login name, and
  * echo off means password.
  */
-static int PAM_conv (int num_msg,
-                     const struct pam_message **msg,
-                     struct pam_response **resp,
-                     void *appdata_ptr _U_) {
-    int count = 0;
-    struct pam_response *reply;
+static int PAM_conv(int num_msg,
+		    const struct pam_message **msg,
+		    struct pam_response **resp, void *appdata_ptr _U_)
+{
+	int count = 0;
+	struct pam_response *reply;
 
 #define COPY_STRING(s) (s) ? strdup(s) : NULL
 
-    errno = 0;
+	errno = 0;
 
-    if (num_msg < 1) {
-        /* Log Entry */
-        LOG(log_info, logtype_uams, "PAM DHX2 Conversation Err -- %s",
-            strerror(errno));
-        /* Log Entry */
-        return PAM_CONV_ERR;
-    }
+	if (num_msg < 1) {
+		/* Log Entry */
+		LOG(log_info, logtype_uams,
+		    "PAM DHX2 Conversation Err -- %s", strerror(errno));
+		/* Log Entry */
+		return PAM_CONV_ERR;
+	}
 
-    reply = (struct pam_response *)
-        calloc(num_msg, sizeof(struct pam_response));
+	reply = (struct pam_response *)
+	    calloc(num_msg, sizeof(struct pam_response));
 
-    if (!reply) {
-        /* Log Entry */
-        LOG(log_info, logtype_uams, "PAM DHX2: Conversation Err -- %s",
-            strerror(errno));
-        /* Log Entry */
-        return PAM_CONV_ERR;
-    }
+	if (!reply) {
+		/* Log Entry */
+		LOG(log_info, logtype_uams,
+		    "PAM DHX2: Conversation Err -- %s", strerror(errno));
+		/* Log Entry */
+		return PAM_CONV_ERR;
+	}
 
-    for (count = 0; count < num_msg; count++) {
-        char *string = NULL;
+	for (count = 0; count < num_msg; count++) {
+		char *string = NULL;
 
-        switch (msg[count]->msg_style) {
-        case PAM_PROMPT_ECHO_ON:
-            if (!(string = COPY_STRING(PAM_username))) {
-                /* Log Entry */
-                LOG(log_info, logtype_uams, "PAM DHX2: username failure -- %s",
-                    strerror(errno));
-                /* Log Entry */
-                goto pam_fail_conv;
-            }
-            break;
-        case PAM_PROMPT_ECHO_OFF:
-            if (!(string = COPY_STRING(PAM_password))) {
-                /* Log Entry */
-                LOG(log_info, logtype_uams, "PAM DHX2: passwd failure: --: %s",
-                    strerror(errno));
-                /* Log Entry */
-                goto pam_fail_conv;
-            }
-            break;
-        case PAM_TEXT_INFO:
+		switch (msg[count]->msg_style) {
+		case PAM_PROMPT_ECHO_ON:
+			if (!(string = COPY_STRING(PAM_username))) {
+				/* Log Entry */
+				LOG(log_info, logtype_uams,
+				    "PAM DHX2: username failure -- %s",
+				    strerror(errno));
+				/* Log Entry */
+				goto pam_fail_conv;
+			}
+			break;
+		case PAM_PROMPT_ECHO_OFF:
+			if (!(string = COPY_STRING(PAM_password))) {
+				/* Log Entry */
+				LOG(log_info, logtype_uams,
+				    "PAM DHX2: passwd failure: --: %s",
+				    strerror(errno));
+				/* Log Entry */
+				goto pam_fail_conv;
+			}
+			break;
+		case PAM_TEXT_INFO:
 #ifdef PAM_BINARY_PROMPT
-        case PAM_BINARY_PROMPT:
-#endif /* PAM_BINARY_PROMPT */
-            /* ignore it... */
-            break;
-        case PAM_ERROR_MSG:
-        default:
-            LOG(log_info, logtype_uams, "PAM DHX2: Binary_Prompt -- %s", strerror(errno));
-            goto pam_fail_conv;
-        }
+		case PAM_BINARY_PROMPT:
+#endif				/* PAM_BINARY_PROMPT */
+			/* ignore it... */
+			break;
+		case PAM_ERROR_MSG:
+		default:
+			LOG(log_info, logtype_uams,
+			    "PAM DHX2: Binary_Prompt -- %s",
+			    strerror(errno));
+			goto pam_fail_conv;
+		}
 
-        if (string) {
-            reply[count].resp_retcode = 0;
-            reply[count].resp = string;
-            string = NULL;
-        }
-    }
+		if (string) {
+			reply[count].resp_retcode = 0;
+			reply[count].resp = string;
+			string = NULL;
+		}
+	}
 
-    *resp = reply;
-    LOG(log_info, logtype_uams, "PAM DHX2: PAM Success");
-    return PAM_SUCCESS;
+	*resp = reply;
+	LOG(log_info, logtype_uams, "PAM DHX2: PAM Success");
+	return PAM_SUCCESS;
 
-pam_fail_conv:
-    for (count = 0; count < num_msg; count++) {
-        if (!reply[count].resp)
-            continue;
-        switch (msg[count]->msg_style) {
-        case PAM_PROMPT_ECHO_OFF:
-        case PAM_PROMPT_ECHO_ON:
-            free(reply[count].resp);
-            break;
-        }
-    }
-    free(reply);
-    /* Log Entry */
-    LOG(log_info, logtype_uams, "PAM DHX2: Conversation Err -- %s",
-        strerror(errno));
-    /* Log Entry */
-    return PAM_CONV_ERR;
+      pam_fail_conv:
+	for (count = 0; count < num_msg; count++) {
+		if (!reply[count].resp)
+			continue;
+		switch (msg[count]->msg_style) {
+		case PAM_PROMPT_ECHO_OFF:
+		case PAM_PROMPT_ECHO_ON:
+			free(reply[count].resp);
+			break;
+		}
+	}
+	free(reply);
+	/* Log Entry */
+	LOG(log_info, logtype_uams, "PAM DHX2: Conversation Err -- %s",
+	    strerror(errno));
+	/* Log Entry */
+	return PAM_CONV_ERR;
 }
 
 static struct pam_conv PAM_conversation = {
-    &PAM_conv,
-    NULL
+	&PAM_conv,
+	NULL
 };
 
 
 static int dhx2_setup(void *obj, char *ibuf _U_, size_t ibuflen _U_,
-                      char *rbuf, size_t *rbuflen)
+		      char *rbuf, size_t *rbuflen)
 {
     int ret;
     size_t nwritten;
@@ -311,93 +318,104 @@ error:              /* We exit here anyway */
 }
 
 /* -------------------------------- */
-static int login(void *obj, char *username, int ulen,  struct passwd **uam_pwd _U_,
-                 char *ibuf, size_t ibuflen,
-                 char *rbuf, size_t *rbuflen)
+static int login(void *obj, char *username, int ulen,
+		 struct passwd **uam_pwd _U_, char *ibuf, size_t ibuflen,
+		 char *rbuf, size_t *rbuflen)
 {
-    if (( dhxpwd = uam_getname(obj, username, ulen)) == NULL ) {
-        LOG(log_info, logtype_uams, "DHX2: unknown username");
-        return AFPERR_NOTAUTH;
-    }
+	if ((dhxpwd = uam_getname(obj, username, ulen)) == NULL) {
+		LOG(log_info, logtype_uams, "DHX2: unknown username");
+		return AFPERR_NOTAUTH;
+	}
 
-    PAM_username = username;
-    LOG(log_info, logtype_uams, "DHX2 login: %s", username);
-    return dhx2_setup(obj, ibuf, ibuflen, rbuf, rbuflen);
+	PAM_username = username;
+	LOG(log_info, logtype_uams, "DHX2 login: %s", username);
+	return dhx2_setup(obj, ibuf, ibuflen, rbuf, rbuflen);
 }
 
 /* -------------------------------- */
 /* dhx login: things are done in a slightly bizarre order to avoid
  * having to clean things up if there's an error. */
 static int pam_login(void *obj, struct passwd **uam_pwd,
-                     char *ibuf, size_t ibuflen,
-                     char *rbuf, size_t *rbuflen)
+		     char *ibuf, size_t ibuflen,
+		     char *rbuf, size_t *rbuflen)
 {
-    char *username;
-    size_t len, ulen;
+	char *username;
+	size_t len, ulen;
 
-    *rbuflen = 0;
+	*rbuflen = 0;
 
-    /* grab some of the options */
-    if (uam_afpserver_option(obj, UAM_OPTION_USERNAME, (void *) &username, &ulen) < 0) {
-        LOG(log_info, logtype_uams, "DHX2: uam_afpserver_option didn't meet uam_option_username  -- %s",
-            strerror(errno));
-        return AFPERR_PARAM;
-    }
+	/* grab some of the options */
+	if (uam_afpserver_option
+	    (obj, UAM_OPTION_USERNAME, (void *) &username, &ulen) < 0) {
+		LOG(log_info, logtype_uams,
+		    "DHX2: uam_afpserver_option didn't meet uam_option_username  -- %s",
+		    strerror(errno));
+		return AFPERR_PARAM;
+	}
 
-    len = (unsigned char) *ibuf++;
-    if ( len > ulen ) {
-        LOG(log_info, logtype_uams, "DHX2: Signature Retieval Failure -- %s",
-            strerror(errno));
-        return AFPERR_PARAM;
-    }
+	len = (unsigned char) *ibuf++;
+	if (len > ulen) {
+		LOG(log_info, logtype_uams,
+		    "DHX2: Signature Retieval Failure -- %s",
+		    strerror(errno));
+		return AFPERR_PARAM;
+	}
 
-    memcpy(username, ibuf, len );
-    ibuf += len;
-    username[ len ] = '\0';
+	memcpy(username, ibuf, len);
+	ibuf += len;
+	username[len] = '\0';
 
-    if ((unsigned long) ibuf & 1) /* pad to even boundary */
-        ++ibuf;
+	if ((unsigned long) ibuf & 1)	/* pad to even boundary */
+		++ibuf;
 
-    return (login(obj, username, ulen, uam_pwd, ibuf, ibuflen, rbuf, rbuflen));
+	return (login
+		(obj, username, ulen, uam_pwd, ibuf, ibuflen, rbuf,
+		 rbuflen));
 }
 
 /* ----------------------------- */
 static int pam_login_ext(void *obj, char *uname, struct passwd **uam_pwd,
-                         char *ibuf, size_t ibuflen,
-                         char *rbuf, size_t *rbuflen)
+			 char *ibuf, size_t ibuflen,
+			 char *rbuf, size_t *rbuflen)
 {
-    char *username;
-    size_t len, ulen;
-    u_int16_t  temp16;
+	char *username;
+	size_t len, ulen;
+	u_int16_t temp16;
 
-    *rbuflen = 0;
+	*rbuflen = 0;
 
-    /* grab some of the options */
-    if (uam_afpserver_option(obj, UAM_OPTION_USERNAME, (void *) &username, &ulen) < 0) {
-        LOG(log_info, logtype_uams, "DHX2: uam_afpserver_option didn't meet uam_option_username  -- %s",
-            strerror(errno));
-        return AFPERR_PARAM;
-    }
+	/* grab some of the options */
+	if (uam_afpserver_option
+	    (obj, UAM_OPTION_USERNAME, (void *) &username, &ulen) < 0) {
+		LOG(log_info, logtype_uams,
+		    "DHX2: uam_afpserver_option didn't meet uam_option_username  -- %s",
+		    strerror(errno));
+		return AFPERR_PARAM;
+	}
 
-    if (*uname != 3)
-        return AFPERR_PARAM;
-    uname++;
-    memcpy(&temp16, uname, sizeof(temp16));
-    len = ntohs(temp16);
+	if (*uname != 3)
+		return AFPERR_PARAM;
+	uname++;
+	memcpy(&temp16, uname, sizeof(temp16));
+	len = ntohs(temp16);
 
-    if ( !len || len > ulen ) {
-        LOG(log_info, logtype_uams, "DHX2: Signature Retrieval Failure -- %s",
-            strerror(errno));
-        return AFPERR_PARAM;
-    }
-    memcpy(username, uname +2, len );
-    username[ len ] = '\0';
+	if (!len || len > ulen) {
+		LOG(log_info, logtype_uams,
+		    "DHX2: Signature Retrieval Failure -- %s",
+		    strerror(errno));
+		return AFPERR_PARAM;
+	}
+	memcpy(username, uname + 2, len);
+	username[len] = '\0';
 
-    return (login(obj, username, ulen, uam_pwd, ibuf, ibuflen, rbuf, rbuflen));
+	return (login
+		(obj, username, ulen, uam_pwd, ibuf, ibuflen, rbuf,
+		 rbuflen));
 }
 
 /* -------------------------------- */
-static int logincont1(void *obj _U_, char *ibuf, size_t ibuflen, char *rbuf, size_t *rbuflen)
+static int logincont1(void *obj _U_, char *ibuf, size_t ibuflen,
+		      char *rbuf, size_t *rbuflen)
 {
     int ret;
     size_t nwritten;
@@ -537,188 +555,204 @@ exit:
 /**
  * Try to authenticate via PAM as "adminauthuser"
  **/
-static int loginasroot(const char *adminauthuser, const char **hostname, int status)
+static int loginasroot(const char *adminauthuser, const char **hostname,
+		       int status)
 {
-    int PAM_error;
+	int PAM_error;
 
-    if ((PAM_error = pam_end(pamh, status)) != PAM_SUCCESS)
-        goto exit;
-    pamh = NULL;
+	if ((PAM_error = pam_end(pamh, status)) != PAM_SUCCESS)
+		goto exit;
+	pamh = NULL;
 
-    if ((PAM_error = pam_start("netatalk", adminauthuser, &PAM_conversation, &pamh)) != PAM_SUCCESS) {
-        LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s", pam_strerror(pamh,PAM_error));
-        goto exit;
-    }
+	if ((PAM_error =
+	     pam_start("netatalk", adminauthuser, &PAM_conversation,
+		       &pamh)) != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
+		    pam_strerror(pamh, PAM_error));
+		goto exit;
+	}
 
-    /* solaris craps out if PAM_TTY and PAM_RHOST aren't set. */
-    pam_set_item(pamh, PAM_TTY, "afpd");
-    pam_set_item(pamh, PAM_RHOST, *hostname);
-    if ((PAM_error = pam_authenticate(pamh, 0)) != PAM_SUCCESS)
-        goto exit;
+	/* solaris craps out if PAM_TTY and PAM_RHOST aren't set. */
+	pam_set_item(pamh, PAM_TTY, "afpd");
+	pam_set_item(pamh, PAM_RHOST, *hostname);
+	if ((PAM_error = pam_authenticate(pamh, 0)) != PAM_SUCCESS)
+		goto exit;
 
-    LOG(log_warning, logtype_uams, "DHX2: Authenticated as \"%s\"", adminauthuser);
+	LOG(log_warning, logtype_uams, "DHX2: Authenticated as \"%s\"",
+	    adminauthuser);
 
-exit:
-    return PAM_error;
+      exit:
+	return PAM_error;
 }
 
 static int logincont2(void *obj_in, struct passwd **uam_pwd,
-                      char *ibuf, size_t ibuflen,
-                      char *rbuf _U_, size_t *rbuflen)
+		      char *ibuf, size_t ibuflen,
+		      char *rbuf _U_, size_t *rbuflen)
 {
-    AFPObj *obj = obj_in;
-    int ret = AFPERR_MISC;
-    int PAM_error;
-    const char *hostname = NULL;
-    gcry_mpi_t retServerNonce;
-    gcry_cipher_hd_t ctx;
-    gcry_error_t ctxerror;
-    char *utfpass = NULL;
+	AFPObj *obj = obj_in;
+	int ret = AFPERR_MISC;
+	int PAM_error;
+	const char *hostname = NULL;
+	gcry_mpi_t retServerNonce;
+	gcry_cipher_hd_t ctx;
+	gcry_error_t ctxerror;
+	char *utfpass = NULL;
 
-    *rbuflen = 0;
+	*rbuflen = 0;
 
-    /* Packet size should be: Session ID + ServerNonce + Passwd buffer (evantually +10 extra bytes, see Apples Docs) */
-    if ((ibuflen != 2 + 16 + 256) && (ibuflen != 2 + 16 + 256 + 10)) {
-        LOG(log_error, logtype_uams, "DHX2: Paket length not correct: %u. Should be 274 or 284.", ibuflen);
-        ret = AFPERR_PARAM;
-        goto error_noctx;
-    }
+	/* Packet size should be: Session ID + ServerNonce + Passwd buffer (evantually +10 extra bytes, see Apples Docs) */
+	if ((ibuflen != 2 + 16 + 256) && (ibuflen != 2 + 16 + 256 + 10)) {
+		LOG(log_error, logtype_uams,
+		    "DHX2: Paket length not correct: %u. Should be 274 or 284.",
+		    ibuflen);
+		ret = AFPERR_PARAM;
+		goto error_noctx;
+	}
 
-    retServerNonce = gcry_mpi_new(0);
+	retServerNonce = gcry_mpi_new(0);
 
-    /* For PAM */
-    uam_afpserver_option(obj, UAM_OPTION_CLIENTNAME, (void *) &hostname, NULL);
+	/* For PAM */
+	uam_afpserver_option(obj, UAM_OPTION_CLIENTNAME,
+			     (void *) &hostname, NULL);
 
-    /* Set up our encryption context. */
-    ctxerror = gcry_cipher_open( &ctx, GCRY_CIPHER_CAST5, GCRY_CIPHER_MODE_CBC, 0);
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
-    /* Set key */
-    ctxerror = gcry_cipher_setkey(ctx, K_MD5hash, K_hash_len);
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
-    /* Set the initialization vector for client->server transfer. */
-    ctxerror = gcry_cipher_setiv(ctx, dhx_c2siv, sizeof(dhx_c2siv));
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
+	/* Set up our encryption context. */
+	ctxerror =
+	    gcry_cipher_open(&ctx, GCRY_CIPHER_CAST5, GCRY_CIPHER_MODE_CBC,
+			     0);
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
+	/* Set key */
+	ctxerror = gcry_cipher_setkey(ctx, K_MD5hash, K_hash_len);
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
+	/* Set the initialization vector for client->server transfer. */
+	ctxerror = gcry_cipher_setiv(ctx, dhx_c2siv, sizeof(dhx_c2siv));
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
 
-    /* Skip Session ID */
-    ibuf += 2;
+	/* Skip Session ID */
+	ibuf += 2;
 
-    /* Finally: decrypt client's md5_K(serverNonce+1, passwor, C2SIV) inplace */
-    ctxerror = gcry_cipher_decrypt(ctx, ibuf, 16+256, NULL, 0);
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
-    /* Pull out nonce. Should be serverNonce+1 */
-    gcry_mpi_scan(&retServerNonce, GCRYMPI_FMT_USG, ibuf, 16, NULL);
-    gcry_mpi_sub_ui(retServerNonce, retServerNonce, 1);
-    if ( gcry_mpi_cmp( serverNonce, retServerNonce) != 0) {
-        /* We're hacked!  */
-        ret = AFPERR_NOTAUTH;
-        goto error_ctx;
-    }
-    ibuf += 16;
+	/* Finally: decrypt client's md5_K(serverNonce+1, passwor, C2SIV) inplace */
+	ctxerror = gcry_cipher_decrypt(ctx, ibuf, 16 + 256, NULL, 0);
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
+	/* Pull out nonce. Should be serverNonce+1 */
+	gcry_mpi_scan(&retServerNonce, GCRYMPI_FMT_USG, ibuf, 16, NULL);
+	gcry_mpi_sub_ui(retServerNonce, retServerNonce, 1);
+	if (gcry_mpi_cmp(serverNonce, retServerNonce) != 0) {
+		/* We're hacked!  */
+		ret = AFPERR_NOTAUTH;
+		goto error_ctx;
+	}
+	ibuf += 16;
 
-    /* ---- Start authentication with PAM --- */
+	/* ---- Start authentication with PAM --- */
 
-    /* The password is in legacy Mac encoding, convert it to host encoding */
-    if (convert_string_allocate(CH_MAC, CH_UNIX, ibuf, -1, &utfpass) == (size_t)-1) {
-        LOG(log_error, logtype_uams, "DHX2: conversion error");
-        goto error_ctx;
-    }
-    PAM_password = utfpass;
+	/* The password is in legacy Mac encoding, convert it to host encoding */
+	if (convert_string_allocate(CH_MAC, CH_UNIX, ibuf, -1, &utfpass) ==
+	    (size_t) -1) {
+		LOG(log_error, logtype_uams, "DHX2: conversion error");
+		goto error_ctx;
+	}
+	PAM_password = utfpass;
 
-#ifdef DEBUG
-    LOG(log_maxdebug, logtype_default, "DHX2: password: %s", PAM_password);
-#endif
+	LOG(log_maxdebug, logtype_default, "DHX2: password: %s",
+	    PAM_password);
 
-    /* Set these things up for the conv function */
+	/* Set these things up for the conv function */
 
-    ret = AFPERR_NOTAUTH;
-    PAM_error = pam_start("netatalk", PAM_username, &PAM_conversation, &pamh);
-    if (PAM_error != PAM_SUCCESS) {
-        LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s", pam_strerror(pamh,PAM_error));
-        goto error_ctx;
-    }
+	ret = AFPERR_NOTAUTH;
+	PAM_error =
+	    pam_start("netatalk", PAM_username, &PAM_conversation, &pamh);
+	if (PAM_error != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
+		    pam_strerror(pamh, PAM_error));
+		goto error_ctx;
+	}
 
-    /* solaris craps out if PAM_TTY and PAM_RHOST aren't set. */
-    pam_set_item(pamh, PAM_TTY, "afpd");
-    pam_set_item(pamh, PAM_RHOST, hostname);
-    pam_set_item(pamh, PAM_RUSER, PAM_username);
+	/* solaris craps out if PAM_TTY and PAM_RHOST aren't set. */
+	pam_set_item(pamh, PAM_TTY, "afpd");
+	pam_set_item(pamh, PAM_RHOST, hostname);
+	pam_set_item(pamh, PAM_RUSER, PAM_username);
 
-    PAM_error = pam_authenticate(pamh, 0);
-    if (PAM_error != PAM_SUCCESS) {
-        if (PAM_error == PAM_MAXTRIES)
-            ret = AFPERR_PWDEXPR;
-        LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s", pam_strerror(pamh, PAM_error));
+	PAM_error = pam_authenticate(pamh, 0);
+	if (PAM_error != PAM_SUCCESS) {
+		if (PAM_error == PAM_MAXTRIES)
+			ret = AFPERR_PWDEXPR;
+		LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
+		    pam_strerror(pamh, PAM_error));
 
-        if (!obj->options.adminauthuser)
-            goto error_ctx;
-        if (loginasroot(obj->options.adminauthuser, &hostname, PAM_error) != PAM_SUCCESS) {
-            goto error_ctx;
-        }
-    }
+		if (!obj->options.adminauthuser)
+			goto error_ctx;
+		if (loginasroot
+		    (obj->options.adminauthuser, &hostname,
+		     PAM_error) != PAM_SUCCESS) {
+			goto error_ctx;
+		}
+	}
 
-    PAM_error = pam_acct_mgmt(pamh, 0);
-    if (PAM_error != PAM_SUCCESS ) {
-        LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
-            pam_strerror(pamh, PAM_error));
-        if (PAM_error == PAM_NEW_AUTHTOK_REQD)    /* password expired */
-            ret = AFPERR_PWDEXPR;
+	PAM_error = pam_acct_mgmt(pamh, 0);
+	if (PAM_error != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
+		    pam_strerror(pamh, PAM_error));
+		if (PAM_error == PAM_NEW_AUTHTOK_REQD)	/* password expired */
+			ret = AFPERR_PWDEXPR;
 #ifdef PAM_AUTHTOKEN_REQD
-        else if (PAM_error == PAM_AUTHTOKEN_REQD)
-            ret = AFPERR_PWDCHNG;
+		else if (PAM_error == PAM_AUTHTOKEN_REQD)
+			ret = AFPERR_PWDCHNG;
 #endif
-        goto error_ctx;
-    }
+		goto error_ctx;
+	}
 
 #ifndef PAM_CRED_ESTABLISH
 #define PAM_CRED_ESTABLISH PAM_ESTABLISH_CRED
 #endif
-    PAM_error = pam_setcred(pamh, PAM_CRED_ESTABLISH);
-    if (PAM_error != PAM_SUCCESS) {
-        LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
-            pam_strerror(pamh, PAM_error));
-        goto error_ctx;
-    }
+	PAM_error = pam_setcred(pamh, PAM_CRED_ESTABLISH);
+	if (PAM_error != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
+		    pam_strerror(pamh, PAM_error));
+		goto error_ctx;
+	}
 
-    PAM_error = pam_open_session(pamh, 0);
-    if (PAM_error != PAM_SUCCESS) {
-        LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
-            pam_strerror(pamh, PAM_error));
-        goto error_ctx;
-    }
+	PAM_error = pam_open_session(pamh, 0);
+	if (PAM_error != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams, "DHX2: PAM_Error: %s",
+		    pam_strerror(pamh, PAM_error));
+		goto error_ctx;
+	}
 
-    memset(ibuf, 0, 256); /* zero out the password */
-    if (utfpass)
-        memset(utfpass, 0, strlen(utfpass));
-    *uam_pwd = dhxpwd;
-    LOG(log_info, logtype_uams, "DHX2: PAM Auth OK!");
+	memset(ibuf, 0, 256);	/* zero out the password */
+	if (utfpass)
+		memset(utfpass, 0, strlen(utfpass));
+	*uam_pwd = dhxpwd;
+	LOG(log_info, logtype_uams, "DHX2: PAM Auth OK!");
 
-    ret = AFP_OK;
+	ret = AFP_OK;
 
-error_ctx:
-    gcry_cipher_close(ctx);
-error_noctx:
-    if (utfpass) free(utfpass);
-    free(K_MD5hash);
-    K_MD5hash=NULL;
-    gcry_mpi_release(serverNonce);
-    gcry_mpi_release(retServerNonce);
-    return ret;
+      error_ctx:
+	gcry_cipher_close(ctx);
+      error_noctx:
+	if (utfpass)
+		free(utfpass);
+	free(K_MD5hash);
+	K_MD5hash = NULL;
+	gcry_mpi_release(serverNonce);
+	gcry_mpi_release(retServerNonce);
+	return ret;
 }
 
 static int pam_logincont(void *obj, struct passwd **uam_pwd,
-                         char *ibuf, size_t ibuflen,
-                         char *rbuf, size_t *rbuflen)
+			 char *ibuf, size_t ibuflen,
+			 char *rbuf, size_t *rbuflen)
 {
     u_int16_t retID;
     int ret;
@@ -739,227 +773,243 @@ static int pam_logincont(void *obj, struct passwd **uam_pwd,
 
 
 /* logout */
-static void pam_logout(void) {
-    pam_close_session(pamh, 0);
-    pam_end(pamh, 0);
-    pamh = NULL;
+static void pam_logout(void)
+{
+	pam_close_session(pamh, 0);
+	pam_end(pamh, 0);
+	pamh = NULL;
 }
 
 /****************************
  * --- Change pwd stuff --- */
 
 static int changepw_1(void *obj, char *uname,
-                      char *ibuf, size_t ibuflen, char *rbuf, size_t *rbuflen)
+		      char *ibuf, size_t ibuflen, char *rbuf,
+		      size_t *rbuflen)
 {
-    *rbuflen = 0;
+	*rbuflen = 0;
 
-    /* Remember it now, use it in changepw_3 */
-    PAM_username = uname;
-    return( dhx2_setup(obj, ibuf, ibuflen, rbuf, rbuflen) );
+	/* Remember it now, use it in changepw_3 */
+	PAM_username = uname;
+	return (dhx2_setup(obj, ibuf, ibuflen, rbuf, rbuflen));
 }
 
 static int changepw_2(void *obj,
-                      char *ibuf, size_t ibuflen, char *rbuf, size_t *rbuflen)
+		      char *ibuf, size_t ibuflen, char *rbuf,
+		      size_t *rbuflen)
 {
-    return( logincont1(obj, ibuf, ibuflen, rbuf, rbuflen) );
+	return (logincont1(obj, ibuf, ibuflen, rbuf, rbuflen));
 }
 
 static int changepw_3(void *obj _U_,
-                      char *ibuf, size_t ibuflen _U_,
-                      char *rbuf _U_, size_t *rbuflen _U_)
+		      char *ibuf, size_t ibuflen _U_,
+		      char *rbuf _U_, size_t *rbuflen _U_)
 {
-    int ret;
-    int PAM_error;
-    uid_t uid;
-    pam_handle_t *lpamh;
-    const char *hostname = NULL;
-    gcry_mpi_t retServerNonce;
-    gcry_cipher_hd_t ctx;
-    gcry_error_t ctxerror;
+	int ret;
+	int PAM_error;
+	uid_t uid;
+	pam_handle_t *lpamh;
+	const char *hostname = NULL;
+	gcry_mpi_t retServerNonce;
+	gcry_cipher_hd_t ctx;
+	gcry_error_t ctxerror;
 
-    *rbuflen = 0;
+	*rbuflen = 0;
 
-    LOG(log_error, logtype_uams, "DHX2 ChangePW: packet 3 processing");
+	LOG(log_error, logtype_uams, "DHX2 ChangePW: packet 3 processing");
 
-    /* Packet size should be: Session ID + ServerNonce + 2*Passwd buffer */
-    if (ibuflen != 2 + 16 + 2*256) {
-        LOG(log_error, logtype_uams, "DHX2: Paket length not correct");
-        ret = AFPERR_PARAM;
-        goto error_noctx;
-    }
+	/* Packet size should be: Session ID + ServerNonce + 2*Passwd buffer */
+	if (ibuflen != 2 + 16 + 2 * 256) {
+		LOG(log_error, logtype_uams,
+		    "DHX2: Paket length not correct");
+		ret = AFPERR_PARAM;
+		goto error_noctx;
+	}
 
-    retServerNonce = gcry_mpi_new(0);
+	retServerNonce = gcry_mpi_new(0);
 
-    /* For PAM */
-    uam_afpserver_option(obj, UAM_OPTION_CLIENTNAME, (void *) &hostname, NULL);
+	/* For PAM */
+	uam_afpserver_option(obj, UAM_OPTION_CLIENTNAME,
+			     (void *) &hostname, NULL);
 
-    /* Set up our encryption context. */
-    ctxerror = gcry_cipher_open( &ctx, GCRY_CIPHER_CAST5, GCRY_CIPHER_MODE_CBC, 0);
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
-    /* Set key */
-    ctxerror = gcry_cipher_setkey(ctx, K_MD5hash, K_hash_len);
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
+	/* Set up our encryption context. */
+	ctxerror =
+	    gcry_cipher_open(&ctx, GCRY_CIPHER_CAST5, GCRY_CIPHER_MODE_CBC,
+			     0);
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
+	/* Set key */
+	ctxerror = gcry_cipher_setkey(ctx, K_MD5hash, K_hash_len);
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
 
-    /* Set the initialization vector for client->server transfer. */
-    ctxerror = gcry_cipher_setiv(ctx, dhx_c2siv, sizeof(dhx_c2siv));
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
+	/* Set the initialization vector for client->server transfer. */
+	ctxerror = gcry_cipher_setiv(ctx, dhx_c2siv, sizeof(dhx_c2siv));
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
 
-    /* Skip Session ID */
-    ibuf += 2;
+	/* Skip Session ID */
+	ibuf += 2;
 
-    /* Finally: decrypt client's md5_K(serverNonce+1, 2*password, C2SIV) inplace */
-    ctxerror = gcry_cipher_decrypt(ctx, ibuf, 16+2*256, NULL, 0);
-    if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
-        ret = AFPERR_MISC;
-        goto error_ctx;
-    }
-    /* Pull out nonce. Should be serverNonce+1 */
-    gcry_mpi_scan(&retServerNonce, GCRYMPI_FMT_USG, ibuf, 16, NULL);
-    gcry_mpi_sub_ui(retServerNonce, retServerNonce, 1);
-    if ( gcry_mpi_cmp( serverNonce, retServerNonce) != 0) {
-        /* We're hacked!  */
-        ret = AFPERR_NOTAUTH;
-        goto error_ctx;
-    }
-    ibuf += 16;
+	/* Finally: decrypt client's md5_K(serverNonce+1, 2*password, C2SIV) inplace */
+	ctxerror = gcry_cipher_decrypt(ctx, ibuf, 16 + 2 * 256, NULL, 0);
+	if (gcry_err_code(ctxerror) != GPG_ERR_NO_ERROR) {
+		ret = AFPERR_MISC;
+		goto error_ctx;
+	}
+	/* Pull out nonce. Should be serverNonce+1 */
+	gcry_mpi_scan(&retServerNonce, GCRYMPI_FMT_USG, ibuf, 16, NULL);
+	gcry_mpi_sub_ui(retServerNonce, retServerNonce, 1);
+	if (gcry_mpi_cmp(serverNonce, retServerNonce) != 0) {
+		/* We're hacked!  */
+		ret = AFPERR_NOTAUTH;
+		goto error_ctx;
+	}
+	ibuf += 16;
 
-    /* ---- Start pwd changing with PAM --- */
-    ibuf[255] = '\0';       /* For safety */
-    ibuf[511] = '\0';
+	/* ---- Start pwd changing with PAM --- */
+	ibuf[255] = '\0';	/* For safety */
+	ibuf[511] = '\0';
 
-    /* check if new and old password are equal */
-    if (memcmp(ibuf, ibuf + 256, 255) == 0) {
-        LOG(log_info, logtype_uams, "DHX2 Chgpwd: new and old password are equal");
-        ret = AFPERR_PWDSAME;
-        goto error_ctx;
-    }
+	/* check if new and old password are equal */
+	if (memcmp(ibuf, ibuf + 256, 255) == 0) {
+		LOG(log_info, logtype_uams,
+		    "DHX2 Chgpwd: new and old password are equal");
+		ret = AFPERR_PWDSAME;
+		goto error_ctx;
+	}
 
-    /* Set these things up for the conv function. PAM_username was set in changepw_1 */
-    PAM_password = ibuf + 256;
-    PAM_error = pam_start("netatalk", PAM_username, &PAM_conversation, &lpamh);
-    if (PAM_error != PAM_SUCCESS) {
-        LOG(log_info, logtype_uams, "DHX2 Chgpwd: PAM error in pam_start");
-        ret = AFPERR_PARAM;
-        goto error_ctx;
-    }
-    pam_set_item(lpamh, PAM_TTY, "afpd");
-    uam_afpserver_option(obj, UAM_OPTION_CLIENTNAME, (void *) &hostname, NULL);
-    pam_set_item(lpamh, PAM_RHOST, hostname);
-    uid = geteuid();
-    seteuid(0);
-    PAM_error = pam_authenticate(lpamh,0);
-    if (PAM_error != PAM_SUCCESS) {
-        LOG(log_info, logtype_uams, "DHX2 Chgpwd: error authenticating with PAM");
-        seteuid(uid);
-        pam_end(lpamh, PAM_error);
-        ret = AFPERR_NOTAUTH;
-        goto error_ctx;
-    }
-    PAM_password = ibuf;
-    PAM_error = pam_chauthtok(lpamh, 0);
-    seteuid(uid); /* un-root ourselves. */
-    memset(ibuf, 0, 512);
-    if (PAM_error != PAM_SUCCESS) {
-        LOG(log_info, logtype_uams, "DHX2 Chgpwd: error changing pw with PAM");
-        pam_end(lpamh, PAM_error);
-        ret = AFPERR_ACCESS;
-        goto error_ctx;
-    }
-    pam_end(lpamh, 0);
-    ret = AFP_OK;
+	/* Set these things up for the conv function. PAM_username was set in changepw_1 */
+	PAM_password = ibuf + 256;
+	PAM_error =
+	    pam_start("netatalk", PAM_username, &PAM_conversation, &lpamh);
+	if (PAM_error != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams,
+		    "DHX2 Chgpwd: PAM error in pam_start");
+		ret = AFPERR_PARAM;
+		goto error_ctx;
+	}
+	pam_set_item(lpamh, PAM_TTY, "afpd");
+	uam_afpserver_option(obj, UAM_OPTION_CLIENTNAME,
+			     (void *) &hostname, NULL);
+	pam_set_item(lpamh, PAM_RHOST, hostname);
+	uid = geteuid();
+	seteuid(0);
+	PAM_error = pam_authenticate(lpamh, 0);
+	if (PAM_error != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams,
+		    "DHX2 Chgpwd: error authenticating with PAM");
+		seteuid(uid);
+		pam_end(lpamh, PAM_error);
+		ret = AFPERR_NOTAUTH;
+		goto error_ctx;
+	}
+	PAM_password = ibuf;
+	PAM_error = pam_chauthtok(lpamh, 0);
+	seteuid(uid);		/* un-root ourselves. */
+	memset(ibuf, 0, 512);
+	if (PAM_error != PAM_SUCCESS) {
+		LOG(log_info, logtype_uams,
+		    "DHX2 Chgpwd: error changing pw with PAM");
+		pam_end(lpamh, PAM_error);
+		ret = AFPERR_ACCESS;
+		goto error_ctx;
+	}
+	pam_end(lpamh, 0);
+	ret = AFP_OK;
 
-error_ctx:
-    gcry_cipher_close(ctx);
-error_noctx:
-    free(K_MD5hash);
-    K_MD5hash=NULL;
-    gcry_mpi_release(serverNonce);
-    gcry_mpi_release(retServerNonce);
-    return ret;
+      error_ctx:
+	gcry_cipher_close(ctx);
+      error_noctx:
+	free(K_MD5hash);
+	K_MD5hash = NULL;
+	gcry_mpi_release(serverNonce);
+	gcry_mpi_release(retServerNonce);
+	return ret;
 }
 
 static int dhx2_changepw(void *obj _U_, char *uname,
-                         struct passwd *pwd _U_, char *ibuf, size_t ibuflen _U_,
-                         char *rbuf _U_, size_t *rbuflen _U_)
+			 struct passwd *pwd _U_, char *ibuf,
+			 size_t ibuflen _U_, char *rbuf _U_,
+			 size_t *rbuflen _U_)
 {
-    /* We use this to serialize the three incoming FPChangePassword calls */
-    static int dhx2_changepw_status = 1;
+	/* We use this to serialize the three incoming FPChangePassword calls */
+	static int dhx2_changepw_status = 1;
 
-    int ret = AFPERR_NOTAUTH;  /* gcc can't figure out it's always initialized */
+	int ret = AFPERR_NOTAUTH;	/* gcc can't figure out it's always initialized */
 
-    switch (dhx2_changepw_status) {
-    case 1:
-        ret = changepw_1( obj, uname, ibuf, ibuflen, rbuf, rbuflen);
-        if ( ret == AFPERR_AUTHCONT)
-            dhx2_changepw_status = 2;
-        break;
-    case 2:
-        ret = changepw_2( obj, ibuf, ibuflen, rbuf, rbuflen);
-        if ( ret == AFPERR_AUTHCONT)
-            dhx2_changepw_status = 3;
-        else
-            dhx2_changepw_status = 1;
-        break;
-    case 3:
-        ret = changepw_3( obj, ibuf, ibuflen, rbuf, rbuflen);
-        dhx2_changepw_status = 1; /* Whether is was succesfull or not: we
-                                     restart anyway !*/
-        break;
-    }
-    return ret;
+	switch (dhx2_changepw_status) {
+	case 1:
+		ret = changepw_1(obj, uname, ibuf, ibuflen, rbuf, rbuflen);
+		if (ret == AFPERR_AUTHCONT)
+			dhx2_changepw_status = 2;
+		break;
+	case 2:
+		ret = changepw_2(obj, ibuf, ibuflen, rbuf, rbuflen);
+		if (ret == AFPERR_AUTHCONT)
+			dhx2_changepw_status = 3;
+		else
+			dhx2_changepw_status = 1;
+		break;
+	case 3:
+		ret = changepw_3(obj, ibuf, ibuflen, rbuf, rbuflen);
+		dhx2_changepw_status = 1;	/* Whether is was succesfull or not: we
+						   restart anyway ! */
+		break;
+	}
+	return ret;
 }
 
 static int uam_setup(const char *path)
 {
-    if (uam_register(UAM_SERVER_LOGIN_EXT, path, "DHX2", pam_login,
-                     pam_logincont, pam_logout, pam_login_ext) < 0)
-        return -1;
-    if (uam_register(UAM_SERVER_CHANGEPW, path, "DHX2", dhx2_changepw) < 0)
-        return -1;
+	if (uam_register(UAM_SERVER_LOGIN_EXT, path, "DHX2", pam_login,
+			 pam_logincont, pam_logout, pam_login_ext) < 0)
+		return -1;
+	if (uam_register(UAM_SERVER_CHANGEPW, path, "DHX2", dhx2_changepw)
+	    < 0)
+		return -1;
 
-    p = gcry_mpi_new(0);
-    g = gcry_mpi_new(0);
+	p = gcry_mpi_new(0);
+	g = gcry_mpi_new(0);
 
-    LOG(log_debug, logtype_uams, "DHX2: generating mersenne primes");
-    /* Generate p and g for DH */
-    if (dh_params_generate(PRIMEBITS) != 0) {
-        LOG(log_error, logtype_uams, "DHX2: Couldn't generate p and g");
-        return -1;
-    }
+	LOG(log_debug, logtype_uams, "DHX2: generating mersenne primes");
+	/* Generate p and g for DH */
+	if (dh_params_generate(PRIMEBITS) != 0) {
+		LOG(log_error, logtype_uams,
+		    "DHX2: Couldn't generate p and g");
+		return -1;
+	}
 
-    return 0;
+	return 0;
 }
 
 static void uam_cleanup(void)
 {
-    uam_unregister(UAM_SERVER_LOGIN, "DHX2");
-    uam_unregister(UAM_SERVER_CHANGEPW, "DHX2");
+	uam_unregister(UAM_SERVER_LOGIN, "DHX2");
+	uam_unregister(UAM_SERVER_CHANGEPW, "DHX2");
 
-    gcry_mpi_release(p);
-    gcry_mpi_release(g);
+	gcry_mpi_release(p);
+	gcry_mpi_release(g);
 }
 
 
 UAM_MODULE_EXPORT struct uam_export uams_dhx2 = {
-    UAM_MODULE_SERVER,
-    UAM_MODULE_VERSION,
-    uam_setup, uam_cleanup
+	UAM_MODULE_SERVER,
+	UAM_MODULE_VERSION,
+	uam_setup, uam_cleanup
 };
 
 
 UAM_MODULE_EXPORT struct uam_export uams_dhx2_pam = {
-    UAM_MODULE_SERVER,
-    UAM_MODULE_VERSION,
-    uam_setup, uam_cleanup
+	UAM_MODULE_SERVER,
+	UAM_MODULE_VERSION,
+	uam_setup, uam_cleanup
 };
 
-#endif /* USE_PAM && UAM_DHX2 */
+#endif				/* USE_PAM && UAM_DHX2 */

@@ -19,9 +19,7 @@
  *	Copyright (c) 1990, The University of Melbourne.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/param.h>
 #include <sys/types.h>
@@ -286,7 +284,7 @@ int main( int ac, char **av )
 long a2bootreq(fname)
 	char	*fname;
 {
-	int f,m;
+	int f;
 	int32_t readlen;
 /*
     LOG(log_info, logtype_default, "          a2bootreq( %s )",fname );

@@ -2,15 +2,11 @@
 #define ATALK_PATHS_H 1
 
 /* we need a way of concatenating strings */
-#ifdef __STDC__
 #ifdef HAVE_BROKEN_CPP
 #define BROKEN_ECHO(a)    a
 #define ATALKPATHCAT(a,b) BROKEN_ECHO(a)##BROKEN_ECHO(b)
 #else
 #define ATALKPATHCAT(a,b) a b
-#endif
-#else
-#define ATALKPATHCAT(a,b) a/**/b
 #endif
 
 
@@ -18,7 +14,7 @@
 #if ! defined (_PATH_LOCKDIR)
 #  if defined (FHS_COMPATIBILITY) || defined (__NetBSD__) || defined (__OpenBSD__)
 #    define _PATH_LOCKDIR	"/var/run/"
-#  elif defined (BSD4_4)
+#  elif defined (__NetBSD__)
 #    ifdef MACOSX_SERVER
 #      define _PATH_LOCKDIR	"/var/run/"
 #    else
@@ -40,11 +36,11 @@
 #else /* !ultrix */
 #define _PATH_PAPDSPOOLDIR	"/var/spool/lpd"
 #endif /* ultrix */
-#ifdef BSD4_4
+#ifdef __NetBSD__
 #define _PATH_DEVPRINTER	"/var/run/printer"
-#else /* !BSD4_4 */
+#else /* !__NetBSD__ */
 #define _PATH_DEVPRINTER	"/dev/printer"
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
 /*
  * atalkd paths

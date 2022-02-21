@@ -24,9 +24,7 @@
    - it doesn't know about Apple extension
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 #include <stdlib.h>
 #include <errno.h>
 
@@ -46,11 +44,10 @@
 
 
 
-static size_t   utf8_pull(void *,char **, size_t *, char **, size_t *);
-static size_t   utf8_push(void *,char **, size_t *, char **, size_t *);
+static size_t utf8_pull(void *, char **, size_t *, char **, size_t *);
+static size_t utf8_push(void *, char **, size_t *, char **, size_t *);
 
-struct charset_functions charset_utf8 =
-{
+struct charset_functions charset_utf8 = {
 	"UTF8",
 	0x08000103,
 	utf8_pull,
@@ -60,27 +57,27 @@ struct charset_functions charset_utf8 =
 	NULL, NULL
 };
 
-struct charset_functions charset_utf8_mac =
-{
+struct charset_functions charset_utf8_mac = {
 	"UTF8-MAC",
 	0x08000103,
 	utf8_pull,
 	utf8_push,
-	CHARSET_VOLUME | CHARSET_CLIENT | CHARSET_MULTIBYTE | CHARSET_DECOMPOSED,
+	CHARSET_VOLUME | CHARSET_CLIENT | CHARSET_MULTIBYTE |
+	    CHARSET_DECOMPOSED,
 	NULL,
 	NULL, NULL
 };
 
 /* ------------------- Convert from UTF-8 to UTF-16 -------------------*/
 static size_t utf8_pull(void *cd _U_, char **inbuf, size_t *inbytesleft,
-			 char **outbuf, size_t *outbytesleft)
+			char **outbuf, size_t *outbytesleft)
 {
 	ucs2_t uc = 0;
 	unsigned int codepoint;
 	int len;
 
 	while (*inbytesleft >= 1 && *outbytesleft >= 2) {
-		unsigned char *c = (unsigned char *)*inbuf;
+		unsigned char *c = (unsigned char *) *inbuf;
 		len = 1;
 
 		/* Arrange conditionals in the order of most frequent occurrence 
@@ -89,48 +86,56 @@ static size_t utf8_pull(void *cd _U_, char **inbuf, size_t *inbytesleft,
 			uc = c[0];
 		} else if ((c[0] & 0xe0) == 0xc0) {
 			if (*inbytesleft < 2) {
-				LOG(log_debug, logtype_default, "short utf8 char");
+				LOG(log_debug, logtype_default,
+				    "short utf8 char");
 				goto badseq;
 			}
-			uc = (ucs2_t) (((c[0] & 0x1f) << 6) | GETUCVAL(c[1],0)) ;
+			uc = (ucs2_t) (((c[0] & 0x1f) << 6) |
+				       GETUCVAL(c[1], 0));
 			len = 2;
 		} else if ((c[0] & 0xf0) == 0xe0) {
 			if (*inbytesleft < 3) {
-				LOG(log_debug, logtype_default, "short utf8 char");
+				LOG(log_debug, logtype_default,
+				    "short utf8 char");
 				goto badseq;
 			}
-			uc = (ucs2_t) (((c[0] & 0x0f) << 12) | GETUCVAL(c[1],6) | GETUCVAL(c[2],0)) ;
+			uc = (ucs2_t) (((c[0] & 0x0f) << 12) |
+				       GETUCVAL(c[1], 6) | GETUCVAL(c[2],
+								    0));
 			len = 3;
 		} else if ((c[0] & 0xf8) == 0xf0) {
 			/* 4 bytes, which happens for surrogate pairs only */
 			if (*inbytesleft < 4) {
-				LOG(log_debug, logtype_default, "short utf8 char");
+				LOG(log_debug, logtype_default,
+				    "short utf8 char");
 				goto badseq;
 			}
 			if (*outbytesleft < 4) {
-				LOG(log_debug, logtype_default, "short ucs-2 write");
+				LOG(log_debug, logtype_default,
+				    "short ucs-2 write");
 				errno = E2BIG;
 				return -1;
 			}
-			codepoint = ((c[0] & 0x07) << 18) | GETUCVAL(c[1],12) |
-				GETUCVAL(c[2],6) |  GETUCVAL(c[3],0);
-			SSVAL(*outbuf,0,(((codepoint - 0x10000) >> 10) + 0xD800)); /* hi  */
-			SSVAL(*outbuf,2,(0xDC00 + (codepoint & 0x03FF)));          /* low */
+			codepoint =
+			    ((c[0] & 0x07) << 18) | GETUCVAL(c[1],
+							     12) |
+			    GETUCVAL(c[2], 6) | GETUCVAL(c[3], 0);
+			SSVAL(*outbuf, 0, (((codepoint - 0x10000) >> 10) + 0xD800));	/* hi  */
+			SSVAL(*outbuf, 2, (0xDC00 + (codepoint & 0x03FF)));	/* low */
 			len = 4;
-			(*inbuf)  += 4;
-			(*inbytesleft)  -= 4;
+			(*inbuf) += 4;
+			(*inbytesleft) -= 4;
 			(*outbytesleft) -= 4;
 			(*outbuf) += 4;
 			continue;
-		}
-		else {
+		} else {
 			errno = EINVAL;
 			return -1;
 		}
 
-		SSVAL(*outbuf,0,uc);
-		(*inbuf)  += len;
-		(*inbytesleft)  -= len;
+		SSVAL(*outbuf, 0, uc);
+		(*inbuf) += len;
+		(*inbytesleft) -= len;
 		(*outbytesleft) -= 2;
 		(*outbuf) += 2;
 	}
@@ -139,28 +144,28 @@ static size_t utf8_pull(void *cd _U_, char **inbuf, size_t *inbytesleft,
 		errno = E2BIG;
 		return -1;
 	}
-	
+
 	return 0;
 
-badseq:
+      badseq:
 	errno = EINVAL;
 	return -1;
 }
 
 /* --------------------- Convert from UTF-16 to UTF-8 -----------*/
 static size_t utf8_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
-			 char **outbuf, size_t *outbytesleft)
+			char **outbuf, size_t *outbytesleft)
 {
-	ucs2_t uc=0;
+	ucs2_t uc = 0;
 	ucs2_t hi, low;
 	unsigned int codepoint;
 	int olen, ilen;
 
 	while (*inbytesleft >= 2 && *outbytesleft >= 1) {
-		unsigned char *c = (unsigned char *)*outbuf;
-		uc = SVAL((*inbuf),0);
-		olen=1;
-		ilen=2;
+		unsigned char *c = (unsigned char *) *outbuf;
+		uc = SVAL((*inbuf), 0);
+		olen = 1;
+		ilen = 2;
 
 		/* Arrange conditionals in the order of most frequent occurrence for
 		   users of Latin-based chars */
@@ -168,14 +173,14 @@ static size_t utf8_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
 			c[0] = uc;
 		} else if (uc < 0x800) {
 			if (*outbytesleft < 2) {
-				LOG(log_debug, logtype_default, "short utf8 write");
+				LOG(log_debug, logtype_default,
+				    "short utf8 write");
 				goto toobig;
 			}
 			c[1] = GETUTF8TRAILBYTE(uc, 0);
-			c[0] = (char)(0xc0 | ((uc >> 6) & 0x1f));
+			c[0] = (char) (0xc0 | ((uc >> 6) & 0x1f));
 			olen = 2;
-		}
-		else if ( uc >= 0x202a && uc <= 0x202e ) {
+		} else if (uc >= 0x202a && uc <= 0x202e) {
 			/* ignore bidi hint characters */
 			olen = 0;
 		}
@@ -192,43 +197,51 @@ static size_t utf8_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
 		 * See www.unicode.org/faq/utf_bom.html for more info.
 		 */
 
-		else if ( 0xd800 <= uc && uc <= 0xdfff) {
+		else if (0xd800 <= uc && uc <= 0xdfff) {
 			/* surrogate - needs 4 bytes from input and 4 bytes for output to UTF-8 */
 			if (*outbytesleft < 4) {
-				LOG(log_debug, logtype_default, "short utf8 write");
+				LOG(log_debug, logtype_default,
+				    "short utf8 write");
 				goto toobig;
 			}
 			if (*inbytesleft < 4) {
 				errno = EINVAL;
 				return -1;
 			}
-			hi =  SVAL((*inbuf),0);
-			low = SVAL((*inbuf),2);
-			if ( 0xd800 <= hi && hi <= 0xdbff && 0xdc00 <= low && low <= 0xdfff) {
-				codepoint = ((hi - 0xd800) << 10) + (low - 0xdc00) + 0x10000;
+			hi = SVAL((*inbuf), 0);
+			low = SVAL((*inbuf), 2);
+			if (0xd800 <= hi && hi <= 0xdbff && 0xdc00 <= low
+			    && low <= 0xdfff) {
+				codepoint =
+				    ((hi - 0xd800) << 10) + (low -
+							     0xdc00) +
+				    0x10000;
 				c[3] = GETUTF8TRAILBYTE(codepoint, 0);
 				c[2] = GETUTF8TRAILBYTE(codepoint, 6);
 				c[1] = GETUTF8TRAILBYTE(codepoint, 12);
-				c[0] = (char)(0xf0 | ((codepoint >> 18) & 0x07));
+				c[0] =
+				    (char) (0xf0 |
+					    ((codepoint >> 18) & 0x07));
 				ilen = olen = 4;
-			} else { /* invalid values for surrogate */
+			} else {	/* invalid values for surrogate */
 				errno = EINVAL;
 				return -1;
 			}
 		} else {
 			if (*outbytesleft < 3) {
-				LOG(log_debug, logtype_default, "short utf8 write");
+				LOG(log_debug, logtype_default,
+				    "short utf8 write");
 				goto toobig;
 			}
 			c[2] = GETUTF8TRAILBYTE(uc, 0);
 			c[1] = GETUTF8TRAILBYTE(uc, 6);
-			c[0] = (char)(0xe0 | ((uc >> 12) & 0x0f));
+			c[0] = (char) (0xe0 | ((uc >> 12) & 0x0f));
 			olen = 3;
 		}
 
-		(*inbytesleft)  -= ilen;
+		(*inbytesleft) -= ilen;
 		(*outbytesleft) -= olen;
-		(*inbuf)  += ilen;
+		(*inbuf) += ilen;
 		(*outbuf) += olen;
 	}
 
@@ -241,10 +254,10 @@ static size_t utf8_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
 		errno = E2BIG;
 		return -1;
 	}
-	
+
 	return 0;
 
-toobig:
+      toobig:
 	errno = E2BIG;
 	return -1;
 }

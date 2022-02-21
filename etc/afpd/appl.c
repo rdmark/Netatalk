@@ -5,9 +5,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,55 +27,58 @@
 #include "file.h"
 #include "desktop.h"
 
-static struct savedt	sa = { { 0, 0, 0, 0 }, -1, 0, 0};
+static struct savedt sa = { { 0, 0, 0, 0 }, -1, 0, 0 };
 
 static int pathcmp(char *p, int plen, char *q, int qlen)
 {
-    return (( plen == qlen && memcmp( p, q, plen ) == 0 ) ? 0 : 1 );
+	return ((plen == qlen && memcmp(p, q, plen) == 0) ? 0 : 1);
 }
 
-static int applopen(struct vol *vol, u_char creator[ 4 ], int flags, int mode)
+static int applopen(struct vol *vol, u_char creator[4], int flags,
+		    int mode)
 {
-    char	*dtf, *adt, *adts;
+	char *dtf, *adt, *adts;
 
-    if ( sa.sdt_fd != -1 ) {
-        if ( !(flags & ( O_RDWR | O_WRONLY )) &&
-                memcmp( sa.sdt_creator, creator, sizeof( CreatorType )) == 0 &&
-                sa.sdt_vid == vol->v_vid ) {
-            return( AFP_OK );
-        }
-        close( sa.sdt_fd );
-        sa.sdt_fd = -1;
-    }
+	if (sa.sdt_fd != -1) {
+		if (!(flags & (O_RDWR | O_WRONLY)) &&
+		    memcmp(sa.sdt_creator, creator,
+			   sizeof(CreatorType)) == 0
+		    && sa.sdt_vid == vol->v_vid) {
+			return (AFP_OK);
+		}
+		close(sa.sdt_fd);
+		sa.sdt_fd = -1;
+	}
 
-    dtf = dtfile( vol, creator, ".appl" );
+	dtf = dtfile(vol, creator, ".appl");
 
-    if (( sa.sdt_fd = open( dtf, flags, ad_mode( dtf, mode ))) < 0 ) {
-        if ( errno == ENOENT && ( flags & O_CREAT )) {
-            if (( adts = strrchr( dtf, '/' )) == NULL ) {
-                return( AFPERR_PARAM );
-            }
-            *adts = '\0';
-            if (( adt = strrchr( dtf, '/' )) == NULL ) {
-                return( AFPERR_PARAM );
-            }
-            *adt = '\0';
-            (void) ad_mkdir( dtf, DIRBITS | 0777 );
-            *adt = '/';
-            (void) ad_mkdir( dtf, DIRBITS | 0777 );
-            *adts = '/';
+	if ((sa.sdt_fd = open(dtf, flags, ad_mode(dtf, mode))) < 0) {
+		if (errno == ENOENT && (flags & O_CREAT)) {
+			if ((adts = strrchr(dtf, '/')) == NULL) {
+				return (AFPERR_PARAM);
+			}
+			*adts = '\0';
+			if ((adt = strrchr(dtf, '/')) == NULL) {
+				return (AFPERR_PARAM);
+			}
+			*adt = '\0';
+			(void) ad_mkdir(dtf, DIRBITS | 0777);
+			*adt = '/';
+			(void) ad_mkdir(dtf, DIRBITS | 0777);
+			*adts = '/';
 
-            if (( sa.sdt_fd = open( dtf, flags, ad_mode( dtf, mode ))) < 0 ) {
-                return( AFPERR_PARAM );
-            }
-        } else {
-            return( AFPERR_PARAM );
-        }
-    }
-    memcpy( sa.sdt_creator, creator, sizeof( CreatorType ));
-    sa.sdt_vid = vol->v_vid;
-    sa.sdt_index = 0;
-    return( AFP_OK );
+			if ((sa.sdt_fd =
+			     open(dtf, flags, ad_mode(dtf, mode))) < 0) {
+				return (AFPERR_PARAM);
+			}
+		} else {
+			return (AFPERR_PARAM);
+		}
+	}
+	memcpy(sa.sdt_creator, creator, sizeof(CreatorType));
+	sa.sdt_vid = vol->v_vid;
+	sa.sdt_index = 0;
+	return (AFP_OK);
 }
 
 /*
@@ -85,29 +86,30 @@ static int applopen(struct vol *vol, u_char creator[ 4 ], int flags, int mode)
  */
 static int copyapplfile(int sfd, int dfd, char *mpath, u_short mplen)
 {
-    int		cc;
-    char	*p;
-    u_int16_t	len;
-    u_char	appltag[ 4 ];
-    char	buf[ MAXPATHLEN ];
+	int cc;
+	char *p;
+	u_int16_t len;
+	u_char appltag[4];
+	char buf[MAXPATHLEN];
 
-    while (( cc = read( sfd, buf, sizeof(appltag) + sizeof( u_short ))) > 0 ) {
-        p = buf + sizeof(appltag);
-        memcpy( &len, p, sizeof(len));
-        len = ntohs( len );
-        p += sizeof( len );
-        if (( cc = read( sa.sdt_fd, p, len )) < len ) {
-            break;
-        }
-        if ( pathcmp( mpath, mplen, p, len ) != 0 ) {
-            p += len;
-            if ( write( dfd, buf, p - buf ) != p - buf ) {
-                cc = -1;
-                break;
-            }
-        }
-    }
-    return( cc );
+	while ((cc =
+		read(sfd, buf, sizeof(appltag) + sizeof(u_short))) > 0) {
+		p = buf + sizeof(appltag);
+		memcpy(&len, p, sizeof(len));
+		len = ntohs(len);
+		p += sizeof(len);
+		if ((cc = read(sa.sdt_fd, p, len)) < len) {
+			break;
+		}
+		if (pathcmp(mpath, mplen, p, len) != 0) {
+			p += len;
+			if (write(dfd, buf, p - buf) != p - buf) {
+				cc = -1;
+				break;
+			}
+		}
+	}
+	return (cc);
 }
 
 /*
@@ -123,249 +125,210 @@ static int copyapplfile(int sfd, int dfd, char *mpath, u_short mplen)
  *
  * See afp_getappl() for the backward compatiblity code.
  */
-static char *
-makemacpath(const struct vol *vol, char *mpath, int mpathlen, struct dir *dir, char *path)
+static char *makemacpath(const struct vol *vol, char *mpath, int mpathlen,
+			 struct dir *dir, char *path)
 {
-    char	*p;
+	char *p;
 
-    p = mpath + mpathlen;
-    p -= strlen( path );
-    memcpy( p, path, strlen( path )); 
+	p = mpath + mpathlen;
+	p -= strlen(path);
+	memcpy(p, path, strlen(path));
 
-    while ( dir->d_did != DIRDID_ROOT ) {
-        p -= blength(dir->d_m_name) + 1;
-        if (p < mpath) {
-            /* FIXME: pathname too long */
-            return NULL;
-        }
-        memcpy(p, cfrombstr(dir->d_m_name), blength(dir->d_m_name) + 1);
-        if ((dir = dirlookup(vol, dir->d_pdid)) == NULL)
-            return NULL;
-    }
-    return( p );
-
-
-#if 0
-    char buffer[12 + MAXPATHLEN + 1];
-    int buflen = 12 + MAXPATHLEN + 1;
-    char *ret = mpath;
-    char *path = name;
-    char *uname = NULL;
-    struct bstrList *pathlist = NULL;
-    cnid_t cnid = dir->d_pdid;
-
-    /* Create list for path elements, request 16 list elements for now*/
-    if ((pathlist = bstListCreateMin(16)) == NULL) {
-        LOG(log_error, logtype_afpd, "makemacpath: OOM: %s", strerror(errno));
-        return NULL;
-    }
-
-    while ( cnid != DIRDID_ROOT ) {
-
-        /* construct path, copy already found uname to path element list*/
-        if ((bstrListPush(pathlist, bfromcstr(path))) != BSTR_OK) {
-            afp_errno = AFPERR_MISC;
-            ret = NULL;
-            goto exit;
-        }
-
-        /* next part */
-        if ((uname = cnid_resolve(vol->v_cdb, &cnid, buffer, buflen)) == NULL ) {
-            afp_errno = AFPERR_NOOBJ;
-            ret = NULL;
-            goto exit;
-        }
-
-        if ((path = utompath(vol, uname, cnid, utf8_encoding())) == NULL) {
-            afp_errno = AFPERR_MISC;
-            ret = NULL;
-            goto exit;
-        }
-    }
+	while (dir->d_did != DIRDID_ROOT) {
+		p -= blength(dir->d_m_name) + 1;
+		if (p < mpath) {
+			/* FIXME: pathname too long */
+			return NULL;
+		}
+		memcpy(p, cfrombstr(dir->d_m_name),
+		       blength(dir->d_m_name) + 1);
+		if ((dir = dirlookup(vol, dir->d_pdid)) == NULL)
+			return NULL;
+	}
+	return (p);
+}
 
 
+int afp_addappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
+		char *rbuf _U_, size_t *rbuflen)
+{
+	struct vol *vol;
+	struct dir *dir;
+	int tfd, cc;
+	u_int32_t did;
+	u_int16_t vid, mplen;
+	struct path *path;
+	char *dtf, *p, *mp;
+	u_char creator[4];
+	u_char appltag[4];
+	char *mpath, *tempfile;
 
-exit:
-    if (pathlist)
-        bstrListDestroy(pathlist);
+	*rbuflen = 0;
+	ibuf += 2;
 
-    return(ret);
+	memcpy(&vid, ibuf, sizeof(vid));
+	ibuf += sizeof(vid);
+	if (NULL == (vol = getvolbyvid(vid))) {
+		return (AFPERR_PARAM);
+	}
+
+	memcpy(&did, ibuf, sizeof(did));
+	ibuf += sizeof(did);
+	if (NULL == (dir = dirlookup(vol, did))) {
+		return afp_errno;
+	}
+
+	memcpy(creator, ibuf, sizeof(creator));
+	ibuf += sizeof(creator);
+
+	memcpy(appltag, ibuf, sizeof(appltag));
+	ibuf += sizeof(appltag);
+
+	if (NULL == (path = cname(vol, dir, &ibuf))) {
+		return get_afp_errno(AFPERR_PARAM);
+	}
+	if (path_isadir(path)) {
+		return (AFPERR_BADTYPE);
+	}
+
+	if (applopen(vol, creator, O_RDWR | O_CREAT, 0666) != AFP_OK) {
+		return (AFPERR_PARAM);
+	}
+	if (lseek(sa.sdt_fd, 0L, SEEK_SET) < 0) {
+		return (AFPERR_PARAM);
+	}
+	dtf = dtfile(vol, creator, ".appl.temp");
+	tempfile = obj->oldtmp;
+	strcpy(tempfile, dtf);
+	if ((tfd = open(tempfile, O_RDWR | O_CREAT, 0666)) < 0) {
+		return (AFPERR_PARAM);
+	}
+	mpath = obj->newtmp;
+	mp = makemacpath(vol, mpath, AFPOBJ_TMPSIZ, curdir, path->m_name);
+	if (!mp) {
+		close(tfd);
+		return AFPERR_PARAM;
+	}
+	mplen = mpath + AFPOBJ_TMPSIZ - mp;
+
+	/* write the new appl entry at start of temporary file */
+	p = mp - sizeof(u_short);
+	mplen = htons(mplen);
+	memcpy(p, &mplen, sizeof(mplen));
+	mplen = ntohs(mplen);
+	p -= sizeof(appltag);
+	memcpy(p, appltag, sizeof(appltag));
+	cc = mpath + AFPOBJ_TMPSIZ - p;
+	if (write(tfd, p, cc) != cc) {
+		close(tfd);
+		unlink(tempfile);
+		return (AFPERR_PARAM);
+	}
+	cc = copyapplfile(sa.sdt_fd, tfd, mp, mplen);
+	close(tfd);
+	close(sa.sdt_fd);
+	sa.sdt_fd = -1;
+
+	if (cc < 0) {
+		unlink(tempfile);
+		return (AFPERR_PARAM);
+	}
+	if (rename(tempfile, dtfile(vol, creator, ".appl")) < 0) {
+		return (AFPERR_PARAM);
+	}
+	return (AFP_OK);
+}
+
+int afp_rmvappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
+		char *rbuf _U_, size_t *rbuflen)
+{
+	struct vol *vol;
+	struct dir *dir;
+	int tfd, cc;
+	u_int32_t did;
+	u_int16_t vid, mplen;
+	struct path *path;
+	char *dtf, *mp;
+	u_char creator[4];
+	char *tempfile, *mpath;
+
+	*rbuflen = 0;
+	ibuf += 2;
+
+	memcpy(&vid, ibuf, sizeof(vid));
+	ibuf += sizeof(vid);
+	if (NULL == (vol = getvolbyvid(vid))) {
+		return (AFPERR_PARAM);
+	}
+
+	memcpy(&did, ibuf, sizeof(did));
+	ibuf += sizeof(did);
+	if (NULL == (dir = dirlookup(vol, did))) {
+		return afp_errno;
+	}
+
+	memcpy(creator, ibuf, sizeof(creator));
+	ibuf += sizeof(creator);
+
+	if (NULL == (path = cname(vol, dir, &ibuf))) {
+		return get_afp_errno(AFPERR_PARAM);
+	}
+	if (path_isadir(path)) {
+		return (AFPERR_BADTYPE);
+	}
+
+	if (applopen(vol, creator, O_RDWR, 0666) != AFP_OK) {
+		return (AFPERR_NOOBJ);
+	}
+	if (lseek(sa.sdt_fd, 0L, SEEK_SET) < 0) {
+		return (AFPERR_PARAM);
+	}
+	dtf = dtfile(vol, creator, ".appl.temp");
+	tempfile = obj->oldtmp;
+	strcpy(tempfile, dtf);
+	if ((tfd = open(tempfile, O_RDWR | O_CREAT, 0666)) < 0) {
+		return (AFPERR_PARAM);
+	}
+	mpath = obj->newtmp;
+	mp = makemacpath(vol, mpath, AFPOBJ_TMPSIZ, curdir, path->m_name);
+	if (!mp) {
+		close(tfd);
+		return AFPERR_PARAM;
+	}
+
+	mplen = mpath + AFPOBJ_TMPSIZ - mp;
+	cc = copyapplfile(sa.sdt_fd, tfd, mp, mplen);
+	close(tfd);
+	close(sa.sdt_fd);
+	sa.sdt_fd = -1;
+
+	if (cc < 0) {
+		unlink(tempfile);
+		return (AFPERR_PARAM);
+	}
+	if (rename(tempfile, dtfile(vol, creator, ".appl")) < 0) {
+		return (AFPERR_PARAM);
+	}
+	return (AFP_OK);
+}
+
+int afp_getappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
+		size_t *rbuflen)
+{
+	struct vol *vol;
+	char *p, *q;
+	int cc;
+	size_t buflen;
+	u_int16_t vid, aindex, bitmap, len;
+	u_char creator[4];
+	u_char appltag[4];
+	char *buf, *cbuf;
+	struct path *path;
+#if defined(APPLCNAME)
+	char utomname[MAXPATHLEN + 1];
+	char *u, *m;
+	int i, h;
 #endif
-}
-
-
-int afp_addappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
-{
-    struct vol		*vol;
-    struct dir		*dir;
-    int			tfd, cc;
-    u_int32_t           did;
-    u_int16_t		vid, mplen;
-    struct path         *path;
-    char                *dtf, *p, *mp;
-    u_char		creator[ 4 ];
-    u_char		appltag[ 4 ];
-    char		*mpath, *tempfile;
-
-    *rbuflen = 0;
-    ibuf += 2;
-
-    memcpy( &vid, ibuf, sizeof( vid ));
-    ibuf += sizeof( vid );
-    if (NULL == ( vol = getvolbyvid( vid ))) {
-        return( AFPERR_PARAM );
-    }
-
-    memcpy( &did, ibuf, sizeof( did ));
-    ibuf += sizeof( did );
-    if (NULL == ( dir = dirlookup( vol, did )) ) {
-        return afp_errno;
-    }
-
-    memcpy( creator, ibuf, sizeof( creator ));
-    ibuf += sizeof( creator );
-
-    memcpy( appltag, ibuf, sizeof( appltag ));
-    ibuf += sizeof( appltag );
-
-    if (NULL == ( path = cname( vol, dir, &ibuf )) ) {
-        return get_afp_errno(AFPERR_PARAM);
-    }
-    if ( path_isadir(path) ) {
-        return( AFPERR_BADTYPE );
-    }
-
-    if ( applopen( vol, creator, O_RDWR|O_CREAT, 0666 ) != AFP_OK ) {
-        return( AFPERR_PARAM );
-    }
-    if ( lseek( sa.sdt_fd, 0L, SEEK_SET ) < 0 ) {
-        return( AFPERR_PARAM );
-    }
-    dtf = dtfile( vol, creator, ".appl.temp" );
-    tempfile = obj->oldtmp;
-    strcpy( tempfile, dtf );
-    if (( tfd = open( tempfile, O_RDWR|O_CREAT, 0666 )) < 0 ) {
-        return( AFPERR_PARAM );
-    }
-    mpath = obj->newtmp;
-    mp = makemacpath( vol, mpath, AFPOBJ_TMPSIZ, curdir, path->m_name );
-    if (!mp) {
-        close(tfd);
-        return AFPERR_PARAM;
-    }
-    mplen =  mpath + AFPOBJ_TMPSIZ - mp;
-
-    /* write the new appl entry at start of temporary file */
-    p = mp - sizeof( u_short );
-    mplen = htons( mplen );
-    memcpy( p, &mplen, sizeof( mplen ));
-    mplen = ntohs( mplen );
-    p -= sizeof( appltag );
-    memcpy(p, appltag, sizeof( appltag ));
-    cc = mpath + AFPOBJ_TMPSIZ - p;
-    if ( write( tfd, p, cc ) != cc ) {
-        close(tfd);
-        unlink( tempfile );
-        return( AFPERR_PARAM );
-    }
-    cc = copyapplfile( sa.sdt_fd, tfd, mp, mplen );
-    close( tfd );
-    close( sa.sdt_fd );
-    sa.sdt_fd = -1;
-
-    if ( cc < 0 ) {
-        unlink( tempfile );
-        return( AFPERR_PARAM );
-    }
-    if ( rename( tempfile, dtfile( vol, creator, ".appl" )) < 0 ) {
-        return( AFPERR_PARAM );
-    }
-    return( AFP_OK );
-}
-
-int afp_rmvappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
-{
-    struct vol		*vol;
-    struct dir		*dir;
-    int			tfd, cc;
-    u_int32_t           did;
-    u_int16_t		vid, mplen;
-    struct path    	*path;
-    char                *dtf, *mp;
-    u_char		creator[ 4 ];
-    char                *tempfile, *mpath;
-
-    *rbuflen = 0;
-    ibuf += 2;
-
-    memcpy( &vid, ibuf, sizeof( vid ));
-    ibuf += sizeof( vid );
-    if (NULL == ( vol = getvolbyvid( vid ))) {
-        return( AFPERR_PARAM );
-    }
-
-    memcpy( &did, ibuf, sizeof( did ));
-    ibuf += sizeof( did );
-    if (NULL == ( dir = dirlookup( vol, did )) ) {
-        return afp_errno;
-    }
-
-    memcpy( creator, ibuf, sizeof( creator ));
-    ibuf += sizeof( creator );
-
-    if (NULL == ( path = cname( vol, dir, &ibuf )) ) {
-        return get_afp_errno(AFPERR_PARAM);
-    }
-    if ( path_isadir(path) ) {
-        return( AFPERR_BADTYPE );
-    }
-
-    if ( applopen( vol, creator, O_RDWR, 0666 ) != AFP_OK ) {
-        return( AFPERR_NOOBJ );
-    }
-    if ( lseek( sa.sdt_fd, 0L, SEEK_SET ) < 0 ) {
-        return( AFPERR_PARAM );
-    }
-    dtf = dtfile( vol, creator, ".appl.temp" );
-    tempfile = obj->oldtmp;
-    strcpy( tempfile, dtf );
-    if (( tfd = open( tempfile, O_RDWR|O_CREAT, 0666 )) < 0 ) {
-        return( AFPERR_PARAM );
-    }
-    mpath = obj->newtmp;
-    mp = makemacpath( vol, mpath, AFPOBJ_TMPSIZ, curdir, path->m_name );
-    if (!mp) {
-        close(tfd);
-        return AFPERR_PARAM ;
-    }
-
-    mplen =  mpath + AFPOBJ_TMPSIZ - mp;
-    cc = copyapplfile( sa.sdt_fd, tfd, mp, mplen );
-    close( tfd );
-    close( sa.sdt_fd );
-    sa.sdt_fd = -1;
-
-    if ( cc < 0 ) {
-        unlink( tempfile );
-        return( AFPERR_PARAM );
-    }
-    if ( rename( tempfile, dtfile( vol, creator, ".appl" )) < 0 ) {
-        return( AFPERR_PARAM );
-    }
-    return( AFP_OK );
-}
-
-int afp_getappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
-{
-    struct vol		*vol;
-    char		*p, *q;
-    int			cc; 
-    size_t		buflen;
-    u_int16_t		vid, aindex, bitmap, len;
-    u_char		creator[ 4 ];
-    u_char		appltag[ 4 ];
-    char                *buf, *cbuf;
-    struct path         *path;
 
     memset(appltag, 0, sizeof(u_char) * 4);
     ibuf += 2;
@@ -426,75 +389,68 @@ int afp_getappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t 
     sa.sdt_index++;
 
 #ifdef APPLCNAME
-    /*
-     * Check to see if this APPL mapping has an mpath or a upath.  If
-     * there are any ':'s in the name, it is a upath and must be converted
-     * to an mpath.  Hopefully, this code will go away.
-     */
-    {
+	/*
+	 * Check to see if this APPL mapping has an mpath or a upath.  If
+	 * there are any ':'s in the name, it is a upath and must be converted
+	 * to an mpath.  Hopefully, this code will go away.
+	 */
+
 #define hextoint( c )	( isdigit( c ) ? c - '0' : c + 10 - 'a' )
 #define islxdigit(x)	(!isupper(x)&&isxdigit(x))
+	u = p;
+	m = utomname;
+	i = len;
+	while (i) {
+		if (*u == ':' && *(u + 1) != '\0' && islxdigit(*(u + 1)) &&
+		    *(u + 2) != '\0' && islxdigit(*(u + 2))) {
+			++u, --i;
+			h = hextoint(*u) << 4;
+			++u, --i;
+			h |= hextoint(*u);
+			*m++ = h;
+		} else {
+			*m++ = *u;
+		}
+		++u, --i;
+	}
 
-        char	utomname[ MAXPATHLEN + 1];
-        char		*u, *m;
-        int		i, h;
+	len = m - utomname;
+	p = utomname;
 
-        u = p;
-        m = utomname;
-        i = len;
-        while ( i ) {
-            if ( *u == ':' && *(u+1) != '\0' && islxdigit( *(u+1)) &&
-                    *(u+2) != '\0' && islxdigit( *(u+2))) {
-                ++u, --i;
-                h = hextoint( *u ) << 4;
-                ++u, --i;
-                h |= hextoint( *u );
-                *m++ = h;
-            } else {
-                *m++ = *u;
-            }
-            ++u, --i;
-        }
+	if (p[len - 1] == '\0') {
+		len--;
+	}
+#endif				/* APPLCNAME */
 
-        len = m - utomname;
-        p = utomname;
+	/* fake up a cname */
+	cbuf = obj->newtmp;
+	q = cbuf;
+	*q++ = 2;		/* long path type */
+	*q++ = (unsigned char) len;
+	memcpy(q, p, len);
+	q = cbuf;
 
-        if ( p[ len - 1 ] == '\0' ) {
-            len--;
-        }
-    }
-#endif /* APPLCNAME */
+	if ((path = cname(vol, vol->v_root, &q)) == NULL) {
+		*rbuflen = 0;
+		return (AFPERR_NOITEM);
+	}
 
-    /* fake up a cname */
-    cbuf = obj->newtmp;
-    q = cbuf;
-    *q++ = 2;	/* long path type */
-    *q++ = (unsigned char)len;
-    memcpy( q, p, len );
-    q = cbuf;
+	if (path_isadir(path) || path->st_errno) {
+		*rbuflen = 0;
+		return (AFPERR_NOITEM);
+	}
+	buflen = *rbuflen - sizeof(bitmap) - sizeof(appltag);
+	if (getfilparams(vol, bitmap, path, curdir, rbuf + sizeof(bitmap) +
+			 sizeof(appltag), &buflen) != AFP_OK) {
+		*rbuflen = 0;
+		return (AFPERR_BITMAP);
+	}
 
-    if (( path = cname( vol, vol->v_root, &q )) == NULL ) {
-        *rbuflen = 0;
-        return( AFPERR_NOITEM );
-    }
-
-    if ( path_isadir(path) || path->st_errno ) {
-        *rbuflen = 0;
-        return( AFPERR_NOITEM );
-    }
-    buflen = *rbuflen - sizeof( bitmap ) - sizeof( appltag );
-    if ( getfilparams(vol, bitmap, path, curdir, rbuf + sizeof( bitmap ) +
-                      sizeof( appltag ), &buflen ) != AFP_OK ) {
-        *rbuflen = 0;
-        return( AFPERR_BITMAP );
-    }
-
-    *rbuflen = buflen + sizeof( bitmap ) + sizeof( appltag );
-    bitmap = htons( bitmap );
-    memcpy( rbuf, &bitmap, sizeof( bitmap ));
-    rbuf += sizeof( bitmap );
-    memcpy( rbuf, appltag, sizeof( appltag ));
-    rbuf += sizeof( appltag );
-    return( AFP_OK );
+	*rbuflen = buflen + sizeof(bitmap) + sizeof(appltag);
+	bitmap = htons(bitmap);
+	memcpy(rbuf, &bitmap, sizeof(bitmap));
+	rbuf += sizeof(bitmap);
+	memcpy(rbuf, appltag, sizeof(appltag));
+	rbuf += sizeof(appltag);
+	return (AFP_OK);
 }
-

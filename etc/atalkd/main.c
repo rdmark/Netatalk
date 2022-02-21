@@ -5,9 +5,7 @@
  * All Rights Reserved. See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/param.h>
 #include <sys/socket.h>
@@ -16,26 +14,10 @@
 #include <sys/resource.h>
 #include <sys/ioctl.h>
 
-/* POSIX.1 check */
 #include <sys/types.h>
-#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#endif /* HAVE_SYS_WAIT_H */
-#ifndef WEXITSTATUS 
-#define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
-#endif /* ! WEXITSTATUS */
-#ifndef WIFEXITED
-#define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
-#endif /* ! WIFEXITED */
-#ifndef WIFSTOPPED
-#define WIFSTOPPED(status) (((status) & 0xff) == 0x7f)
-#endif
 
 #include <errno.h>
-#ifdef TRU64
-#include <sys/mbuf.h>
-#include <net/route.h>
-#endif /* TRU64 */
 #include <net/if.h>
 #include <net/route.h>
 
@@ -78,23 +60,6 @@
 /* Forward Declarations */
 int ifconfig(const char *iname, unsigned long cmd, struct sockaddr_at *sa);
 
-/* FIXME/SOCKLEN_T: socklen_t is a unix98 feature */
-#ifndef SOCKLEN_T
-#define SOCKLEN_T unsigned int
-#endif /* SOCKLEN_T */
-
-#ifndef WEXITSTATUS
-#define WEXITSTATUS(x)	((x).w_retcode)
-#endif /* WEXITSTATUS */
-
-/* linux has a special ioctl for appletalk device destruction.  as of
- * 2.1.57, SIOCDIFADDR works w/ linux. okay, we need to deal with the
- * fact that SIOCDIFADDR may be defined on linux despite the fact that
- * it doesn't work. */
-#if !defined(SIOCDIFADDR) && defined(SIOCATALKDIFADDR)
-#define SIOCDIFADDR SIOCATALKDIFADDR
-#endif
-
 #define elements(a)	(sizeof(a)/sizeof((a)[0]))
 
 #define PKTSZ	1024
@@ -115,7 +80,7 @@ static int		atservNATSERV = elements( atserv );
 
 struct interface	*interfaces = NULL, *ciface = NULL;
 
-static int		debug = 0, quiet = 0, chatty = 0;
+int			debug = 0, quiet = 0, chatty = 0;
 static char		*configfile = NULL;
 static int		ziptimeout = 0;
 static int		stable = 0, noparent = 0;
@@ -134,20 +99,19 @@ int readconf( char * );
 int getifconf( void );
 int writeconf( char * );
 
+static void consistency (void );
+
 /* this is the messiest of the bunch as atalkd can exit pretty much
  * everywhere. we delete interfaces here instead of in as_down. */
 static void atalkd_exit(const int i)
 {
-#ifdef SIOCDIFADDR
   struct interface *iface;
 
   for (iface = interfaces; iface; iface = iface->i_next) {
     if (ifconfig( iface->i_name, SIOCDIFADDR, &iface->i_addr)) {
-#ifdef SIOCATALKDIFADDR
-#if (SIOCDIFADDR != SIOCATALKDIFADDR)
+#if defined(__linux__)
       if (!ifconfig(iface->i_name, SIOCATALKDIFADDR, &iface->i_addr)) 
 	continue;
-#endif /* SIOCDIFADDR != SIOCATALKDIFADDR */
 #endif /* SIOCATALKIFADDR */
       LOG(log_error, logtype_atalkd, "difaddr(%u.%u): %s", 
 	      ntohs(iface->i_addr.sat_addr.s_net), 
@@ -158,7 +122,6 @@ static void atalkd_exit(const int i)
         ifsetallmulti(iface->i_name, 0);
 #endif /* linux */
   }
-#endif /* SOPCDOFADDR */
 
   server_unlock(pidfile);
   exit(i);
@@ -522,9 +485,9 @@ static void as_timer(int sig _U_)
 	 * interface is configured as a router.  
 	 */
 	if ((iface->i_flags & IFACE_ISROUTER)) {
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	    sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	    sat.sat_family = AF_APPLETALK;
 	    sat.sat_addr.s_net = ATADDR_ANYNET;
 	    sat.sat_addr.s_node = ATADDR_BCAST;
@@ -666,16 +629,15 @@ static void as_timer(int sig _U_)
 	}
     }
 
-#ifdef DEBUG
-    consistency();
-#endif /* DEBUG */
+    if ( debug )
+        consistency();
+
 }
 
-#ifdef DEBUG
 /*
 * Consistency check...
 */
-consistency()
+static void consistency()
 {
     struct rtmptab	*rtmp;
     struct list		*lr, *lz;
@@ -685,7 +647,8 @@ consistency()
 	for ( lr = zt->zt_rt; lr; lr = lr->l_next ) {
 	    rtmp = (struct rtmptab *)lr->l_data;
 	    if ( rtmp->rt_iprev == 0 && rtmp->rt_gate != 0 ) {
-		LOG(log_error, logtype_atalkd, "%.*s has %u-%u (unused)",
+		if ( debug )
+		    LOG(log_error, logtype_atalkd, "%.*s has %u-%u (unused)",
 			zt->zt_len, zt->zt_name, ntohs( rtmp->rt_firstnet ),
 			ntohs( rtmp->rt_lastnet ));
 		atalkd_exit(1);
@@ -696,7 +659,8 @@ consistency()
 		}
 	    }
 	    if ( lz == 0 ) {
-		LOG(log_error, logtype_atalkd, "no map from %u-%u to %.*s", 
+		if ( debug )
+		    LOG(log_error, logtype_atalkd, "no map from %u-%u to %.*s", 
 			ntohs( rtmp->rt_firstnet ),
 			ntohs( rtmp->rt_lastnet ),
 			zt->zt_len, zt->zt_name );
@@ -705,7 +669,6 @@ consistency()
 	}
     }
 }
-#endif /* DEBUG */
 
 static void
 as_debug(int sig _U_)
@@ -845,9 +808,6 @@ as_down(int sig _U_)
 
 int main( int ac, char **av)
 {
-    extern char         *optarg;
-    extern int          optind;
-
     struct sockaddr_at	sat;
     struct sigaction	sv;
     struct itimerval	it;
@@ -858,7 +818,7 @@ int main( int ac, char **av)
     struct atport	*ap;
     fd_set		readfds;
     int			i, c;
-    SOCKLEN_T 		fromlen;
+    socklen_t 		fromlen;
     char		*prog;
 
     while (( c = getopt( ac, av, "12qsdtf:P:v" )) != EOF ) {
@@ -938,6 +898,8 @@ int main( int ac, char **av)
      */
     if ( readconf( configfile ) < 0 && getifconf() < 0 ) {
 	fprintf( stderr, "%s: can't get interfaces, exiting.\n", prog );
+	if (interfaces != NULL)
+		free(interfaces);
 	exit( 1 );
     }
 
@@ -1029,17 +991,13 @@ int main( int ac, char **av)
 #endif /* __svr4__ */
 
     /* delete pre-existing interface addresses. */
-#ifdef SIOCDIFADDR
     for (iface = interfaces; iface; iface = iface->i_next) {
       if (ifconfig(iface->i_name, SIOCDIFADDR, &iface->i_addr)) {
-#ifdef SIOCATALKDIFADDR
-#if (SIOCDIFADDR != SIOCATALKDIFADDR)
+#if defined(__linux__)
 	ifconfig(iface->i_name, SIOCATALKDIFADDR, &iface->i_addr);
-#endif /* SIOCDIFADDR != SIOCATALKDIFADDR */
 #endif /* SIOCATALKDIFADDR */
       }
     }
-#endif /* SIOCDIFADDR */
 
     /*
      * Disassociate. The child will send itself a signal when it is
@@ -1077,12 +1035,8 @@ int main( int ac, char **av)
       exit( 0 );
     }
 
-#ifdef ultrix
-    openlog( prog, LOG_PID );
-#else /* ultrix */
     set_processname(prog);
     syslog_setup(log_debug, logtype_default, logoption_pid, logfacility_daemon );
-#endif /* ultrix */
 
     LOG(log_info, logtype_atalkd, "restart (%s)", version );
 
@@ -1090,7 +1044,7 @@ int main( int ac, char **av)
      * Socket for use in routing ioctl()s. Can't add routes to our
      * interfaces until we have our routing socket.
      */
-#ifdef BSD4_4
+#ifdef __NetBSD__
     if (( rtfd = socket( PF_ROUTE, SOCK_RAW, AF_APPLETALK )) < 0 ) {
 	LOG(log_error, logtype_atalkd, "route socket: %s", strerror(errno) );
 	atalkd_exit( 1 );
@@ -1099,12 +1053,12 @@ int main( int ac, char **av)
 	LOG(log_error, logtype_atalkd, "route shutdown: %s", strerror(errno) );
 	atalkd_exit( 1 );
     }
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
     if (( rtfd = socket( AF_APPLETALK, SOCK_DGRAM, 0 )) < 0 ) {
 	LOG(log_error, logtype_atalkd, "route socket: %s", strerror(errno) );
 	atalkd_exit( 1 );
     }
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 
     ciface = interfaces;
     bootaddr( ciface );
@@ -1154,10 +1108,6 @@ int main( int ac, char **av)
 
     sigemptyset( &signal_set );
     sigaddset(&signal_set, SIGALRM);
-#if 0
-    /* don't block SIGTERM */
-    sigaddset(&signal_set, SIGTERM);
-#endif
     sigaddset(&signal_set, SIGUSR1);
 
     for (;;) {
@@ -1182,7 +1132,7 @@ int main( int ac, char **av)
 			    LOG(log_error, logtype_atalkd, "recvfrom: %s", strerror(errno) );
 			    continue;
 			}
-#ifdef DEBUG1
+
 			if ( debug ) {
 			    printf( "packet from %u.%u on %s (%x) %d (%d)\n",
 				    ntohs( sat.sat_addr.s_net ),
@@ -1190,7 +1140,7 @@ int main( int ac, char **av)
 				    iface->i_flags, ap->ap_port, ap->ap_fd );
 			    bprint( Packet, c );
 			}
-#endif 
+
 			if (sigprocmask(SIG_BLOCK, &signal_set, &old_set) < 0) {
 			    LOG(log_error, logtype_atalkd, "sigprocmask: %s", strerror(errno) );
 			    atalkd_exit( 1 );
@@ -1201,9 +1151,9 @@ int main( int ac, char **av)
 			  atalkd_exit(1);
 			}
 
-#ifdef DEBUG
-			consistency();
-#endif 
+			if ( debug )
+				consistency();
+
 			if (sigprocmask(SIG_SETMASK, &old_set, NULL) < 0) {
 			    LOG(log_error, logtype_atalkd, "sigprocmask old set: %s", strerror(errno) );
 			    atalkd_exit( 1 );
@@ -1319,9 +1269,9 @@ void setaddr(struct interface *iface,
 	}
     }
 
-#ifdef BSD4_4
+#ifdef __NetBSD__
     iface->i_addr.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     iface->i_addr.sat_family = AF_APPLETALK;
     iface->i_addr.sat_addr.s_net = net;
     iface->i_addr.sat_addr.s_node = node;
@@ -1343,10 +1293,7 @@ smaller net range.", iface->i_name, ntohs(first), ntohs(last), strerror(errno));
 
     /* open ports */
     i = 1; /* enable broadcasts */
-#if 0
-    /* useless message, no? */
-    LOG(log_info, logtype_atalkd, "setsockopt incompatible w/ Solaris STREAMS module.");
-#endif /* __svr4__ */
+
     for ( ap = iface->i_ports; ap; ap = ap->ap_next ) {
 	if (( ap->ap_fd = socket( AF_APPLETALK, SOCK_DGRAM, 0 )) < 0 ) {
 	    LOG(log_error, logtype_atalkd, "socket: %s", strerror(errno) );
@@ -1357,9 +1304,9 @@ smaller net range.", iface->i_name, ntohs(first), ntohs(last), strerror(errno));
 #endif /* ! __svr4 */
 
 	memset( &sat, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
 	sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
 	sat.sat_family = AF_APPLETALK;
 	sat.sat_addr.s_net = iface->i_addr.sat_addr.s_net;
 	sat.sat_addr.s_node = iface->i_addr.sat_addr.s_node;
@@ -1370,18 +1317,16 @@ smaller net range.", iface->i_name, ntohs(first), ntohs(last), strerror(errno));
 	    LOG(log_error, logtype_atalkd, "bind %u.%u:%u: %s",
 		    ntohs( sat.sat_addr.s_net ),
 		    sat.sat_addr.s_node, sat.sat_port, strerror(errno) );
-#ifdef SIOCDIFADDR
 	    /* remove all interfaces if we have a problem with bind */
 	    for (iface = interfaces; iface; iface = iface->i_next) {
 	      if (ifconfig( iface->i_name, SIOCDIFADDR, &iface->i_addr )) {
-#ifdef SIOCATALKDIFADDR
+#if defined(__linux__)
 #if (SIOCDIFADDR != SIOCATALKDIFADDR)
 		ifconfig( iface->i_name, SIOCATALKDIFADDR, &iface->i_addr );
 #endif /* SIOCDIFADDR != SIOCATALKDIFADDR */
 #endif /* SIOCATALKDIFADDR */
 	      }
 	    }
-#endif /* SIOCDIFADDR */
 	    atalkd_exit( 1 );
 	}
     }
@@ -1492,7 +1437,6 @@ void dumpconfig( struct interface *iface)
     printf( "\n" );
 }
 
-#ifdef DEBUG
 void dumproutes(void)
 {
     struct interface	*iface;
@@ -1543,7 +1487,6 @@ void dumproutes(void)
 
 void dumpzones(void)
 {
-    struct interface	*iface;
     struct rtmptab	*rtmp;
     struct list		*l;
     struct ziptab	*zt;
@@ -1568,4 +1511,3 @@ void dumpzones(void)
     printf( "\n" );
     fflush( stdout );
 }
-#endif /* DEBUG */

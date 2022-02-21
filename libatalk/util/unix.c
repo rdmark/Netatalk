@@ -17,9 +17,7 @@
  * Netatalk utility functions
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <unistd.h>
 #include <stdint.h>
@@ -44,10 +42,10 @@
 /* close all FDs >= a specified value */
 static void closeall(int fd)
 {
-    int fdlimit = sysconf(_SC_OPEN_MAX);
+	int fdlimit = sysconf(_SC_OPEN_MAX);
 
-    while (fd < fdlimit)
-        close(fd++);
+	while (fd < fdlimit)
+		close(fd++);
 }
 
 /*!
@@ -60,54 +58,54 @@ static void closeall(int fd)
  */
 int daemonize(int nochdir, int noclose)
 {
-    switch (fork()) {
-    case 0:
-        break;
-    case -1:
-        return -1;
-    default:
-        _exit(0);
-    }
+	switch (fork()) {
+	case 0:
+		break;
+	case -1:
+		return -1;
+	default:
+		_exit(0);
+	}
 
-    if (setsid() < 0)
-        return -1;
+	if (setsid() < 0)
+		return -1;
 
-    switch (fork()) {
-    case 0: 
-        break;
-    case -1:
-        return -1;
-    default:
-        _exit(0);
-    }
+	switch (fork()) {
+	case 0:
+		break;
+	case -1:
+		return -1;
+	default:
+		_exit(0);
+	}
 
-    if (!nochdir)
-        chdir("/");
+	if (!nochdir)
+		chdir("/");
 
-    if (!noclose) {
-        closeall(0);
-        open("/dev/null",O_RDWR);
-        dup(0);
-        dup(0);
-    }
+	if (!noclose) {
+		closeall(0);
+		open("/dev/null", O_RDWR);
+		dup(0);
+		dup(0);
+	}
 
-    return 0;
+	return 0;
 }
 
 static uid_t saved_uid = -1;
 
 void become_root(void)
 {
-    saved_uid = geteuid();
-    if (seteuid(0) != 0)
-        AFP_PANIC("Can't seteuid(0)");
+	saved_uid = geteuid();
+	if (seteuid(0) != 0)
+		AFP_PANIC("Can't seteuid(0)");
 }
 
 void unbecome_root(void)
 {
-    if (saved_uid == -1 || seteuid(saved_uid) < 0)
-        AFP_PANIC("Can't seteuid back");
-    saved_uid = -1;
+	if (saved_uid == -1 || seteuid(saved_uid) < 0)
+		AFP_PANIC("Can't seteuid back");
+	saved_uid = -1;
 }
 
 /*!
@@ -117,13 +115,13 @@ void unbecome_root(void)
  */
 const char *getcwdpath(void)
 {
-    static char cwd[MAXPATHLEN + 1];
-    char *p;
+	static char cwd[MAXPATHLEN + 1];
+	char *p;
 
-    if ((p = getcwd(cwd, MAXPATHLEN)) != NULL)
-        return p;
-    else
-        return strerror(errno);
+	if ((p = getcwd(cwd, MAXPATHLEN)) != NULL)
+		return p;
+	else
+		return strerror(errno);
 }
 
 /*!
@@ -133,19 +131,19 @@ const char *getcwdpath(void)
  */
 const char *fullpathname(const char *name)
 {
-    static char wd[MAXPATHLEN + 1];
+	static char wd[MAXPATHLEN + 1];
 
-    if (name[0] == '/')
-        return name;
+	if (name[0] == '/')
+		return name;
 
-    if (getcwd(wd , MAXPATHLEN)) {
-        strlcat(wd, "/", MAXPATHLEN);
-        strlcat(wd, name, MAXPATHLEN);
-    } else {
-        strlcpy(wd, name, MAXPATHLEN);
-    }
+	if (getcwd(wd, MAXPATHLEN)) {
+		strlcat(wd, "/", MAXPATHLEN);
+		strlcat(wd, name, MAXPATHLEN);
+	} else {
+		strlcpy(wd, name, MAXPATHLEN);
+	}
 
-    return wd;
+	return wd;
 }
 
 /*!
@@ -162,10 +160,10 @@ const char *fullpathname(const char *name)
  */
 char *stripped_slashes_basename(char *p)
 {
-    int i = strlen(p) - 1;
-    while (i > 0 && p[i] == '/')
-        p[i--] = 0;
-    return (strrchr(p, '/') ? strrchr(p, '/') + 1 : p);
+	int i = strlen(p) - 1;
+	while (i > 0 && p[i] == '/')
+		p[i--] = 0;
+	return (strrchr(p, '/') ? strrchr(p, '/') + 1 : p);
 }
 
 /*********************************************************************************
@@ -177,18 +175,18 @@ char *stripped_slashes_basename(char *p)
 
 int ostat(const char *path, struct stat *buf, int options)
 {
-    if (options & O_NOFOLLOW)
-        return lstat(path, buf);
-    else
-        return stat(path, buf);
+	if (options & O_NOFOLLOW)
+		return lstat(path, buf);
+	else
+		return stat(path, buf);
 }
 
 int ochown(const char *path, uid_t owner, gid_t group, int options)
 {
-    if (options & O_NOFOLLOW)
-        return lchown(path, owner, group);
-    else
-        return chown(path, owner, group);
+	if (options & O_NOFOLLOW)
+		return lchown(path, owner, group);
+	else
+		return chown(path, owner, group);
 }
 
 /*!
@@ -203,25 +201,26 @@ int ochown(const char *path, uid_t owner, gid_t group, int options)
  * O_NOFOLLOW: don't chmod() symlinks, do nothing, return 0
  * O_NETATALK_ACL: call chmod_acl() instead of chmod()
  */
-int ochmod(const char *path, mode_t mode, const struct stat *st, int options)
+int ochmod(const char *path, mode_t mode, const struct stat *st,
+	   int options)
 {
-    struct stat sb;
+	struct stat sb;
 
-    if (!st) {
-        if (lstat(path, &sb) != 0)
-            return -1;
-        st = &sb;
-    }
+	if (!st) {
+		if (lstat(path, &sb) != 0)
+			return -1;
+		st = &sb;
+	}
 
-    if (options & O_NOFOLLOW)
-        if (S_ISLNK(st->st_mode))
-            return 0;
+	if (options & O_NOFOLLOW)
+		if (S_ISLNK(st->st_mode))
+			return 0;
 
-    if (options & O_NETATALK_ACL) {
-        return chmod_acl(path, mode);
-    } else {
-        return chmod(path, mode);
-    }
+	if (options & O_NETATALK_ACL) {
+		return chmod_acl(path, mode);
+	} else {
+		return chmod(path, mode);
+	}
 }
 
 /* 
@@ -236,15 +235,16 @@ int ochmod(const char *path, mode_t mode, const struct stat *st, int options)
 int ostatat(int dirfd, const char *path, struct stat *st, int options)
 {
 #ifdef HAVE_ATFUNCS
-    if (dirfd == -1)
-        dirfd = AT_FDCWD;
-    return fstatat(dirfd, path, st, (options & O_NOFOLLOW) ? AT_SYMLINK_NOFOLLOW : 0);
+	if (dirfd == -1)
+		dirfd = AT_FDCWD;
+	return fstatat(dirfd, path, st,
+		       (options & O_NOFOLLOW) ? AT_SYMLINK_NOFOLLOW : 0);
 #else
     return ostat(path, st, options);
 #endif            
 
-    /* DEADC0DE */
-    return -1;
+	/* DEADC0DE */
+	return -1;
 }
 
 /*!
@@ -257,72 +257,72 @@ int ostatat(int dirfd, const char *path, struct stat *st, int options)
  */
 int ochdir(const char *dir, int options)
 {
-    char buf[MAXPATHLEN+1];
-    char cwd[MAXPATHLEN+1];
-    char *test;
-    int  i;
+	char buf[MAXPATHLEN + 1];
+	char cwd[MAXPATHLEN + 1];
+	char *test;
+	int i;
 
-    if (!(options & O_NOFOLLOW))
-        return chdir(dir);
+	if (!(options & O_NOFOLLOW))
+		return chdir(dir);
 
-    /*
-     dir is a canonical path (without "../" "./" "//" )
-     but may end with a / 
-    */
-    *cwd = 0;
-    if (*dir != '/') {
-        if (getcwd(cwd, MAXPATHLEN) == NULL)
-            return -1;
-    }
-    if (chdir(dir) != 0)
-        return -1;
+	/*
+	   dir is a canonical path (without "../" "./" "//" )
+	   but may end with a / 
+	 */
+	*cwd = 0;
+	if (*dir != '/') {
+		if (getcwd(cwd, MAXPATHLEN) == NULL)
+			return -1;
+	}
+	if (chdir(dir) != 0)
+		return -1;
 
-    /* 
-     * Cases:
-     * chdir request   | realpath result | ret
-     * (after getwcwd) |                 |
-     * =======================================
-     * /a/b/.          | /a/b            | 0
-     * /a/b/.          | /c              | 1
-     * /a/b/.          | /c/d/e/f        | 1
-     */
-    if (getcwd(buf, MAXPATHLEN) == NULL)
-        return 1;
+	/* 
+	 * Cases:
+	 * chdir request   | realpath result | ret
+	 * (after getwcwd) |                 |
+	 * =======================================
+	 * /a/b/.          | /a/b            | 0
+	 * /a/b/.          | /c              | 1
+	 * /a/b/.          | /c/d/e/f        | 1
+	 */
+	if (getcwd(buf, MAXPATHLEN) == NULL)
+		return 1;
 
-    i = 0;
-    if (*cwd) {
-        /* relative path requested, 
-         * Same directory?
-        */
-        for (; cwd[i]; i++) {
-            if (buf[i] != cwd[i])
-                return 1;
-        }
-        if (buf[i]) {
-            if (buf[i] != '/')
-                return 1;
-            i++;
-        }                    
-    }
+	i = 0;
+	if (*cwd) {
+		/* relative path requested, 
+		 * Same directory?
+		 */
+		for (; cwd[i]; i++) {
+			if (buf[i] != cwd[i])
+				return 1;
+		}
+		if (buf[i]) {
+			if (buf[i] != '/')
+				return 1;
+			i++;
+		}
+	}
 
-    test = &buf[i];    
-    for (i = 0; test[i]; i++) {
-        if (test[i] != dir[i]) {
-            return 1;
-        }
-    }
-    /* trailing '/' ? */
-    if (!dir[i])
-        return 0;
+	test = &buf[i];
+	for (i = 0; test[i]; i++) {
+		if (test[i] != dir[i]) {
+			return 1;
+		}
+	}
+	/* trailing '/' ? */
+	if (!dir[i])
+		return 0;
 
-    if (dir[i] != '/')
-        return 1;
+	if (dir[i] != '/')
+		return 1;
 
-    i++;
-    if (dir[i])
-        return 1;
+	i++;
+	if (dir[i])
+		return 1;
 
-    return 0;
+	return 0;
 }
 
 /*!
@@ -330,27 +330,27 @@ int ochdir(const char *dir, int options)
  */
 void randombytes(void *buf, int n)
 {
-    char *p = (char *)buf;
-    int fd, i;
-    struct timeval tv;
+	char *p = (char *) buf;
+	int fd, i;
+	struct timeval tv;
 
-    if ((fd = open("/dev/urandom", O_RDONLY)) != -1) {
-        /* generate from /dev/urandom */
-        if (read(fd, buf, n) != n) {
-            close(fd);
-            fd = -1;
-        } else {
-            close(fd);
-            /* fd now != -1, so srandom wont be called below */
-        }
-    }
+	if ((fd = open("/dev/urandom", O_RDONLY)) != -1) {
+		/* generate from /dev/urandom */
+		if (read(fd, buf, n) != n) {
+			close(fd);
+			fd = -1;
+		} else {
+			close(fd);
+			/* fd now != -1, so srandom wont be called below */
+		}
+	}
 
-    if (fd == -1) {
-        gettimeofday(&tv, NULL);
-        srandom((unsigned int)tv.tv_usec);
-        for (i=0 ; i < n ; i++)
-            p[i] = random() & 0xFF;
-    }
+	if (fd == -1) {
+		gettimeofday(&tv, NULL);
+		srandom((unsigned int) tv.tv_usec);
+		for (i = 0; i < n; i++)
+			p[i] = random() & 0xFF;
+	}
 
-    return;
+	return;
 }

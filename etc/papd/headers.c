@@ -5,9 +5,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h" 
-#endif /* HAVE_CONFIG_H */
+#include "config.h"
 
 #include <sys/param.h>
 #include <string.h>
@@ -21,132 +19,131 @@
 #include "comment.h"
 #include "lp.h"
 
-int ch_title( struct papfile *, struct papfile * );
-int ch_for( struct papfile *, struct papfile * );
+int ch_title(struct papfile *, struct papfile *);
+int ch_for(struct papfile *, struct papfile *);
+
+extern int debug;
 
 static char *get_text(char *start, int linelength)
 {
-    char *p, *q;
-    char *t, *ret;
-    char *stop;
-    
-    /* 1023 is arbitrary 255 max for comment but some may be escape \xxx and space and keyword */
+	char *p, *q;
+	char *t, *ret;
+	char *stop;
 
-    if (linelength > 1023)
-        return NULL;
+	/* 1023 is arbitrary 255 max for comment but some may be escape \xxx and space and keyword */
 
-    t = ret = calloc(1, linelength +1);
+	if (linelength > 1023)
+		return NULL;
 
-    if (!ret)
-        return NULL;
+	t = ret = calloc(1, linelength + 1);
 
-    stop = start + linelength;
-    for ( p = start; p < stop; p++ ) {
-        if ( *p == ':' ) {
-            p++;
-            break;
-        }
-    }
-    
-    for ( ; p < stop; p++ ) {
-        if (*p != ' ' && *p != '\t') {
-            break;
-        }
-    }
+	if (!ret)
+		return NULL;
 
-    if ( p < stop && *p == '(' ) {
-        int count;
-        /* start with ( then it's a <text> */ 
-        p++;
-        for ( q = p, count = 1; q < stop; q++, t++ ) {
-            if (*q == '(') {
-              count++;
-            }
-            else if ( *q == ')' ) {
-                count--;
-                if (!count) {
-                    break;
-                }
-            }
-            *t = *q;
-        }
-    }
-    else {
-        /* it's a textline */
-        for ( q = p; q < stop; q++, t++ ) {
-            *t = *q;
-        }
-    }
-    return ret;
+	stop = start + linelength;
+	for (p = start; p < stop; p++) {
+		if (*p == ':') {
+			p++;
+			break;
+		}
+	}
+
+	for (; p < stop; p++) {
+		if (*p != ' ' && *p != '\t') {
+			break;
+		}
+	}
+
+	if (p < stop && *p == '(') {
+		int count;
+		/* start with ( then it's a <text> */
+		p++;
+		for (q = p, count = 1; q < stop; q++, t++) {
+			if (*q == '(') {
+				count++;
+			} else if (*q == ')') {
+				count--;
+				if (!count) {
+					break;
+				}
+			}
+			*t = *q;
+		}
+	} else {
+		/* it's a textline */
+		for (q = p; q < stop; q++, t++) {
+			*t = *q;
+		}
+	}
+	return ret;
 }
 
-int ch_for( struct papfile *in, struct papfile *out _U_)
+int ch_for(struct papfile *in, struct papfile *out _U_)
 {
-    char                *start, *cmt;
-    int                 linelength, crlflength;
+	char *start, *cmt;
+	int linelength, crlflength;
 
-    switch ( markline( in, &start, &linelength, &crlflength )) {
-    case 0 :
-        return( 0 );
+	switch (markline(in, &start, &linelength, &crlflength)) {
+	case 0:
+		return (0);
 
-    case -1 :
-        return( CH_MORE );
+	case -1:
+		return (CH_MORE);
 
-    case -2 :
-        return( CH_ERROR );
-    }
+	case -2:
+		return (CH_ERROR);
+	}
 
-    cmt = get_text(start, linelength);
+	cmt = get_text(start, linelength);
 
-    if ( cmt ) {
-	lp_for ( cmt );
-	free(cmt);
-    }
+	if (cmt) {
+		lp_for(cmt);
+		free(cmt);
+	}
 
-    in->pf_state |= PF_TRANSLATE;
-    lp_write( in, start, linelength + crlflength );
-    in->pf_state &= ~PF_TRANSLATE;
-    compop();
-    CONSUME( in, linelength + crlflength );
-    return( CH_DONE );
+	in->pf_state |= PF_TRANSLATE;
+	lp_write(in, start, linelength + crlflength);
+	in->pf_state &= ~PF_TRANSLATE;
+	compop();
+	CONSUME(in, linelength + crlflength);
+	return (CH_DONE);
 }
 
-int ch_title( struct papfile *in, struct papfile *out _U_)
+int ch_title(struct papfile *in, struct papfile *out _U_)
 {
-    char		*start, *cmt;
-    int			linelength, crlflength;
+	char *start, *cmt;
+	int linelength, crlflength;
 
-    switch ( markline( in, &start, &linelength, &crlflength )) {
-    case 0 :
-	return( 0 );
+	switch (markline(in, &start, &linelength, &crlflength)) {
+	case 0:
+		return (0);
 
-    case -1 :
-	return( CH_MORE );
+	case -1:
+		return (CH_MORE);
 
-    case -2 :
-        return( CH_ERROR );
-    }
+	case -2:
+		return (CH_ERROR);
+	}
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "Parsing %%Title");
-#endif
+	if (debug)
+		LOG(log_debug9, logtype_papd, "Parsing %%Title");
 
-    cmt = get_text(start, linelength);
+	cmt = get_text(start, linelength);
 
-    if ( cmt ) {
-	lp_job( cmt );
-	free(cmt);
-    }
+	if (cmt) {
+		lp_job(cmt);
+		free(cmt);
+	}
 
-    in->pf_state |= PF_TRANSLATE;
-    lp_write( in, start, linelength + crlflength );
-    in->pf_state &= ~PF_TRANSLATE;
-    compop();
-    CONSUME( in, linelength + crlflength );
-    return( CH_DONE );
+	in->pf_state |= PF_TRANSLATE;
+	lp_write(in, start, linelength + crlflength);
+	in->pf_state &= ~PF_TRANSLATE;
+	compop();
+	CONSUME(in, linelength + crlflength);
+	return (CH_DONE);
 }
 
-static int guess_creator ( char *creator )
+static int guess_creator(char *creator)
 {
 	if (strstr(creator, "LaserWriter"))
 		return 1;
@@ -157,147 +154,144 @@ static int guess_creator ( char *creator )
 }
 
 
-int ch_creator( struct papfile *in, struct papfile *out _U_)
+int ch_creator(struct papfile *in, struct papfile *out _U_)
 {
-    char		*start, *cmt;
-    int			linelength, crlflength;
+	char *start, *cmt;
+	int linelength, crlflength;
 
-    switch ( markline( in, &start, &linelength, &crlflength )) {
-    case 0 :
-	return( 0 );
+	switch (markline(in, &start, &linelength, &crlflength)) {
+	case 0:
+		return (0);
 
-    case -1 :
-	return( CH_MORE );
+	case -1:
+		return (CH_MORE);
 
-    case -2 :
-        return( CH_ERROR );
-    }
+	case -2:
+		return (CH_ERROR);
+	}
 
-    cmt = get_text(start, linelength);
+	cmt = get_text(start, linelength);
 
-    if ( cmt ) {
-	in->origin = guess_creator ( cmt );
-	free(cmt);
-	lp_origin(in->origin);
-    }
+	if (cmt) {
+		in->origin = guess_creator(cmt);
+		free(cmt);
+		lp_origin(in->origin);
+	}
 
-    in->pf_state |= PF_TRANSLATE;
-    lp_write( in, start, linelength + crlflength );
-    in->pf_state &= ~PF_TRANSLATE;
-    compop();
-    CONSUME( in, linelength + crlflength );
-    return( CH_DONE );
+	in->pf_state |= PF_TRANSLATE;
+	lp_write(in, start, linelength + crlflength);
+	in->pf_state &= ~PF_TRANSLATE;
+	compop();
+	CONSUME(in, linelength + crlflength);
+	return (CH_DONE);
 }
 
-int ch_endcomm( struct papfile *in, struct papfile *out _U_)
+int ch_endcomm(struct papfile *in, struct papfile *out _U_)
 {
-    char                *start;
-    int                 linelength, crlflength;
+	char *start;
+	int linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "End Comment");
-#endif
-    in->pf_state |= PF_STW;
+	if (debug)
+		LOG(log_debug9, logtype_papd, "End Comment");
 
-    switch ( markline( in, &start, &linelength, &crlflength )) {
-    case 0 :
-	return( 0 );
+	in->pf_state |= PF_STW;
 
-    case -1 :
-	return( CH_MORE );
+	switch (markline(in, &start, &linelength, &crlflength)) {
+	case 0:
+		return (0);
 
-    case -2 :
-        return( CH_ERROR );
-    }
+	case -1:
+		return (CH_MORE);
 
-    in->pf_state |= PF_TRANSLATE;
-    lp_write( in, start, linelength + crlflength );
-    in->pf_state &= ~PF_TRANSLATE;
-    compop();
-    CONSUME( in, linelength + crlflength );
-    return ( CH_DONE);
+	case -2:
+		return (CH_ERROR);
+	}
+
+	in->pf_state |= PF_TRANSLATE;
+	lp_write(in, start, linelength + crlflength);
+	in->pf_state &= ~PF_TRANSLATE;
+	compop();
+	CONSUME(in, linelength + crlflength);
+	return (CH_DONE);
 }
 
-int ch_starttranslate( struct papfile *in, struct papfile *out _U_)
+int ch_starttranslate(struct papfile *in, struct papfile *out _U_)
 {
-    char                *start;
-    int                 linelength, crlflength;
+	char *start;
+	int linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "Start translate");
-#endif
+	if (debug)
+		LOG(log_debug9, logtype_papd, "Start translate");
 
-    switch ( markline( in, &start, &linelength, &crlflength )) {
-    case 0 :
-        return( 0 );
+	switch (markline(in, &start, &linelength, &crlflength)) {
+	case 0:
+		return (0);
 
-    case -1 :
-        return( CH_MORE );
+	case -1:
+		return (CH_MORE);
 
-    case -2 :
-        return( CH_ERROR );
-    }
+	case -2:
+		return (CH_ERROR);
+	}
 
-    in->pf_state |= PF_TRANSLATE;
-    lp_write( in, start, linelength + crlflength );
-    compop();
-    CONSUME( in, linelength + crlflength );
-    return ( CH_DONE);
+	in->pf_state |= PF_TRANSLATE;
+	lp_write(in, start, linelength + crlflength);
+	compop();
+	CONSUME(in, linelength + crlflength);
+	return (CH_DONE);
 }
 
 int ch_endtranslate(struct papfile *in, struct papfile *out _U_)
 {
-    char                *start;
-    int                 linelength, crlflength;
+	char *start;
+	int linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "EndTranslate");
-#endif
+	if (debug)
+		LOG(log_debug9, logtype_papd, "EndTranslate");
 
-    switch ( markline( in, &start, &linelength, &crlflength )) {
-    case 0 :
-        return( 0 );
+	switch (markline(in, &start, &linelength, &crlflength)) {
+	case 0:
+		return (0);
 
-    case -1 :
-        return( CH_MORE );
+	case -1:
+		return (CH_MORE);
 
-    case -2 :
-        return( CH_ERROR );
-    }
+	case -2:
+		return (CH_ERROR);
+	}
 
-    lp_write( in, start, linelength + crlflength );
-    in->pf_state &= ~PF_TRANSLATE;
-    compop();
-    CONSUME( in, linelength + crlflength );
-    return ( CH_DONE);
+	lp_write(in, start, linelength + crlflength);
+	in->pf_state &= ~PF_TRANSLATE;
+	compop();
+	CONSUME(in, linelength + crlflength);
+	return (CH_DONE);
 }
 
-int ch_translateone( struct papfile *in, struct papfile *out _U_)
+int ch_translateone(struct papfile *in, struct papfile *out _U_)
 {
-    char                *start;
-    int                 linelength, crlflength;
+	char *start;
+	int linelength, crlflength;
 
-#ifdef DEBUG
-    LOG(log_debug9, logtype_papd, "TranslateOne");
-#endif
+	if (debug)
+		LOG(log_debug9, logtype_papd, "TranslateOne");
 
-    switch ( markline( in, &start, &linelength, &crlflength )) {
-    case 0 :
-        return( 0 );
+	switch (markline(in, &start, &linelength, &crlflength)) {
+	case 0:
+		return (0);
 
-    case -1 :
-        return( CH_MORE );
+	case -1:
+		return (CH_MORE);
 
-    case -2 :
-        return( CH_ERROR );
-    }
+	case -2:
+		return (CH_ERROR);
+	}
 
-    in->pf_state |= PF_TRANSLATE;
-    lp_write( in, start, linelength + crlflength );
-    in->pf_state &= ~PF_TRANSLATE;
-    compop();
-    CONSUME( in, linelength + crlflength );
-    return ( CH_DONE);
+	in->pf_state |= PF_TRANSLATE;
+	lp_write(in, start, linelength + crlflength);
+	in->pf_state &= ~PF_TRANSLATE;
+	compop();
+	CONSUME(in, linelength + crlflength);
+	return (CH_DONE);
 }
 
 
@@ -306,25 +300,25 @@ int ch_translateone( struct papfile *in, struct papfile *out _U_)
 /*
  * "Header" comments.
  */
-struct papd_comment	headers[] = {
-    { "%%Title:",			NULL,		ch_title,	0 },
-    { "%%For:",				NULL,		ch_for,		0 },
-    { "%%Creator:",			NULL,		ch_creator,	0 },
-    { "%%EndComments",			NULL,		ch_endcomm,	0 },
-    { "%%BeginFeature",			NULL,		ch_starttranslate,  0 },
-    { "%%EndFeature",			NULL,		ch_endtranslate,  0 },
-    { "%%BeginPageSetup",		NULL,		ch_starttranslate, 0 },
-    { "%%EndPageSetup",			NULL,		ch_endtranslate, 0 },
+struct papd_comment headers[] = {
+	{ "%%Title:", NULL, ch_title, 0 },
+	{ "%%For:", NULL, ch_for, 0 },
+	{ "%%Creator:", NULL, ch_creator, 0 },
+	{ "%%EndComments", NULL, ch_endcomm, 0 },
+	{ "%%BeginFeature", NULL, ch_starttranslate, 0 },
+	{ "%%EndFeature", NULL, ch_endtranslate, 0 },
+	{ "%%BeginPageSetup", NULL, ch_starttranslate, 0 },
+	{ "%%EndPageSetup", NULL, ch_endtranslate, 0 },
 #if 0
-    { "%%BeginSetup",			NULL,		ch_translateone,  0 },
-    { "%%EndSetup",			NULL,		ch_translateone,  0 },
-    { "%%BeginProlog",			NULL,		ch_translateone,  0 },
-    { "%%EndProlog",			NULL,		ch_translateone,  0 },
-    { "%%Page:",			NULL,		ch_translateone, 0 },
-    { "%%PageTrailer",			NULL,		ch_translateone, 0 },
-    { "%%Trailer",			NULL,		ch_translateone, 0 },
-    { "%%EOF",				NULL,		ch_translateone, 0 },
+	{ "%%BeginSetup", NULL, ch_translateone, 0 },
+	{ "%%EndSetup", NULL, ch_translateone, 0 },
+	{ "%%BeginProlog", NULL, ch_translateone, 0 },
+	{ "%%EndProlog", NULL, ch_translateone, 0 },
+	{ "%%Page:", NULL, ch_translateone, 0 },
+	{ "%%PageTrailer", NULL, ch_translateone, 0 },
+	{ "%%Trailer", NULL, ch_translateone, 0 },
+	{ "%%EOF", NULL, ch_translateone, 0 },
 #endif
-    { "%%",				NULL,		ch_translateone, 0 },
-    { NULL,				NULL,		NULL,		0 },
+	{ "%%", NULL, ch_translateone, 0 },
+	{ NULL, NULL, NULL, 0 },
 };

@@ -23,9 +23,7 @@
  *	netatalk@itd.umich.edu
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>
 #include <string.h>
@@ -41,60 +39,58 @@
 
 #ifdef EBUG
 #include <stdio.h>
-#endif /* EBUG */
+#endif				/* EBUG */
 
 #include "atp_internals.h"
 
-int
-atp_rresp(
-    ATP			ah,		/* open atp handle */
-    struct atp_block	*atpb)		/* parameter block */
-{
-    int		i, rc;
-    size_t	len;
+int atp_rresp(ATP ah,		/* open atp handle */
+	      struct atp_block *atpb)
+{				/* parameter block */
+	int i, rc;
+	size_t len;
 
 #ifdef EBUG
-    atp_print_bufuse( ah, "atp_rresp" );
-#endif /* EBUG */
-    /* check parameters
-    */
-    if ( atpb->atp_rresiovcnt <= 0 || atpb->atp_rresiovcnt > 8 ) {
-	errno = EINVAL;
-	return( -1 );
-    }
-
-    while (( rc = atp_rsel( ah, atpb->atp_saddr, ATP_TRESP )) == 0 ) {
-	;
-    }
-
-    if ( rc != ATP_TRESP ) {
-	return( rc );
-    }
-
-    for ( i = 0; i < 8; ++i ) {
-	if ( ah->atph_resppkt[ i ] == NULL ) {
-	    break;
+	atp_print_bufuse(ah, "atp_rresp");
+#endif				/* EBUG */
+	/* check parameters
+	 */
+	if (atpb->atp_rresiovcnt <= 0 || atpb->atp_rresiovcnt > 8) {
+		errno = EINVAL;
+		return (-1);
 	}
-	len = ah->atph_resppkt[ i ]->atpbuf_dlen - ATP_HDRSIZE;
-	if ( i > atpb->atp_rresiovcnt - 1 ||
-		len > atpb->atp_rresiov[ i ].iov_len ) {
-	    errno = EMSGSIZE;
-	    return( -1 );
+
+	while ((rc = atp_rsel(ah, atpb->atp_saddr, ATP_TRESP)) == 0) {
+		;
 	}
+
+	if (rc != ATP_TRESP) {
+		return (rc);
+	}
+
+	for (i = 0; i < 8; ++i) {
+		if (ah->atph_resppkt[i] == NULL) {
+			break;
+		}
+		len = ah->atph_resppkt[i]->atpbuf_dlen - ATP_HDRSIZE;
+		if (i > atpb->atp_rresiovcnt - 1 ||
+		    len > atpb->atp_rresiov[i].iov_len) {
+			errno = EMSGSIZE;
+			return (-1);
+		}
 #ifdef EBUG
-	fprintf( stderr, "atp_rresp copying %ld bytes packet %d\n",
-		len, i );
-	bprint( (char *)ah->atph_resppkt[ i ]->atpbuf_info.atpbuf_data,
-		len + ATP_HDRSIZE );
-#endif /* EBUG */
-	memcpy(atpb->atp_rresiov[ i ].iov_base,
-	       ah->atph_resppkt[ i ]->atpbuf_info.atpbuf_data + ATP_HDRSIZE,
-	       len );
-	atpb->atp_rresiov[ i ].iov_len = len;
-	atp_free_buf( ah->atph_resppkt[ i ] );
-	ah->atph_resppkt[ i ] = NULL;
-    }
-    atpb->atp_rresiovcnt = i;
+		fprintf(stderr, "atp_rresp copying %ld bytes packet %d\n",
+			len, i);
+		bprint((char *) ah->atph_resppkt[i]->atpbuf_info.
+		       atpbuf_data, len + ATP_HDRSIZE);
+#endif				/* EBUG */
+		memcpy(atpb->atp_rresiov[i].iov_base,
+		       ah->atph_resppkt[i]->atpbuf_info.atpbuf_data +
+		       ATP_HDRSIZE, len);
+		atpb->atp_rresiov[i].iov_len = len;
+		atp_free_buf(ah->atph_resppkt[i]);
+		ah->atph_resppkt[i] = NULL;
+	}
+	atpb->atp_rresiovcnt = i;
 
-    return( 0 );
+	return (0);
 }

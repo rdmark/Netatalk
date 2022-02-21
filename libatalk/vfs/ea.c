@@ -12,9 +12,7 @@
   GNU General Public License for more details.
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <unistd.h>
 #include <stdint.h>
@@ -971,7 +969,7 @@ exit:
         ea->ea_fd = -1;
     }
 
-    return 0;
+    return ret;
 }
 
 

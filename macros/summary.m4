@@ -4,6 +4,7 @@ dnl Autoconf macros, display configure summary
 AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 
 	AC_MSG_RESULT([Configure summary:])
+	AC_MSG_RESULT([    Version: ($VERSION)])
 	AC_MSG_RESULT([    Install style:])
 	if test "x$sysv_style" != "x"; then
 		AC_MSG_RESULT([         $sysv_style])
@@ -44,11 +45,8 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	AC_MSG_RESULT([         clrtxt  ($uams_using_options)])
 	AC_MSG_RESULT([         guest])
 	AC_MSG_RESULT([    Options:])
-	AC_MSG_RESULT([         DDP (AppleTalk) support: $netatalk_cv_ddp_enabled])
-	if test "x$netatalk_cv_ddp_enabled" = "xyes"; then
-		AC_MSG_RESULT([         CUPS support:            $netatalk_cv_use_cups])
-		AC_MSG_RESULT([         Apple 2 boot support:    $compile_a2boot])
-	fi
+	AC_MSG_RESULT([         CUPS support:            $netatalk_cv_use_cups])
+	AC_MSG_RESULT([         Apple 2 boot support:    $compile_a2boot])
 	AC_MSG_RESULT([         SLP support:             $netatalk_cv_srvloc])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
 	AC_MSG_RESULT([         tcp wrapper support:     $netatalk_cv_tcpwrap])
@@ -59,7 +57,6 @@ dnl	fi
 	AC_MSG_RESULT([         admin group support:     $netatalk_cv_admin_group])
 	AC_MSG_RESULT([         valid shell check:       $netatalk_cv_use_shellcheck])
 	AC_MSG_RESULT([         cracklib support:        $netatalk_cv_with_cracklib])
-	AC_MSG_RESULT([         dropbox kludge:          $netatalk_cv_dropkludge])
 	AC_MSG_RESULT([         force volume uid/gid:    $netatalk_cv_force_uidgid])
 	AC_MSG_RESULT([         ACL support:             $with_acl_support])
 	AC_MSG_RESULT([         LDAP support:            $with_ldap])

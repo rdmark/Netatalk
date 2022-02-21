@@ -36,11 +36,7 @@
 
 /* setgid directories */
 #ifndef DIRBITS
-# ifdef AFS
-#  define DIRBITS 0
-# else /* AFS */
 #  define DIRBITS S_ISGID
-# endif /* AFS */
 #endif /* DIRBITS */
 
 /* reserved directory id's */

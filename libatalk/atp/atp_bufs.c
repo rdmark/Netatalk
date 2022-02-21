@@ -27,9 +27,7 @@
  * Our own memory maintenance for atp
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>
 #include <string.h>
@@ -45,104 +43,108 @@
 
 #define			N_MORE_BUFS		10
 
-static struct atpbuf 	*free_list = NULL;	/* free buffers */
+static struct atpbuf *free_list = NULL;	/* free buffers */
 
 #ifdef EBUG
-static int		numbufs = 0;
-#endif /* EBUG */
+static int numbufs = 0;
+#endif				/* EBUG */
 
 /* only call this when the free_list is empty...
  * N_MORE_BUFS must be >= one
 */
 static int more_bufs(void)
 {
-    int			i;
-    char		*mem;
-    struct atpbuf	*bp;
+	int i;
+	char *mem;
+	struct atpbuf *bp;
 
-    /* get the whole chunk in one malloc call
-    */
-    if (( mem = malloc( N_MORE_BUFS * sizeof( struct atpbuf ))) == NULL ) {
-	errno = ENOBUFS;
-	return -1;
-    }
-    /* now split into separate bufs
-    */
-    bp = free_list = (struct atpbuf *) mem;
-    for ( i = 1; i < N_MORE_BUFS; ++i ) {
-	bp->atpbuf_next = (struct atpbuf *) ( mem += sizeof( struct atpbuf ));
-	bp = bp->atpbuf_next;
-    }
-    bp->atpbuf_next = NULL;
+	/* get the whole chunk in one malloc call
+	 */
+	if ((mem = malloc(N_MORE_BUFS * sizeof(struct atpbuf))) == NULL) {
+		errno = ENOBUFS;
+		return -1;
+	}
+	/* now split into separate bufs
+	 */
+	bp = free_list = (struct atpbuf *) mem;
+	for (i = 1; i < N_MORE_BUFS; ++i) {
+		bp->atpbuf_next = (struct atpbuf *) (mem +=
+						     sizeof(struct
+							    atpbuf));
+		bp = bp->atpbuf_next;
+	}
+	bp->atpbuf_next = NULL;
 
-    return 0;
+	return 0;
 }
 
 
 #ifdef EBUG
 void atp_print_bufuse(ATP ah, char *s)
 {
-    struct atpbuf	*bp;
-    int			i, sentcount, incount, respcount;
+	struct atpbuf *bp;
+	int i, sentcount, incount, respcount;
 
-    sentcount = 0;
-    for ( bp = ah->atph_sent; bp != NULL; bp = bp->atpbuf_next ) {
-	++sentcount;
-	for ( i = 0; i < 8; ++i ) {
-	    if ( bp->atpbuf_info.atpbuf_xo.atpxo_packet[ i ] != NULL ) {
+	sentcount = 0;
+	for (bp = ah->atph_sent; bp != NULL; bp = bp->atpbuf_next) {
 		++sentcount;
-	    }
+		for (i = 0; i < 8; ++i) {
+			if (bp->atpbuf_info.atpbuf_xo.atpxo_packet[i] !=
+			    NULL) {
+				++sentcount;
+			}
+		}
 	}
-    }
 
-    if ( ah->atph_reqpkt != NULL ) {
-	++sentcount;
-    }
-
-
-    incount = 0;
-    for ( bp = ah->atph_queue; bp != NULL; bp = bp->atpbuf_next, ++incount );
-
-    respcount = 0;
-    for ( i = 0; i < 8; ++i ) {
-        if ( ah->atph_resppkt[ i ] != NULL ) {
-	    ++respcount;
+	if (ah->atph_reqpkt != NULL) {
+		++sentcount;
 	}
-    }
 
-    printf( "<%d> %s: bufs total %d  sent %d  incoming %d  req %d  resp %d\n",
-	getpid(), s, numbufs, sentcount, incount,
-	( ah->atph_reqpkt != NULL ) ? 1: 0, respcount );
+
+	incount = 0;
+	for (bp = ah->atph_queue; bp != NULL;
+	     bp = bp->atpbuf_next, ++incount);
+
+	respcount = 0;
+	for (i = 0; i < 8; ++i) {
+		if (ah->atph_resppkt[i] != NULL) {
+			++respcount;
+		}
+	}
+
+	printf
+	    ("<%d> %s: bufs total %d  sent %d  incoming %d  req %d  resp %d\n",
+	     getpid(), s, numbufs, sentcount, incount,
+	     (ah->atph_reqpkt != NULL) ? 1 : 0, respcount);
 }
-#endif /* EBUG */
+#endif				/* EBUG */
 
 
 struct atpbuf *atp_alloc_buf(void)
 {
-    struct atpbuf *bp;
+	struct atpbuf *bp;
 
-    if ( free_list == NULL && more_bufs() ) return NULL;
+	if (free_list == NULL && more_bufs())
+		return NULL;
 
-    bp = free_list;
-    free_list = free_list->atpbuf_next;
+	bp = free_list;
+	free_list = free_list->atpbuf_next;
 #ifdef EBUG
-    ++numbufs;
-#endif /* EBUG */
-    return bp;
+	++numbufs;
+#endif				/* EBUG */
+	return bp;
 }
 
 
 int atp_free_buf(struct atpbuf *bp)
 {
-    if ( bp == NULL ) {
-	return -1;
-    }
-    bp->atpbuf_next = free_list;
-    free_list = bp;
+	if (bp == NULL) {
+		return -1;
+	}
+	bp->atpbuf_next = free_list;
+	free_list = bp;
 #ifdef EBUG
-    --numbufs;
-#endif /* EBUG */
-    return 0;
+	--numbufs;
+#endif				/* EBUG */
+	return 0;
 }
-
-

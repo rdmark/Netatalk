@@ -19,9 +19,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <string.h>
@@ -75,12 +73,12 @@ static struct fce_history fce_history_list[FCE_HISTORY_LEN];
 * 
 ****/
 
-static long get_ms_difftime (  struct timeval *tv1, struct timeval *tv2 )
+static long get_ms_difftime(struct timeval *tv1, struct timeval *tv2)
 {
 	unsigned long s = tv2->tv_sec - tv1->tv_sec;
 	long us = tv2->tv_usec - tv1->tv_usec;
 
-	return s * 1000 + us/1000;
+	return s * 1000 + us / 1000;
 }
 
 /******************************************************************************
@@ -90,15 +88,16 @@ static long get_ms_difftime (  struct timeval *tv1, struct timeval *tv2 )
 void fce_initialize_history()
 {
 	for (int i = 0; i < FCE_HISTORY_LEN; i++) {
-		memset( &fce_history_list[i], 0, sizeof(fce_history_list[i]) );
+		memset(&fce_history_list[i], 0,
+		       sizeof(fce_history_list[i]));
 	}
 }
 
-bool fce_handle_coalescation( char *path, int is_dir, int mode )
+bool fce_handle_coalescation(char *path, int is_dir, int mode)
 {
 	/* These two are used to eval our next index in history */
 	/* the history is unsorted, speed should not be a problem, length is 10 */
-	unsigned long oldest_entry = (unsigned long )((long)-1);
+	unsigned long oldest_entry = (unsigned long) ((long) -1);
 	int oldest_entry_idx = -1;
 	struct timeval tv;
 
@@ -107,7 +106,7 @@ bool fce_handle_coalescation( char *path, int is_dir, int mode )
 
 	/* After a file creation *ALWAYS* a file modification is produced */
 	if ((mode == FCE_FILE_CREATE) && (coalesce & FCE_COALESCE_CREATE))
-        return true;
+		return true;
 
 	/* get timestamp */
 	gettimeofday(&tv, 0);
@@ -125,17 +124,18 @@ bool fce_handle_coalescation( char *path, int is_dir, int mode )
 		}
 
 		/* Too old ? */
-		if (get_ms_difftime( &fh->tv, &tv ) > MAX_COALESCE_TIME_MS) {
+		if (get_ms_difftime(&fh->tv, &tv) > MAX_COALESCE_TIME_MS) {
 			/* Invalidate entry */
 			fh->tv.tv_sec = 0;
 			oldest_entry = 0;
-			oldest_entry_idx = i;			
+			oldest_entry_idx = i;
 			continue;
 		}
 
 
 		/* If we find a parent dir wich was created we are done */
-		if ((coalesce & FCE_COALESCE_CREATE) && (fh->mode == FCE_DIR_CREATE)) {
+		if ((coalesce & FCE_COALESCE_CREATE)
+		    && (fh->mode == FCE_DIR_CREATE)) {
 			/* Parent dir ? */
 			if (!strncmp(fh->path, path, strlen(fh->path)))
 				return true;
@@ -143,8 +143,9 @@ bool fce_handle_coalescation( char *path, int is_dir, int mode )
 
 		/* If we find a parent dir we should be DELETED we are done */
 		if ((coalesce & FCE_COALESCE_DELETE)
-            && fh->is_dir
-            && (mode == FCE_FILE_DELETE || mode == FCE_DIR_DELETE)) {
+		    && fh->is_dir
+		    && (mode == FCE_FILE_DELETE
+			|| mode == FCE_DIR_DELETE)) {
 			/* Parent dir ? */
 			if (!strncmp(fh->path, path, strlen(fh->path)))
 				return true;
@@ -161,7 +162,7 @@ bool fce_handle_coalescation( char *path, int is_dir, int mode )
 	fce_history_list[oldest_entry_idx].tv = tv;
 	fce_history_list[oldest_entry_idx].mode = mode;
 	fce_history_list[oldest_entry_idx].is_dir = is_dir;
-	strncpy( fce_history_list[oldest_entry_idx].path, path, MAXPATHLEN);
+	strncpy(fce_history_list[oldest_entry_idx].path, path, MAXPATHLEN);
 
 	/* we have to handle this event */
 	return false;
@@ -174,29 +175,25 @@ bool fce_handle_coalescation( char *path, int is_dir, int mode )
 
 int fce_set_coalesce(char *opt)
 {
-    char *e;
-    char *p;
-    
-    if (opt == NULL)
-        return AFPERR_PARAM;
+	char *e;
+	char *p;
 
-    e = strdup(opt);
+	if (opt == NULL)
+		return AFPERR_PARAM;
 
-    for (p = strtok(e, ","); p; p = strtok(NULL, ",")) {
-        if (strcmp(p, "all") == 0) {
-            coalesce = FCE_COALESCE_ALL;
-        } else if (strcmp(p, "delete") == 0) {
-            coalesce = FCE_COALESCE_DELETE;
-        } else if (strcmp(p, "create") == 0) {
-            coalesce = FCE_COALESCE_CREATE;
-        }
-    }
+	e = strdup(opt);
 
-    free(e);
+	for (p = strtok(e, ","); p; p = strtok(NULL, ",")) {
+		if (strcmp(p, "all") == 0) {
+			coalesce = FCE_COALESCE_ALL;
+		} else if (strcmp(p, "delete") == 0) {
+			coalesce = FCE_COALESCE_DELETE;
+		} else if (strcmp(p, "create") == 0) {
+			coalesce = FCE_COALESCE_CREATE;
+		}
+	}
 
-    return AFP_OK;
+	free(e);
+
+	return AFP_OK;
 }
-
-
-
-

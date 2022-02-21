@@ -24,9 +24,7 @@
    - it doesn't know about Apple extension
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 #include <stdlib.h>
 #include <netatalk/endian.h>
 #include <atalk/unicode.h>
@@ -34,11 +32,12 @@
 #include "mac_centraleurope.h"
 #include "generic_mb.h"
 
-static size_t   mac_centraleurope_pull(void *,char **, size_t *, char **, size_t *);
-static size_t   mac_centraleurope_push(void *,char **, size_t *, char **, size_t *);
+static size_t mac_centraleurope_pull(void *, char **, size_t *, char **,
+				     size_t *);
+static size_t mac_centraleurope_push(void *, char **, size_t *, char **,
+				     size_t *);
 
-struct charset_functions charset_mac_centraleurope =
-{
+struct charset_functions charset_mac_centraleurope = {
 	"MAC_CENTRALEUROPE",
 	29,
 	mac_centraleurope_pull,
@@ -51,16 +50,22 @@ struct charset_functions charset_mac_centraleurope =
 
 /* ------------------------ */
 
-static size_t mac_centraleurope_push( void *cd, char **inbuf, size_t *inbytesleft,
-                         char **outbuf, size_t *outbytesleft)
+static size_t mac_centraleurope_push(void *cd, char **inbuf,
+				     size_t *inbytesleft, char **outbuf,
+				     size_t *outbytesleft)
 {
-	return (size_t) mb_generic_push( char_ucs2_to_mac_centraleurope, cd, inbuf, inbytesleft, outbuf, outbytesleft);
+	return (size_t) mb_generic_push(char_ucs2_to_mac_centraleurope, cd,
+					inbuf, inbytesleft, outbuf,
+					outbytesleft);
 }
 
 /* ------------------------ */
 
-static size_t mac_centraleurope_pull ( void *cd, char **inbuf, size_t *inbytesleft,
-                         char **outbuf, size_t *outbytesleft)
+static size_t mac_centraleurope_pull(void *cd, char **inbuf,
+				     size_t *inbytesleft, char **outbuf,
+				     size_t *outbytesleft)
 {
-	return (size_t) mb_generic_pull( char_mac_centraleurope_to_ucs2, cd, inbuf, inbytesleft, outbuf, outbytesleft);
+	return (size_t) mb_generic_pull(char_mac_centraleurope_to_ucs2, cd,
+					inbuf, inbytesleft, outbuf,
+					outbytesleft);
 }

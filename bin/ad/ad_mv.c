@@ -12,9 +12,7 @@
  * GNU General Public License for more details.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -51,32 +49,9 @@ static int fflg, iflg, nflg, vflg;
 static afpvol_t svolume, dvolume;
 static cnid_t did, pdid;
 static volatile sig_atomic_t alarmed;
-static char           *netatalk_dirs[] = {
-    ".AppleDouble",
-    ".AppleDB",
-    ".AppleDesktop",
-    NULL
-};
 
 static int copy(const char *, const char *);
 static int do_move(const char *, const char *);
-static void preserve_fd_acls(int source_fd, int dest_fd, const char *source_path,
-                             const char *dest_path);
-/*
-  Check for netatalk special folders e.g. ".AppleDB" or ".AppleDesktop"
-  Returns pointer to name or NULL.
-*/
-static const char *check_netatalk_dirs(const char *name)
-{
-    int c;
-
-    for (c=0; netatalk_dirs[c]; c++) {
-        if ((strcmp(name, netatalk_dirs[c])) == 0)
-            return netatalk_dirs[c];
-    }
-    return NULL;
-}
-
 /*
   SIGNAL handling:
   catch SIGINT and SIGTERM which cause clean exit. Ignore anything else.
@@ -243,7 +218,6 @@ int ad_mv(int argc, char *argv[])
         }
     }
 
-exit:
     closevol(&dvolume);
     return rval;
 }
@@ -465,13 +439,4 @@ static int copy(const char *from, const char *to)
         return (1);
     }
     return 0;
-}
-
-static void
-preserve_fd_acls(int source_fd,
-                 int dest_fd,
-                 const char *source_path,
-                 const char *dest_path)
-{
-    ;
 }

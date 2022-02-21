@@ -3,9 +3,7 @@
  * All rights reserved. See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <string.h>
@@ -17,22 +15,23 @@
 #include <atalk/util.h>
 #include <atalk/logger.h>
 
-static void dsi_init_buffer(DSI *dsi)
+static void dsi_init_buffer(DSI * dsi)
 {
-    size_t quantum = dsi->server_quantum ? dsi->server_quantum : DSI_SERVQUANT_DEF;
+	size_t quantum =
+	    dsi->server_quantum ? dsi->server_quantum : DSI_SERVQUANT_DEF;
 
-    /* default is 12 * 300k = 3,6 MB (Apr 2011) */
-    if ((dsi->buffer = malloc(dsi->dsireadbuf * quantum)) == NULL) {
-        LOG(log_error, logtype_dsi, "dsi_init_buffer: OOM");
-        AFP_PANIC("OOM in dsi_init_buffer");
-    }
-    dsi->start = dsi->buffer;
-    dsi->eof = dsi->buffer;
-    dsi->end = dsi->buffer + (dsi->dsireadbuf * quantum);
+	/* default is 12 * 300k = 3,6 MB (Apr 2011) */
+	if ((dsi->buffer = malloc(dsi->dsireadbuf * quantum)) == NULL) {
+		LOG(log_error, logtype_dsi, "dsi_init_buffer: OOM");
+		AFP_PANIC("OOM in dsi_init_buffer");
+	}
+	dsi->start = dsi->buffer;
+	dsi->eof = dsi->buffer;
+	dsi->end = dsi->buffer + (dsi->dsireadbuf * quantum);
 }
 
 /* OpenSession. set up the connection */
-void dsi_opensession(DSI *dsi)
+void dsi_opensession(DSI * dsi)
 {
   size_t i = 0;
   uint32_t servquant;
@@ -53,7 +52,7 @@ void dsi_opensession(DSI *dsi)
     option_len = dsi->commands[i++];
 
     if (i + option_len > dsi->cmdlen) {
-      LOG(log_error, logtype_dsi, "option %"PRIu8" too large: %zu",
+      LOG(log_error, logtype_dsi, "option %ux too large: %zu",
           cmd, option_len);
       exit(EXITERR_CLNT);
     }
@@ -61,7 +60,7 @@ void dsi_opensession(DSI *dsi)
     switch (cmd) {
     case DSIOPT_ATTNQUANT:
       if (option_len != sizeof(dsi->attn_quantum)) {
-        LOG(log_error, logtype_dsi, "option %"PRIu8" bad length: %zu",
+        LOG(log_error, logtype_dsi, "option %ux bad length: %zu",
             cmd, option_len);
         exit(EXITERR_CLNT);
       }

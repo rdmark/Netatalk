@@ -46,9 +46,9 @@
 #include <netatalk/endian.h>
 
 struct elaphdr {
-    u_char	el_dnode;
-    u_char	el_snode;
-    u_char	el_type;
+	u_char el_dnode;
+	u_char el_snode;
+	u_char el_type;
 };
 
 #define	SZ_ELAPHDR	3
@@ -61,37 +61,37 @@ struct elaphdr {
  * bitfields on a little-endian arch.
  */
 struct ddpehdr {
-    union {
-	struct {
+	union {
+		struct {
 #if BYTE_ORDER == BIG_ENDIAN
-    unsigned		dub_pad:2;
-    unsigned		dub_hops:4;
-    unsigned		dub_len:10;
-    unsigned		dub_sum:16;
-#else /* BYTE_ORDER == BIG_ENDIAN */
+			unsigned dub_pad:2;
+			unsigned dub_hops:4;
+			unsigned dub_len:10;
+			unsigned dub_sum:16;
+#else				/* BYTE_ORDER == BIG_ENDIAN */
 #if BYTE_ORDER == LITTLE_ENDIAN
-    unsigned		dub_sum:16;
-    unsigned		dub_len:10;
-    unsigned		dub_hops:4;
-    unsigned		dub_pad:2;
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
-    OOPS!
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
-#endif /* BYTE_ORDER == BIG_ENDIAN */
-	} du_bits;
-	unsigned	du_bytes;
-    } deh_u;
+			unsigned dub_sum:16;
+			unsigned dub_len:10;
+			unsigned dub_hops:4;
+			unsigned dub_pad:2;
+#else				/* BYTE_ORDER == LITTLE_ENDIAN */
+			 OOPS !
+#endif				/* BYTE_ORDER == LITTLE_ENDIAN */
+#endif				/* BYTE_ORDER == BIG_ENDIAN */
+		} du_bits;
+		unsigned du_bytes;
+	} deh_u;
 #define deh_pad		deh_u.du_bits.dub_pad
 #define deh_hops	deh_u.du_bits.dub_hops
 #define deh_len		deh_u.du_bits.dub_len
 #define deh_sum		deh_u.du_bits.dub_sum
 #define deh_bytes	deh_u.du_bytes
-    u_short		deh_dnet;
-    u_short		deh_snet;
-    u_char		deh_dnode;
-    u_char		deh_snode;
-    u_char		deh_dport;
-    u_char		deh_sport;
+	u_short deh_dnet;
+	u_short deh_snet;
+	u_char deh_dnode;
+	u_char deh_snode;
+	u_char deh_dport;
+	u_char deh_sport;
 };
 
 #define SZ_DDPEHDR      12
@@ -99,23 +99,23 @@ struct ddpehdr {
 #define DDP_MAXHOPS	15
 
 struct ddpshdr {
-    union {
-	struct {
+	union {
+		struct {
 #if BYTE_ORDER == BIG_ENDIAN
-    unsigned		dub_pad:6;
-    unsigned		dub_len:10;
-    unsigned		dub_dport:8;
-    unsigned		dub_sport:8;
-#endif /* BYTE_ORDER == BIG_ENDIAN */
+			unsigned dub_pad:6;
+			unsigned dub_len:10;
+			unsigned dub_dport:8;
+			unsigned dub_sport:8;
+#endif				/* BYTE_ORDER == BIG_ENDIAN */
 #if BYTE_ORDER == LITTLE_ENDIAN
-    unsigned		dub_sport:8;
-    unsigned		dub_dport:8;
-    unsigned		dub_len:10;
-    unsigned		dub_pad:6;
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
-	} du_bits;
-	unsigned	du_bytes;
-    } dsh_u;
+			unsigned dub_sport:8;
+			unsigned dub_dport:8;
+			unsigned dub_len:10;
+			unsigned dub_pad:6;
+#endif				/* BYTE_ORDER == LITTLE_ENDIAN */
+		} du_bits;
+		unsigned du_bytes;
+	} dsh_u;
 #define dsh_pad		dsh_u.du_bits.dub_pad
 #define dsh_len		dsh_u.du_bits.dub_len
 #define dsh_dport	dsh_u.du_bits.dub_dport
@@ -124,4 +124,4 @@ struct ddpshdr {
 };
 #define SZ_DDPSHDR      4
 
-#endif /* netatalk/ddp.h */
+#endif				/* netatalk/ddp.h */

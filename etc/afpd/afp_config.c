@@ -3,9 +3,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,46 +41,44 @@
 #include "volume.h"
 #include "afp_zeroconf.h"
 
-#define LINESIZE 1024  
+#define LINESIZE 1024
 
 /* get rid of unneeded configurations. i use reference counts to deal
  * w/ multiple configs sharing the same afp_options. oh, to dream of
  * garbage collection ... */
-void configfree(AFPConfig *configs, const AFPConfig *config)
+void configfree(AFPConfig * configs, const AFPConfig * config)
 {
-    AFPConfig *p, *q;
+	AFPConfig *p, *q;
 
-    for (p = configs; p; p = q) {
-        q = p->next;
-        if (p == config)
-            continue;
+	for (p = configs; p; p = q) {
+		q = p->next;
+		if (p == config)
+			continue;
 
-        /* do a little reference counting */
-        if (--(*p->optcount) < 1) {
-            afp_options_free(&p->obj.options, p->defoptions);
-            free(p->optcount);
-        }
+		/* do a little reference counting */
+		if (--(*p->optcount) < 1) {
+			afp_options_free(&p->obj.options, p->defoptions);
+			free(p->optcount);
+		}
 
-        switch (p->obj.proto) {
-#ifndef NO_DDP
-        case AFPPROTO_ASP:
-            free(p->obj.Obj);
-            free(p->obj.Type);
-            free(p->obj.Zone);
-            atp_close(((ASP) p->obj.handle)->asp_atp);
-            free(p->obj.handle);
-            break;
-#endif /* no afp/asp */
-        case AFPPROTO_DSI:
-            close(p->fd);
-            free(p->obj.handle);
-            break;
-        }
-        free(p);
-    }
+		switch (p->obj.proto) {
+		case AFPPROTO_ASP:
+			free(p->obj.Obj);
+			free(p->obj.Type);
+			free(p->obj.Zone);
+			atp_close(((ASP) p->obj.handle)->asp_atp);
+			free(p->obj.handle);
+			break;
+		case AFPPROTO_DSI:
+			close(p->fd);
+			free(p->obj.handle);
+			break;
+		}
+		free(p);
+	}
 
-    /* the master loaded the volumes for zeroconf, get rid of that */
-    unload_volumes_and_extmap();
+	/* the master loaded the volumes for zeroconf, get rid of that */
+	unload_volumes_and_extmap();
 }
 
 #ifdef USE_SRVLOC
@@ -98,9 +94,7 @@ static char * srvloc_encode(const struct afp_options *options, const char *name)
 	char *conv_name;
 	unsigned char *p;
 	unsigned int i = 0;
-#ifndef NO_DDP
 	char *Obj, *Type = "", *Zone = "";
-#endif
 
 	/* Convert name to maccharset */
         if ((size_t)-1 ==(convert_string_allocate( options->unixcharset, options->maccharset,
@@ -108,7 +102,7 @@ static char * srvloc_encode(const struct afp_options *options, const char *name)
 		return (char*)name;
 
 	/* Escape characters */
-	p = conv_name;
+	p = (unsigned char *)conv_name;
 	while (*p && i<(sizeof(buf)-4)) {
 	    if (*p == '@')
 		break;
@@ -129,7 +123,6 @@ static char * srvloc_encode(const struct afp_options *options, const char *name)
 	}
 	buf[i] = '\0';
 
-#ifndef NO_DDP
 	/* Add ZONE,  */
         if (nbp_name(options->server, &Obj, &Type, &Zone )) {
         	LOG(log_error, logtype_afpd, "srvloc_encode: can't parse %s", options->server );
@@ -137,16 +130,13 @@ static char * srvloc_encode(const struct afp_options *options, const char *name)
 	else {
 		snprintf( buf+i, sizeof(buf)-i-1 ,"&ZONE=%s", Zone);
 	}
-#endif
 	free (conv_name);
 
 	return buf;
 }
-#endif /* USE_SRVLOC */
 
 static void dsi_cleanup(const AFPConfig *config)
 {
-#ifdef USE_SRVLOC
     SLPError err;
     SLPError callbackerr;
     SLPHandle hslp;
@@ -179,62 +169,60 @@ static void dsi_cleanup(const AFPConfig *config)
 srvloc_dereg_err:
     dsi->srvloc_url[0] = '\0';
     SLPClose(hslp);
-#endif /* USE_SRVLOC */
 }
+#endif /* USE_SRVLOC */
 
-#ifndef NO_DDP
-static void asp_cleanup(const AFPConfig *config)
+static void asp_cleanup(const AFPConfig * config)
 {
-    /* we need to stop tickle handler */
-    asp_stop_tickle();
-    nbp_unrgstr(config->obj.Obj, config->obj.Type, config->obj.Zone,
-                &config->obj.options.ddpaddr);
+	/* we need to stop tickle handler */
+	asp_stop_tickle();
+	nbp_unrgstr(config->obj.Obj, config->obj.Type, config->obj.Zone,
+		    &config->obj.options.ddpaddr);
 }
 
 /* these two are almost identical. it should be possible to collapse them
  * into one with minimal junk. */
-static int asp_start(AFPConfig *config, AFPConfig *configs,
-                     server_child *server_children)
+static int asp_start(AFPConfig * config, AFPConfig * configs,
+		     server_child * server_children)
 {
-    ASP asp;
+	ASP asp;
 
-    if (!(asp = asp_getsession(config->obj.handle, server_children,
-                               config->obj.options.tickleval))) {
-        LOG(log_error, logtype_afpd, "main: asp_getsession: %s", strerror(errno) );
-        exit( EXITERR_CLNT );
-    }
+	if (!(asp = asp_getsession(config->obj.handle, server_children,
+				   config->obj.options.tickleval))) {
+		LOG(log_error, logtype_afpd, "main: asp_getsession: %s",
+		    strerror(errno));
+		exit(EXITERR_CLNT);
+	}
 
-    if (asp->child) {
-        configfree(configs, config); /* free a bunch of stuff */
-        afp_over_asp(&config->obj);
-        exit (0);
-    }
+	if (asp->child) {
+		configfree(configs, config);	/* free a bunch of stuff */
+		afp_over_asp(&config->obj);
+		exit(0);
+	}
 
-    return 0;
-}
-#endif /* no afp/asp */
-
-static afp_child_t *dsi_start(AFPConfig *config, AFPConfig *configs,
-                              server_child *server_children)
-{
-    DSI *dsi = config->obj.handle;
-    afp_child_t *child = NULL;
-
-    if (!(child = dsi_getsession(dsi,
-                                 server_children,
-                                 config->obj.options.tickleval))) {
-        /* we've forked. */
-        configfree(configs, config);
-        afp_over_dsi(&config->obj); /* start a session */
-        exit (0);
-    }
-
-    return child;
+	return 0;
 }
 
-#ifndef NO_DDP
+static afp_child_t *dsi_start(AFPConfig * config, AFPConfig * configs,
+			      server_child * server_children)
+{
+	DSI *dsi = config->obj.handle;
+	afp_child_t *child = NULL;
+
+	if (!(child = dsi_getsession(dsi,
+				     server_children,
+				     config->obj.options.tickleval))) {
+		/* we've forked. */
+		configfree(configs, config);
+		afp_over_dsi(&config->obj);	/* start a session */
+		exit(0);
+	}
+
+	return child;
+}
+
 static AFPConfig *ASPConfigInit(const struct afp_options *options,
-                                unsigned char *refcount)
+				unsigned char *refcount)
 {
     AFPConfig *config;
     ATP atp;
@@ -325,12 +313,11 @@ serv_free_return:
     free(config);
     return NULL;
 }
-#endif /* no afp/asp */
 
 
 static AFPConfig *DSIConfigInit(const struct afp_options *options,
-                                unsigned char *refcount,
-                                const dsi_proto protocol)
+				unsigned char *refcount,
+				const dsi_proto protocol)
 {
     AFPConfig *config;
     DSI *dsi;
@@ -464,124 +451,129 @@ srvloc_reg_err:
  * entry in config->last or something like that. that would make
  * supporting multiple dsi transports easier. */
 static AFPConfig *AFPConfigInit(struct afp_options *options,
-                                const struct afp_options *defoptions)
+				const struct afp_options *defoptions)
 {
-    AFPConfig *config = NULL, *next = NULL;
-    unsigned char *refcount;
+	AFPConfig *config = NULL, *next = NULL;
+	unsigned char *refcount;
 
-    if ((refcount = (unsigned char *)
-                    calloc(1, sizeof(unsigned char))) == NULL) {
-        LOG(log_error, logtype_afpd, "AFPConfigInit: calloc(refcount): %s", strerror(errno) );
-        return NULL;
-    }
+	if ((refcount = (unsigned char *)
+	     calloc(1, sizeof(unsigned char))) == NULL) {
+		LOG(log_error, logtype_afpd,
+		    "AFPConfigInit: calloc(refcount): %s",
+		    strerror(errno));
+		return NULL;
+	}
 
-#ifndef NO_DDP
-    /* handle asp transports */
-    if ((options->transports & AFPTRANS_DDP) &&
-            (config = ASPConfigInit(options, refcount)))
-        config->defoptions = defoptions;
-#endif /* NO_DDP */
+	/* handle asp transports */
+	if ((options->transports & AFPTRANS_DDP) &&
+	    (config = ASPConfigInit(options, refcount)))
+		config->defoptions = defoptions;
 
 
-    /* set signature */
-    set_signature(options);
+	/* set signature */
+	set_signature(options);
 
-    /* handle dsi transports and dsi proxies. we only proxy
-     * for DSI connections. */
+	/* handle dsi transports and dsi proxies. we only proxy
+	 * for DSI connections. */
 
-    /* this should have something like the following:
-     * for (i=mindsi; i < maxdsi; i++)
-     *   if (options->transports & (1 << i) && 
-     *     (next = DSIConfigInit(options, refcount, i)))
-     *     next->defoptions = defoptions;
-     */
-    if ((options->transports & AFPTRANS_TCP) &&
-            (((options->flags & OPTION_PROXY) == 0) ||
-             ((options->flags & OPTION_PROXY) && config))
-            && (next = DSIConfigInit(options, refcount, DSI_TCPIP)))
-        next->defoptions = defoptions;
+	/* this should have something like the following:
+	 * for (i=mindsi; i < maxdsi; i++)
+	 *   if (options->transports & (1 << i) && 
+	 *     (next = DSIConfigInit(options, refcount, i)))
+	 *     next->defoptions = defoptions;
+	 */
+	if ((options->transports & AFPTRANS_TCP) &&
+	    (((options->flags & OPTION_PROXY) == 0) ||
+	     ((options->flags & OPTION_PROXY) && config))
+	    && (next = DSIConfigInit(options, refcount, DSI_TCPIP)))
+		next->defoptions = defoptions;
 
-    /* load in all the authentication modules. we can load the same
-       things multiple times if necessary. however, loading different
-       things with the same names will cause complaints. by not loading
-       in any uams with proxies, we prevent ddp connections from succeeding.
-    */
-    auth_load(options->uampath, options->uamlist);
+	/* load in all the authentication modules. we can load the same
+	   things multiple times if necessary. however, loading different
+	   things with the same names will cause complaints. by not loading
+	   in any uams with proxies, we prevent ddp connections from succeeding.
+	 */
+	auth_load(options->uampath, options->uamlist);
 
-    /* this should be able to accept multiple dsi transports. i think
-     * the only thing that gets affected is the net addresses. */
-    status_init(config, next, options);
+	/* this should be able to accept multiple dsi transports. i think
+	 * the only thing that gets affected is the net addresses. */
+	status_init(config, next, options);
 
-    /* attach dsi config to tail of asp config */
-    if (config) {
-        config->next = next;
-        return config;
-    }
+	/* attach dsi config to tail of asp config */
+	if (config) {
+		config->next = next;
+		return config;
+	}
 
-    return next;
+	return next;
 }
 
 /* fill in the appropriate bits for each interface */
 AFPConfig *configinit(struct afp_options *cmdline)
 {
-    FILE *fp;
-    char buf[LINESIZE + 1], *p, have_option = 0;
-    size_t len;
-    struct afp_options options;
-    AFPConfig *config=NULL, *first = NULL; 
+	FILE *fp;
+	char buf[LINESIZE + 1], *p, have_option = 0;
+	size_t len;
+	struct afp_options options;
+	AFPConfig *config = NULL, *first = NULL;
 
-    /* if config file doesn't exist, load defaults */
-    if ((fp = fopen(cmdline->configfile, "r")) == NULL)
-    {
-        LOG(log_debug, logtype_afpd, "ConfigFile %s not found, assuming defaults",
-            cmdline->configfile);
-        return AFPConfigInit(cmdline, cmdline);
-    }
+	/* if config file doesn't exist, load defaults */
+	if ((fp = fopen(cmdline->configfile, "r")) == NULL) {
+		LOG(log_debug, logtype_afpd,
+		    "ConfigFile %s not found, assuming defaults",
+		    cmdline->configfile);
+		return AFPConfigInit(cmdline, cmdline);
+	}
 
-    /* scan in the configuration file */
-    len = 0;
-    while (!feof(fp)) {
-	if (!fgets(&buf[len], LINESIZE - len, fp) || buf[len] == '#')
-            continue;
-	len = strlen(buf);
-	if ( len >= 2 && buf[len-2] == '\\' ) {
-	    len -= 2;
-	    continue;
-	} else
-	    len = 0;
+	/* scan in the configuration file */
+	len = 0;
+	while (!feof(fp)) {
+		if (!fgets(&buf[len], LINESIZE - len, fp)
+		    || buf[len] == '#')
+			continue;
+		len = strlen(buf);
+		if (len >= 2 && buf[len - 2] == '\\') {
+			len -= 2;
+			continue;
+		} else
+			len = 0;
 
-        /* a little pre-processing to get rid of spaces and end-of-lines */
-        p = buf;
-        while (p && isspace(*p))
-            p++;
-        if (!p || (*p == '\0'))
-            continue;
+		/* a little pre-processing to get rid of spaces and end-of-lines */
+		p = buf;
+		while (p && isspace(*p))
+			p++;
+		if (!p || (*p == '\0'))
+			continue;
 
-        have_option = 1;
+		have_option = 1;
 
-        memcpy(&options, cmdline, sizeof(options));
-        if (!afp_options_parseline(p, &options))
-            continue;
+		memcpy(&options, cmdline, sizeof(options));
+		if (!afp_options_parseline(p, &options))
+			continue;
 
-        /* AFPConfigInit can return two linked configs due to DSI and ASP */
-        if (!first) {
-            if ((first = AFPConfigInit(&options, cmdline)))
-                config = first->next ? first->next : first;
-        } else if ((config->next = AFPConfigInit(&options, cmdline))) {
-            config = config->next->next ? config->next->next : config->next;
-        }
-    }
+		/* AFPConfigInit can return two linked configs due to DSI and ASP */
+		if (!first) {
+			if ((first = AFPConfigInit(&options, cmdline)))
+				config = first->next ? first->next : first;
+		} else
+		    if ((config->next =
+			 AFPConfigInit(&options, cmdline))) {
+			config =
+			    config->next->next ? config->next->
+			    next : config->next;
+		}
+	}
 
 #ifdef HAVE_LDAP
-    /* Parse afp_ldap.conf */
-    acl_ldap_readconfig(_PATH_ACL_LDAPCONF);
-#endif /* HAVE_LDAP */
+	/* Parse afp_ldap.conf */
+	acl_ldap_readconfig(_PATH_ACL_LDAPCONF);
+#endif				/* HAVE_LDAP */
 
-    LOG(log_debug, logtype_afpd, "Finished parsing Config File");
-    fclose(fp);
+	LOG(log_debug, logtype_afpd, "Finished parsing Config File");
+	fclose(fp);
 
-    if (!have_option)
-        first = AFPConfigInit(cmdline, cmdline);
+	if (!have_option)
+		first = AFPConfigInit(cmdline, cmdline);
 
     /* Now register with zeroconf, we also need the volumes for that */
     if (first && !(first->obj.options.flags & OPTION_NOZEROCONF)) {

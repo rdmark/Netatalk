@@ -27,9 +27,7 @@
  * AppleTalk Echo Protocol Client
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -76,7 +74,7 @@ static void done(int sig _U_)
 		nsent, nrecv, (( nsent - nrecv ) * 100 ) / nsent );
 	if ( nrecv ) {
 	    printf( "round-trip (ms)  min/avg/max = %ld/%ld/%ld\n",
-		    minms, totalms / nrecv, maxms );
+		    (unsigned long) minms, (unsigned long) totalms / nrecv, (unsigned long) maxms );
 	}	
     }
     exit( 0 );
@@ -164,9 +162,9 @@ int main(int ac, char **av)
        port = ntohs( se->s_port );
 
     memset( &target, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     target.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     target.sat_family = AF_APPLETALK;
     if ( !atalk_aton( av[ optind ], &target.sat_addr )) {
 	if ( nbp_name( av[ optind ], &obj, &type, &zone ) || !obj ) {
@@ -252,7 +250,7 @@ int main(int ac, char **av)
 	}
 	printf( "%d bytes from %u.%u: aep_seq=%d. time=%ld. ms\n",
 		cc, ntohs( sat.sat_addr.s_net ), sat.sat_addr.s_node,
-		seq, ms );
+		seq, (unsigned long) ms );
         if (pings && seq + 1 >= pings) done(0);
     }
 }

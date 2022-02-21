@@ -5,9 +5,7 @@
  * All rights reserved. See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -19,22 +17,21 @@
 
 /* server generated tickles. as this is only called by the tickle handler,
  * we don't need to block signals. */
-int dsi_tickle(DSI *dsi)
+int dsi_tickle(DSI * dsi)
 {
-  char block[DSI_BLOCKSIZ];
-  u_int16_t id;
-  
-  if ((dsi->flags & DSI_SLEEPING) || dsi->in_write)
-      return 1;
+	char block[DSI_BLOCKSIZ];
+	u_int16_t id;
 
-  id = htons(dsi_serverID(dsi));
+	if ((dsi->flags & DSI_SLEEPING) || dsi->in_write)
+		return 1;
 
-  memset(block, 0, sizeof(block));
-  block[0] = DSIFL_REQUEST;
-  block[1] = DSIFUNC_TICKLE;
-  memcpy(block + 2, &id, sizeof(id));
-  /* code = len = reserved = 0 */
+	id = htons(dsi_serverID(dsi));
 
-  return dsi_stream_write(dsi, block, DSI_BLOCKSIZ, DSI_NOWAIT);
+	memset(block, 0, sizeof(block));
+	block[0] = DSIFL_REQUEST;
+	block[1] = DSIFUNC_TICKLE;
+	memcpy(block + 2, &id, sizeof(id));
+	/* code = len = reserved = 0 */
+
+	return dsi_stream_write(dsi, block, DSI_BLOCKSIZ, DSI_NOWAIT);
 }
-

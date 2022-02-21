@@ -28,9 +28,7 @@
  * SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -71,67 +69,74 @@
  */
 bstring rel_path_in_vol(const char *path, const char *volpath)
 {
-    EC_INIT;
-    int cwd = -1;
-    bstring fpath = NULL;
-    char *dname = NULL;
-    struct stat st;
+	EC_INIT;
+	int cwd = -1;
+	bstring fpath = NULL;
+	char *dname = NULL;
+	struct stat st;
 
-    if (path == NULL || volpath == NULL)
-        return NULL;
+	if (path == NULL || volpath == NULL)
+		return NULL;
 
-    EC_NEG1_LOG(cwd = open(".", O_RDONLY));
+	EC_NEG1_LOG(cwd = open(".", O_RDONLY));
 
-    EC_ZERO_LOGSTR(lstat(path, &st), "lstat(%s): %s", path, strerror(errno));
+	EC_ZERO_LOGSTR(lstat(path, &st), "lstat(%s): %s", path,
+		       strerror(errno));
 
-    if (path[0] == '/') {
-        EC_NULL(fpath = bfromcstr(path));
-    } else {
-        switch (S_IFMT & st.st_mode) {
-        case S_IFREG:
-        case S_IFLNK:
-            EC_NULL_LOG(dname = strdup(path));
-            EC_ZERO_LOGSTR(chdir(dirname(dname)), "chdir(%s): %s", dirname, strerror(errno));
-            free(dname);
-            dname = NULL;
-            EC_NULL(fpath = bfromcstr(getcwdpath()));
-            BSTRING_STRIP_SLASH(fpath);
-            EC_ZERO(bcatcstr(fpath, "/"));
-            EC_NULL_LOG(dname = strdup(path));
-            EC_ZERO(bcatcstr(fpath, basename(dname)));
-            break;
+	if (path[0] == '/') {
+		EC_NULL(fpath = bfromcstr(path));
+	} else {
+		switch (S_IFMT & st.st_mode) {
+		case S_IFREG:
+		case S_IFLNK:
+			EC_NULL_LOG(dname = strdup(path));
+			EC_ZERO_LOGSTR(chdir(dirname(dname)),
+				       "chdir(%s): %s", dirname,
+				       strerror(errno));
+			free(dname);
+			dname = NULL;
+			EC_NULL(fpath = bfromcstr(getcwdpath()));
+			BSTRING_STRIP_SLASH(fpath);
+			EC_ZERO(bcatcstr(fpath, "/"));
+			EC_NULL_LOG(dname = strdup(path));
+			EC_ZERO(bcatcstr(fpath, basename(dname)));
+			break;
 
-        case S_IFDIR:
-            EC_ZERO_LOGSTR(chdir(path), "chdir(%s): %s", path, strerror(errno));
-            EC_NULL(fpath = bfromcstr(getcwdpath()));
-            break;
+		case S_IFDIR:
+			EC_ZERO_LOGSTR(chdir(path), "chdir(%s): %s", path,
+				       strerror(errno));
+			EC_NULL(fpath = bfromcstr(getcwdpath()));
+			break;
 
-        default:
-            EC_FAIL;
-        }
-    }
+		default:
+			EC_FAIL;
+		}
+	}
 
-    BSTRING_STRIP_SLASH(fpath);
+	BSTRING_STRIP_SLASH(fpath);
 
-    /*
-     * Now we have eg:
-     *   fpath:   /Volume/netatalk/dir/bla
-     *   volpath: /Volume/netatalk/
-     * we want: "dir/bla"
-     */
-    int len = strlen(volpath);
-    if (volpath[len-1] != '/')
-        /* in case volpath has no trailing slash */
-        len ++;
-    EC_ZERO(bdelete(fpath, 0, len));
+	/*
+	 * Now we have eg:
+	 *   fpath:   /Volume/netatalk/dir/bla
+	 *   volpath: /Volume/netatalk/
+	 * we want: "dir/bla"
+	 */
+	int len = strlen(volpath);
+	if (volpath[len - 1] != '/')
+		/* in case volpath has no trailing slash */
+		len++;
+	EC_ZERO(bdelete(fpath, 0, len));
 
-EC_CLEANUP:
-    if (dname) free(dname);
-    if (cwd != -1) {
-        fchdir(cwd);
-        close(cwd);
-    }
-    if (ret != 0)
-        return NULL;
-    return fpath;
+      EC_CLEANUP:
+	if (dname)
+		free(dname);
+	if (cwd != -1) {
+		if (fchdir(cwd)) {
+			fprintf(stderr, "bad EC_CLEANUP\n");
+		}
+		close(cwd);
+	}
+	if (ret != 0)
+		return NULL;
+	return fpath;
 }

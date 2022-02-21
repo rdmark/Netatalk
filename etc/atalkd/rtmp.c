@@ -5,9 +5,7 @@
  * All Rights Reserved. See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,10 +15,6 @@
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-#ifdef TRU64
-#include <sys/mbuf.h>
-#include <net/route.h>
-#endif /* TRU64 */
 #include <net/if.h>
 #include <net/route.h>
 #include <netatalk/endian.h>
@@ -42,6 +36,8 @@
 #include "atserv.h"
 #include "route.h"
 #include "main.h"
+
+extern int debug;
 
 void rtmp_delzonemap(struct rtmptab *rtmp)
 {
@@ -797,11 +793,10 @@ int rtmp_packet(struct atport *ap, struct sockaddr_at *from, char *data, int len
 		LOG(log_error, logtype_atalkd, "as_timer sendto: %s", strerror(errno) );
 	    }
 	} else if ( *data == 2 || *data == 3 ) {
-#ifdef DEBUG
-	    printf( "rtmp_packet rdr (%d) from %u.%u\n",
+	    if ( debug ) 
+                printf( "rtmp_packet rdr (%d) from %u.%u\n",
 		    *data, ntohs( from->sat_addr.s_net ),
 		    from->sat_addr.s_node );
-#endif /* DEBUG */
 	} else {
 	    LOG(log_info, logtype_atalkd, "rtmp_packet unknown request from %u.%u",
 		    ntohs( from->sat_addr.s_net ), from->sat_addr.s_node );
@@ -843,9 +838,9 @@ int rtmp_request( struct interface *iface)
      * There is a problem with the net zero "hint" hack.
      */
     memset( &sat, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     sat.sat_family = AF_APPLETALK;
     sat.sat_addr.s_net = iface->i_addr.sat_addr.s_net;
     sat.sat_addr.s_node = ATADDR_BCAST;
@@ -874,35 +869,35 @@ int looproute(struct interface *iface, unsigned int cmd)
     }
 
     memset( &dst, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     dst.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     dst.sat_family = AF_APPLETALK;
     dst.sat_addr.s_net = iface->i_addr.sat_addr.s_net;
     dst.sat_addr.s_node = iface->i_addr.sat_addr.s_node;
     memset( &loop, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     loop.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     loop.sat_family = AF_APPLETALK;
     loop.sat_addr.s_net = htons( ATADDR_ANYNET );
     loop.sat_addr.s_node = ATADDR_ANYNODE;
 
-#ifndef BSD4_4
+#ifndef __NetBSD__
     if ( route( cmd,
 		(struct sockaddr *) &dst,
 		(struct sockaddr *) &loop,
 		RTF_UP | RTF_HOST ) ) {
 	return( 1 );
     }
-#else /* ! BSD4_4 */
+#else /* ! __NetBSD__ */
     if ( route( cmd,
 	    	(struct sockaddr_at *) &dst,
 		(struct sockaddr_at *) &loop,
 		RTF_UP | RTF_HOST ) ) {
 	return ( 1);
     }
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     if ( cmd == RTMP_ADD ) {
 	iface->i_flags |= IFACE_LOOP;
     }
@@ -932,9 +927,9 @@ int gateroute(unsigned int command, struct rtmptab *rtmp)
      * back interface, and who wants that?
      */
     memset( &gate, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     gate.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     gate.sat_family = AF_APPLETALK;
     gate.sat_addr.s_net = rtmp->rt_gate->g_sat.sat_addr.s_net;
     gate.sat_addr.s_node = rtmp->rt_gate->g_sat.sat_addr.s_node;
@@ -943,15 +938,15 @@ int gateroute(unsigned int command, struct rtmptab *rtmp)
     }
 
     memset( &dst, 0, sizeof( struct sockaddr_at ));
-#ifdef BSD4_4
+#ifdef __NetBSD__
     dst.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     dst.sat_family = AF_APPLETALK;
     dst.sat_addr.s_node = ATADDR_ANYNODE;
 
     do {
 	dst.sat_addr.s_net = htons( net );
-#ifndef BSD4_4
+#ifndef __NetBSD__
 	if ( route( command,
 		    (struct sockaddr *) &dst,
 		    (struct sockaddr *) &gate,
@@ -961,7 +956,7 @@ int gateroute(unsigned int command, struct rtmptab *rtmp)
 		    strerror(errno) );
 	    continue;
 	}
-#else /* ! BSD4_4 */
+#else /* ! __NetBSD__ */
 	if ( route( command,
 		    (struct sockaddr_at *) &dst,
 		    (struct sockaddr_at *) &gate,
@@ -970,7 +965,7 @@ int gateroute(unsigned int command, struct rtmptab *rtmp)
 	    	    ntohs( gate.sat_addr.s_net ), gate.sat_addr.s_node, strerror(errno) );
 	    continue;
 	}
-#endif /* ! BSD4_4 */
+#endif /* ! __NetBSD__ */
     } while ( net++ < ntohs( rtmp->rt_lastnet ));
 
     if ( command == RTMP_ADD ) {

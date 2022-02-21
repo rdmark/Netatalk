@@ -5,13 +5,9 @@
  * All Rights Reserved. See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 #include <string.h>
 #include <sys/param.h>
 #include <sys/types.h>
@@ -23,14 +19,10 @@
 #include "rtmp.h"
 #include "route.h"
 
-#ifndef BSD4_4
+#ifndef __NetBSD__
 int route( int message, struct sockaddr *dst, struct sockaddr *gate, int flags)
 {
-#ifdef TRU64
-    struct ortentry	rtent;
-#else /* TRU64 */
     struct rtentry	rtent;
-#endif /* TRU64 */
 
     memset( &rtent, 0, sizeof( struct rtentry ));
     rtent.rt_dst = *dst;
@@ -39,7 +31,7 @@ int route( int message, struct sockaddr *dst, struct sockaddr *gate, int flags)
     return( ioctl( rtfd, message, &rtent ));
 }
 
-#else /* BSD4_4 */
+#else /* __NetBSD__ */
 
 struct sockaddr_m {
     u_char	sam_len;
@@ -56,7 +48,7 @@ struct rt_msg_at {
     struct sockaddr_m	rtma_mask;
 } rtma;
 
-route( int message, struct sockaddr_at	*dst, struct sockaddr_at *gate, int flags)
+int route( int message, struct sockaddr_at	*dst, struct sockaddr_at *gate, int flags)
 {
     int			rc;
 
@@ -84,4 +76,4 @@ route( int message, struct sockaddr_at	*dst, struct sockaddr_at *gate, int flags
     }
     return( 0 );
 }
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */

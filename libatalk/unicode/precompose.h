@@ -12,8 +12,8 @@
 #define LCOUNT 19
 #define VCOUNT 21
 #define TCOUNT 28
-#define NCOUNT 588     /* (VCOUNT * TCOUNT) */
-#define SCOUNT 11172   /* (LCOUNT * NCOUNT) */
+#define NCOUNT 588		/* (VCOUNT * TCOUNT) */
+#define SCOUNT 11172		/* (LCOUNT * NCOUNT) */
 
 #define PRECOMP_COUNT 955
 #define DECOMP_COUNT 955
@@ -23,12 +23,12 @@
 #define DECOMP_SP_COUNT 26
 #define MAXCOMBSPLEN 4
 
-#define COMBBUFLEN 4  /* max(MAXCOMBLEN,MAXCOMBSPLEN) */
+#define COMBBUFLEN 4		/* max(MAXCOMBLEN,MAXCOMBSPLEN) */
 
 static const struct {
-  unsigned int replacement;
-  unsigned int base;
-  unsigned int comb;
+	unsigned int replacement;
+	unsigned int base;
+	unsigned int comb;
 } precompositions[] = {
 /*{ 0x0000226E, 0x0000003C, 0x00000338 },*/   /* NOT LESS-THAN */
 /*{ 0x00002260, 0x0000003D, 0x00000338 },*/   /* NOT EQUAL TO */
@@ -1059,9 +1059,9 @@ static const struct {
 };
 
 static const struct {
-  unsigned int replacement;
-  unsigned int base;
-  unsigned int comb;
+	unsigned int replacement;
+	unsigned int base;
+	unsigned int comb;
 } decompositions[] = {
   { 0x000000C0, 0x00000041, 0x00000300 },     /* LATIN CAPITAL LETTER A WITH GRAVE */
   { 0x000000C1, 0x00000041, 0x00000301 },     /* LATIN CAPITAL LETTER A WITH ACUTE */
@@ -2092,9 +2092,9 @@ static const struct {
 };
 
 static const struct {
-  unsigned int replacement_sp;
-  unsigned int base_sp;
-  unsigned int comb_sp;
+	unsigned int replacement_sp;
+	unsigned int base_sp;
+	unsigned int comb_sp;
 } precompositions_sp[] = {
   { 0xD804DC9A, 0xD804DC99, 0xD804DCBA },     /* KAITHI LETTER DDDHA */
   { 0xD804DC9C, 0xD804DC9B, 0xD804DCBA },     /* KAITHI LETTER RHA */
@@ -2125,9 +2125,9 @@ static const struct {
 };
 
 static const struct {
-  unsigned int replacement_sp;
-  unsigned int base_sp;
-  unsigned int comb_sp;
+	unsigned int replacement_sp;
+	unsigned int base_sp;
+	unsigned int comb_sp;
 } decompositions_sp[] = {
   { 0xD804DC9A, 0xD804DC99, 0xD804DCBA },     /* KAITHI LETTER DDDHA */
   { 0xD804DC9C, 0xD804DC9B, 0xD804DCBA },     /* KAITHI LETTER RHA */

@@ -46,9 +46,7 @@
  * in "to") to form the final target path.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -108,7 +106,9 @@ static int copy(const char *fpath, const struct stat *sb, int tflag, struct FTW 
 static int ftw_copy_file(const struct FTW *, const char *, const struct stat *, int);
 static int ftw_copy_link(const struct FTW *, const char *, const struct stat *, int);
 static int setfile(const struct stat *, int);
+#if 0
 static int preserve_dir_acls(const struct stat *, char *, char *);
+#endif
 static int preserve_fd_acls(int, int);
 
 /*
@@ -951,9 +951,9 @@ static int preserve_fd_acls(int source_fd, int dest_fd)
     return (0);
 }
 
+#if 0
 static int preserve_dir_acls(const struct stat *fs, char *source_dir, char *dest_dir)
 {
-#if 0
     acl_t (*aclgetf)(const char *, acl_type_t);
     int (*aclsetf)(const char *, acl_type_t, acl_t);
     struct acl *aclp;
@@ -1035,6 +1035,6 @@ static int preserve_dir_acls(const struct stat *fs, char *source_dir, char *dest
         return (1);
     }
     acl_free(acl);
-#endif
     return (0);
 }
+#endif

@@ -12,9 +12,7 @@
   GNU General Public License for more details.
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <string.h>
 #include <stdio.h>
@@ -111,48 +109,48 @@
 /*****************************
  *       the dircache        */
 
-static hash_t       *dircache;        /* The actual cache */
-static unsigned int dircache_maxsize; /* cache maximum size */
+static hash_t *dircache;	/* The actual cache */
+static unsigned int dircache_maxsize;	/* cache maximum size */
 
 static struct dircache_stat {
-    unsigned long long lookups;
-    unsigned long long hits;
-    unsigned long long misses;
-    unsigned long long added;
-    unsigned long long removed;
-    unsigned long long expunged;
-    unsigned long long evicted;
+	unsigned long long lookups;
+	unsigned long long hits;
+	unsigned long long misses;
+	unsigned long long added;
+	unsigned long long removed;
+	unsigned long long expunged;
+	unsigned long long evicted;
 } dircache_stat;
 
 /* FNV 1a */
 static hash_val_t hash_vid_did(const void *key)
 {
-    const struct dir *k = (const struct dir *)key;
-    hash_val_t hash = 2166136261;
+	const struct dir *k = (const struct dir *) key;
+	hash_val_t hash = 2166136261;
 
-    hash ^= k->d_vid >> 8;
-    hash *= 16777619;
-    hash ^= k->d_vid;
-    hash *= 16777619;
+	hash ^= k->d_vid >> 8;
+	hash *= 16777619;
+	hash ^= k->d_vid;
+	hash *= 16777619;
 
-    hash ^= k->d_did >> 24;
-    hash *= 16777619;
-    hash ^= (k->d_did >> 16) & 0xff;
-    hash *= 16777619;
-    hash ^= (k->d_did >> 8) & 0xff;
-    hash *= 16777619;
-    hash ^= (k->d_did >> 0) & 0xff;
-    hash *= 16777619;
+	hash ^= k->d_did >> 24;
+	hash *= 16777619;
+	hash ^= (k->d_did >> 16) & 0xff;
+	hash *= 16777619;
+	hash ^= (k->d_did >> 8) & 0xff;
+	hash *= 16777619;
+	hash ^= (k->d_did >> 0) & 0xff;
+	hash *= 16777619;
 
-    return hash;
+	return hash;
 }
 
 static int hash_comp_vid_did(const void *key1, const void *key2)
 {
-    const struct dir *k1 = key1;
-    const struct dir *k2 = key2;
+	const struct dir *k1 = key1;
+	const struct dir *k2 = key2;
 
-    return !(k1->d_did == k2->d_did && k1->d_vid == k2->d_vid);
+	return !(k1->d_did == k2->d_did && k1->d_vid == k2->d_vid);
 }
 
 /**************************************************
@@ -161,77 +159,77 @@ static int hash_comp_vid_did(const void *key1, const void *key2)
 static hash_t *index_didname;
 
 #undef get16bits
-#if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__)    \
-    || defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
+#if defined(__i386__)
 #define get16bits(d) (*((const uint16_t *) (d)))
-#endif
-
-#if !defined (get16bits)
+#else
 #define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)    \
                       +(uint32_t)(((const uint8_t *)(d))[0]) )
 #endif
 
 static hash_val_t hash_didname(const void *p)
 {
-    const struct dir *key = (const struct dir *)p;
-    const unsigned char *data = key->d_u_name->data;
-    int len = key->d_u_name->slen;
-    hash_val_t hash = key->d_pdid + key->d_vid;
-    hash_val_t tmp;
+	const struct dir *key = (const struct dir *) p;
+	const unsigned char *data = key->d_u_name->data;
+	int len = key->d_u_name->slen;
+	hash_val_t hash = key->d_pdid + key->d_vid;
+	hash_val_t tmp;
 
-    int rem = len & 3;
-    len >>= 2;
+	int rem = len & 3;
+	len >>= 2;
 
-    /* Main loop */
-    for (;len > 0; len--) {
-        hash  += get16bits (data);
-        tmp    = (get16bits (data+2) << 11) ^ hash;
-        hash   = (hash << 16) ^ tmp;
-        data  += 2*sizeof (uint16_t);
-        hash  += hash >> 11;
-    }
+	/* Main loop */
+	for (; len > 0; len--) {
+		hash += get16bits(data);
+		tmp = (get16bits(data + 2) << 11) ^ hash;
+		hash = (hash << 16) ^ tmp;
+		data += 2 * sizeof(uint16_t);
+		hash += hash >> 11;
+	}
 
-    /* Handle end cases */
-    switch (rem) {
-    case 3: hash += get16bits (data);
-        hash ^= hash << 16;
-        hash ^= data[sizeof (uint16_t)] << 18;
-        hash += hash >> 11;
-        break;
-    case 2: hash += get16bits (data);
-        hash ^= hash << 11;
-        hash += hash >> 17;
-        break;
-    case 1: hash += *data;
-        hash ^= hash << 10;
-        hash += hash >> 1;
-    }
+	/* Handle end cases */
+	switch (rem) {
+	case 3:
+		hash += get16bits(data);
+		hash ^= hash << 16;
+		hash ^= data[sizeof(uint16_t)] << 18;
+		hash += hash >> 11;
+		break;
+	case 2:
+		hash += get16bits(data);
+		hash ^= hash << 11;
+		hash += hash >> 17;
+		break;
+	case 1:
+		hash += *data;
+		hash ^= hash << 10;
+		hash += hash >> 1;
+	}
 
-    /* Force "avalanching" of final 127 bits */
-    hash ^= hash << 3;
-    hash += hash >> 5;
-    hash ^= hash << 4;
-    hash += hash >> 17;
-    hash ^= hash << 25;
-    hash += hash >> 6;
+	/* Force "avalanching" of final 127 bits */
+	hash ^= hash << 3;
+	hash += hash >> 5;
+	hash ^= hash << 4;
+	hash += hash >> 17;
+	hash ^= hash << 25;
+	hash += hash >> 6;
 
-    return hash;
+	return hash;
 }
 
 static int hash_comp_didname(const void *k1, const void *k2)
 {
-    const struct dir *key1 = (const struct dir *)k1;
-    const struct dir *key2 = (const struct dir *)k2;
+	const struct dir *key1 = (const struct dir *) k1;
+	const struct dir *key2 = (const struct dir *) k2;
 
-    return ! (key1->d_vid == key2->d_vid
-              && key1->d_pdid == key2->d_pdid
-              && (bstrcmp(key1->d_u_name, key2->d_u_name) == 0) );
+	return !(key1->d_vid == key2->d_vid
+		 && key1->d_pdid == key2->d_pdid
+		 && (bstrcmp(key1->d_u_name, key2->d_u_name) == 0));
 }
 
 /***************************
  * queue index on dircache */
 
-static q_t *index_queue;    /* the index itself */
+static q_t *index_queue;	/* the index itself */
 static unsigned long queue_count;
 
 /*!
@@ -246,34 +244,37 @@ static unsigned long queue_count;
  */
 static void dircache_evict(void)
 {
-    int i = DIRCACHE_FREE_QUANTUM;
-    struct dir *dir;
+	int i = DIRCACHE_FREE_QUANTUM;
+	struct dir *dir;
 
-    LOG(log_debug, logtype_afpd, "dircache: {starting cache eviction}");
+	LOG(log_debug, logtype_afpd,
+	    "dircache: {starting cache eviction}");
 
-    while (i--) {
-        if ((dir = (struct dir *)dequeue(index_queue)) == NULL) { /* 1 */
-            dircache_dump();
-            AFP_PANIC("dircache_evict");
-        }
-        queue_count--;
+	while (i--) {
+		if ((dir = (struct dir *) dequeue(index_queue)) == NULL) {	/* 1 */
+			dircache_dump();
+			AFP_PANIC("dircache_evict");
+		}
+		queue_count--;
 
-        if (curdir == dir) {                          /* 2 */
-            if ((dir->qidx_node = enqueue(index_queue, dir)) == NULL) {
-                dircache_dump();
-                AFP_PANIC("dircache_evict");
-            }
-            queue_count++;
-            continue;
-        }
+		if (curdir == dir) {	/* 2 */
+			if ((dir->qidx_node =
+			     enqueue(index_queue, dir)) == NULL) {
+				dircache_dump();
+				AFP_PANIC("dircache_evict");
+			}
+			queue_count++;
+			continue;
+		}
 
-        dircache_remove(NULL, dir, DIRCACHE | DIDNAME_INDEX); /* 3 */
-        dir_free(dir);                                        /* 4 */
-    }
+		dircache_remove(NULL, dir, DIRCACHE | DIDNAME_INDEX);	/* 3 */
+		dir_free(dir);	/* 4 */
+	}
 
-    AFP_ASSERT(queue_count == dircache->hash_nodecount);
-    dircache_stat.evicted += DIRCACHE_FREE_QUANTUM;
-    LOG(log_debug, logtype_afpd, "dircache: {finished cache eviction}");
+	AFP_ASSERT(queue_count == dircache->hash_nodecount);
+	dircache_stat.evicted += DIRCACHE_FREE_QUANTUM;
+	LOG(log_debug, logtype_afpd,
+	    "dircache: {finished cache eviction}");
 }
 
 
@@ -301,52 +302,60 @@ static void dircache_evict(void)
  */
 struct dir *dircache_search_by_did(const struct vol *vol, cnid_t cnid)
 {
-    struct dir *cdir = NULL;
-    struct dir key;
-    struct stat st;
-    hnode_t *hn;
+	struct dir *cdir = NULL;
+	struct dir key;
+	struct stat st;
+	hnode_t *hn;
 
-    AFP_ASSERT(vol);
-    AFP_ASSERT(ntohl(cnid) >= CNID_START);
+	AFP_ASSERT(vol);
+	AFP_ASSERT(ntohl(cnid) >= CNID_START);
 
-    dircache_stat.lookups++;
-    key.d_vid = vol->v_vid;
-    key.d_did = cnid;
-    if ((hn = hash_lookup(dircache, &key)))
-        cdir = hnode_get(hn);
+	dircache_stat.lookups++;
+	key.d_vid = vol->v_vid;
+	key.d_did = cnid;
+	if ((hn = hash_lookup(dircache, &key)))
+		cdir = hnode_get(hn);
 
-    if (cdir) {
-        if (cdir->d_flags & DIRF_ISFILE) { /* (1) */
-            LOG(log_debug, logtype_afpd, "dircache(cnid:%u): {not a directory:\"%s\"}",
-                ntohl(cnid), cfrombstr(cdir->d_u_name));
-            (void)dir_remove(vol, cdir); /* (1a) */
-            dircache_stat.expunged++;
-            return NULL;        /* (1b) */
+	if (cdir) {
+		if (cdir->d_flags & DIRF_ISFILE) {	/* (1) */
+			LOG(log_debug, logtype_afpd,
+			    "dircache(cnid:%u): {not a directory:\"%s\"}",
+			    ntohl(cnid), cfrombstr(cdir->d_u_name));
+			(void) dir_remove(vol, cdir);	/* (1a) */
+			dircache_stat.expunged++;
+			return NULL;	/* (1b) */
 
-        }
-        if (ostat(cfrombstr(cdir->d_fullpath), &st, vol_syml_opt(vol)) != 0) {
-            LOG(log_debug, logtype_afpd, "dircache(cnid:%u): {missing:\"%s\"}",
-                ntohl(cnid), cfrombstr(cdir->d_fullpath));
-            (void)dir_remove(vol, cdir);
-            dircache_stat.expunged++;
-            return NULL;
-        }
-        if ((cdir->dcache_ctime != st.st_ctime) || (cdir->dcache_ino != st.st_ino)) {
-            LOG(log_debug, logtype_afpd, "dircache(cnid:%u): {modified:\"%s\"}",
-                ntohl(cnid), cfrombstr(cdir->d_u_name));
-            (void)dir_remove(vol, cdir);
-            dircache_stat.expunged++;
-            return NULL;
-        }
-        LOG(log_debug, logtype_afpd, "dircache(cnid:%u): {cached: path:\"%s\"}",
-            ntohl(cnid), cfrombstr(cdir->d_fullpath));
-        dircache_stat.hits++;
-    } else {
-        LOG(log_debug, logtype_afpd, "dircache(cnid:%u): {not in cache}", ntohl(cnid));
-        dircache_stat.misses++;
-    }
-    
-    return cdir;
+		}
+		if (ostat
+		    (cfrombstr(cdir->d_fullpath), &st,
+		     vol_syml_opt(vol)) != 0) {
+			LOG(log_debug, logtype_afpd,
+			    "dircache(cnid:%u): {missing:\"%s\"}",
+			    ntohl(cnid), cfrombstr(cdir->d_fullpath));
+			(void) dir_remove(vol, cdir);
+			dircache_stat.expunged++;
+			return NULL;
+		}
+		if ((cdir->dcache_ctime != st.st_ctime)
+		    || (cdir->dcache_ino != st.st_ino)) {
+			LOG(log_debug, logtype_afpd,
+			    "dircache(cnid:%u): {modified:\"%s\"}",
+			    ntohl(cnid), cfrombstr(cdir->d_u_name));
+			(void) dir_remove(vol, cdir);
+			dircache_stat.expunged++;
+			return NULL;
+		}
+		LOG(log_debug, logtype_afpd,
+		    "dircache(cnid:%u): {cached: path:\"%s\"}",
+		    ntohl(cnid), cfrombstr(cdir->d_fullpath));
+		dircache_stat.hits++;
+	} else {
+		LOG(log_debug, logtype_afpd,
+		    "dircache(cnid:%u): {not in cache}", ntohl(cnid));
+		dircache_stat.misses++;
+	}
+
+	return cdir;
 }
 
 /*!
@@ -363,63 +372,71 @@ struct dir *dircache_search_by_did(const struct vol *vol, cnid_t cnid)
  * @returns pointer to struct dir if found in cache, else NULL
  */
 struct dir *dircache_search_by_name(const struct vol *vol,
-                                    const struct dir *dir,
-                                    char *name,
-                                    int len)
+				    const struct dir *dir,
+				    char *name, int len)
 {
-    struct dir *cdir = NULL;
-    struct dir key;
-    struct stat st;
+	struct dir *cdir = NULL;
+	struct dir key;
+	struct stat st;
 
-    hnode_t *hn;
-    static_bstring uname = {-1, len, (unsigned char *)name};
+	hnode_t *hn;
+	static_bstring uname = { -1, len, (unsigned char *) name };
 
-    AFP_ASSERT(vol);
-    AFP_ASSERT(dir);
-    AFP_ASSERT(name);
-    AFP_ASSERT(len == strlen(name));
-    AFP_ASSERT(len < 256);
+	AFP_ASSERT(vol);
+	AFP_ASSERT(dir);
+	AFP_ASSERT(name);
+	AFP_ASSERT(len == strlen(name));
+	AFP_ASSERT(len < 256);
 
-    dircache_stat.lookups++;
-    LOG(log_debug, logtype_afpd, "dircache_search_by_name(did:%u, \"%s\")",
-        ntohl(dir->d_did), name);
+	dircache_stat.lookups++;
+	LOG(log_debug, logtype_afpd,
+	    "dircache_search_by_name(did:%u, \"%s\")", ntohl(dir->d_did),
+	    name);
 
-    if (dir->d_did != DIRDID_ROOT_PARENT) {
-        key.d_vid = vol->v_vid;
-        key.d_pdid = dir->d_did;
-        key.d_u_name = &uname;
+	if (dir->d_did != DIRDID_ROOT_PARENT) {
+		key.d_vid = vol->v_vid;
+		key.d_pdid = dir->d_did;
+		key.d_u_name = &uname;
 
-        if ((hn = hash_lookup(index_didname, &key)))
-            cdir = hnode_get(hn);
-    }
+		if ((hn = hash_lookup(index_didname, &key)))
+			cdir = hnode_get(hn);
+	}
 
-    if (cdir) {
-        if (ostat(cfrombstr(cdir->d_fullpath), &st, vol_syml_opt(vol)) != 0) {
-            LOG(log_debug, logtype_afpd, "dircache(did:%u,\"%s\"): {missing:\"%s\"}",
-                ntohl(dir->d_did), name, cfrombstr(cdir->d_fullpath));
-            (void)dir_remove(vol, cdir);
-            dircache_stat.expunged++;
-            return NULL;
-        }
+	if (cdir) {
+		if (ostat
+		    (cfrombstr(cdir->d_fullpath), &st,
+		     vol_syml_opt(vol)) != 0) {
+			LOG(log_debug, logtype_afpd,
+			    "dircache(did:%u,\"%s\"): {missing:\"%s\"}",
+			    ntohl(dir->d_did), name,
+			    cfrombstr(cdir->d_fullpath));
+			(void) dir_remove(vol, cdir);
+			dircache_stat.expunged++;
+			return NULL;
+		}
 
-        /* Remove modified directories and files */
-        if ((cdir->dcache_ctime != st.st_ctime) || (cdir->dcache_ino != st.st_ino)) {
-            LOG(log_debug, logtype_afpd, "dircache(did:%u,\"%s\"): {modified}",
-                ntohl(dir->d_did), name);
-            (void)dir_remove(vol, cdir);
-            dircache_stat.expunged++;
-            return NULL;
-        }
-        LOG(log_debug, logtype_afpd, "dircache(did:%u,\"%s\"): {found in cache}",
-            ntohl(dir->d_did), name);
-        dircache_stat.hits++;
-    } else {
-        LOG(log_debug, logtype_afpd, "dircache(did:%u,\"%s\"): {not in cache}",
-            ntohl(dir->d_did), name);
-        dircache_stat.misses++;
-    }
+		/* Remove modified directories and files */
+		if ((cdir->dcache_ctime != st.st_ctime)
+		    || (cdir->dcache_ino != st.st_ino)) {
+			LOG(log_debug, logtype_afpd,
+			    "dircache(did:%u,\"%s\"): {modified}",
+			    ntohl(dir->d_did), name);
+			(void) dir_remove(vol, cdir);
+			dircache_stat.expunged++;
+			return NULL;
+		}
+		LOG(log_debug, logtype_afpd,
+		    "dircache(did:%u,\"%s\"): {found in cache}",
+		    ntohl(dir->d_did), name);
+		dircache_stat.hits++;
+	} else {
+		LOG(log_debug, logtype_afpd,
+		    "dircache(did:%u,\"%s\"): {not in cache}",
+		    ntohl(dir->d_did), name);
+		dircache_stat.misses++;
+	}
 
-    return cdir;
+	return cdir;
 }
 
 /*!
@@ -431,10 +448,8 @@ struct dir *dircache_search_by_name(const struct vol *vol,
  *
  * @returns 0 on success, -1 on error which should result in an abort
  */
-int dircache_add(const struct vol *vol,
-                 struct dir *dir)
+int dircache_add(const struct vol *vol, struct dir *dir)
 {
-    struct dir *cdir = NULL;
     struct dir key;
     hnode_t *hn;
 
@@ -508,43 +523,46 @@ int dircache_add(const struct vol *vol,
   */
 void dircache_remove(const struct vol *vol _U_, struct dir *dir, int flags)
 {
-    hnode_t *hn;
+	hnode_t *hn;
 
-    AFP_ASSERT(dir);
-    AFP_ASSERT((flags & ~(QUEUE_INDEX | DIDNAME_INDEX | DIRCACHE)) == 0);
+	AFP_ASSERT(dir);
+	AFP_ASSERT((flags & ~(QUEUE_INDEX | DIDNAME_INDEX | DIRCACHE)) ==
+		   0);
 
-    if (flags & QUEUE_INDEX) {
-        /* remove it from the queue index */
-        dequeue(dir->qidx_node->prev); /* this effectively deletes the dequeued node */
-        queue_count--;
-    }
+	if (flags & QUEUE_INDEX) {
+		/* remove it from the queue index */
+		dequeue(dir->qidx_node->prev);	/* this effectively deletes the dequeued node */
+		queue_count--;
+	}
 
-    if (flags & DIDNAME_INDEX) {
-        if ((hn = hash_lookup(index_didname, dir)) == NULL) {
-            LOG(log_error, logtype_afpd, "dircache_remove(%u,\"%s\"): not in didname index", 
-                ntohl(dir->d_did), cfrombstr(dir->d_u_name));
-            dircache_dump();
-            AFP_PANIC("dircache_remove");
-        }
-        hash_delete_free(index_didname, hn);
-    }
+	if (flags & DIDNAME_INDEX) {
+		if ((hn = hash_lookup(index_didname, dir)) == NULL) {
+			LOG(log_error, logtype_afpd,
+			    "dircache_remove(%u,\"%s\"): not in didname index",
+			    ntohl(dir->d_did), cfrombstr(dir->d_u_name));
+			dircache_dump();
+			AFP_PANIC("dircache_remove");
+		}
+		hash_delete_free(index_didname, hn);
+	}
 
-    if (flags & DIRCACHE) {
-        if ((hn = hash_lookup(dircache, dir)) == NULL) {
-            LOG(log_error, logtype_afpd, "dircache_remove(%u,\"%s\"): not in dircache", 
-                ntohl(dir->d_did), cfrombstr(dir->d_u_name));
-            dircache_dump();
-            AFP_PANIC("dircache_remove");
-        }
-        hash_delete_free(dircache, hn);
-    }
+	if (flags & DIRCACHE) {
+		if ((hn = hash_lookup(dircache, dir)) == NULL) {
+			LOG(log_error, logtype_afpd,
+			    "dircache_remove(%u,\"%s\"): not in dircache",
+			    ntohl(dir->d_did), cfrombstr(dir->d_u_name));
+			dircache_dump();
+			AFP_PANIC("dircache_remove");
+		}
+		hash_delete_free(dircache, hn);
+	}
 
-    LOG(log_debug, logtype_afpd, "dircache(did:%u,\"%s\"): {removed}",
-        ntohl(dir->d_did), cfrombstr(dir->d_u_name));
+	LOG(log_debug, logtype_afpd, "dircache(did:%u,\"%s\"): {removed}",
+	    ntohl(dir->d_did), cfrombstr(dir->d_u_name));
 
-    dircache_stat.removed++;
-    AFP_ASSERT(queue_count == index_didname->hash_nodecount 
-               && queue_count == dircache->hash_nodecount);
+	dircache_stat.removed++;
+	AFP_ASSERT(queue_count == index_didname->hash_nodecount
+		   && queue_count == dircache->hash_nodecount);
 }
 
 /*!
@@ -563,40 +581,48 @@ void dircache_remove(const struct vol *vol _U_, struct dir *dir, int flags)
  */
 int dircache_init(int reqsize)
 {
-    dircache_maxsize = DEFAULT_MAX_DIRCACHE_SIZE;
+	dircache_maxsize = DEFAULT_MAX_DIRCACHE_SIZE;
 
-    /* Initialize the main dircache */
-    if (reqsize > DEFAULT_MAX_DIRCACHE_SIZE && reqsize < MAX_POSSIBLE_DIRCACHE_SIZE) {
-        while ((dircache_maxsize < MAX_POSSIBLE_DIRCACHE_SIZE) && (dircache_maxsize < reqsize))
-               dircache_maxsize *= 2;
-    }
-    if ((dircache = hash_create(dircache_maxsize, hash_comp_vid_did, hash_vid_did)) == NULL)
-        return -1;
-    
-    LOG(log_debug, logtype_afpd, "dircache_init: done. max dircache size: %u", dircache_maxsize);
+	/* Initialize the main dircache */
+	if (reqsize > DEFAULT_MAX_DIRCACHE_SIZE
+	    && reqsize < MAX_POSSIBLE_DIRCACHE_SIZE) {
+		while ((dircache_maxsize < MAX_POSSIBLE_DIRCACHE_SIZE)
+		       && (dircache_maxsize < reqsize))
+			dircache_maxsize *= 2;
+	}
+	if ((dircache =
+	     hash_create(dircache_maxsize, hash_comp_vid_did,
+			 hash_vid_did)) == NULL)
+		return -1;
 
-    /* Initialize did/name index hashtable */
-    if ((index_didname = hash_create(dircache_maxsize, hash_comp_didname, hash_didname)) == NULL)
-        return -1;
+	LOG(log_debug, logtype_afpd,
+	    "dircache_init: done. max dircache size: %u",
+	    dircache_maxsize);
 
-    /* Initialize index queue */
-    if ((index_queue = queue_init()) == NULL)
-        return -1;
-    else
-        queue_count = 0;
+	/* Initialize did/name index hashtable */
+	if ((index_didname =
+	     hash_create(dircache_maxsize, hash_comp_didname,
+			 hash_didname)) == NULL)
+		return -1;
 
-    /* Initialize index queue */
-    if ((invalid_dircache_entries = queue_init()) == NULL)
-        return -1;
+	/* Initialize index queue */
+	if ((index_queue = queue_init()) == NULL)
+		return -1;
+	else
+		queue_count = 0;
 
-    /* As long as directory.c hasn't got its own initializer call, we do it for it */
-    rootParent.d_did = DIRDID_ROOT_PARENT;
-    rootParent.d_fullpath = bfromcstr("ROOT_PARENT");
-    rootParent.d_m_name = bfromcstr("ROOT_PARENT");
-    rootParent.d_u_name = rootParent.d_m_name;
-    rootParent.d_rights_cache = 0xffffffff;
+	/* Initialize index queue */
+	if ((invalid_dircache_entries = queue_init()) == NULL)
+		return -1;
 
-    return 0;
+	/* As long as directory.c hasn't got its own initializer call, we do it for it */
+	rootParent.d_did = DIRDID_ROOT_PARENT;
+	rootParent.d_fullpath = bfromcstr("ROOT_PARENT");
+	rootParent.d_m_name = bfromcstr("ROOT_PARENT");
+	rootParent.d_u_name = rootParent.d_m_name;
+	rootParent.d_rights_cache = 0xffffffff;
+
+	return 0;
 }
 
 /*!
@@ -604,16 +630,15 @@ int dircache_init(int reqsize)
  */
 void log_dircache_stat(void)
 {
-    LOG(log_info, logtype_afpd, "dircache statistics: "
-        "entries: %lu, lookups: %llu, hits: %llu, misses: %llu, added: %llu, removed: %llu, expunged: %llu, evicted: %llu",
-        queue_count,
-        dircache_stat.lookups,
-        dircache_stat.hits,
-        dircache_stat.misses,
-        dircache_stat.added,
-        dircache_stat.removed,
-        dircache_stat.expunged,
-        dircache_stat.evicted);
+	LOG(log_info, logtype_afpd, "dircache statistics: "
+	    "entries: %lu, lookups: %llu, hits: %llu, misses: %llu, added: %llu, removed: %llu, expunged: %llu, evicted: %llu",
+	    queue_count,
+	    dircache_stat.lookups,
+	    dircache_stat.hits,
+	    dircache_stat.misses,
+	    dircache_stat.added,
+	    dircache_stat.removed,
+	    dircache_stat.expunged, dircache_stat.evicted);
 }
 
 /*!
@@ -621,78 +646,84 @@ void log_dircache_stat(void)
  */
 void dircache_dump(void)
 {
-    char tmpnam[64];
-    FILE *dump;
-    qnode_t *n = index_queue->next;
-    hnode_t *hn;
-    hscan_t hs;
-    const struct dir *dir;
-    int i;
+	char tmpnam[64];
+	FILE *dump;
+	qnode_t *n = index_queue->next;
+	hnode_t *hn;
+	hscan_t hs;
+	const struct dir *dir;
+	int i;
 
-    LOG(log_warning, logtype_afpd, "Dumping directory cache...");
+	LOG(log_warning, logtype_afpd, "Dumping directory cache...");
 
-    sprintf(tmpnam, "/tmp/dircache.%u", getpid());
-    if ((dump = fopen(tmpnam, "w+")) == NULL) {
-        LOG(log_error, logtype_afpd, "dircache_dump: %s", strerror(errno));
-        return;
-    }
-    setbuf(dump, NULL);
+	sprintf(tmpnam, "/tmp/dircache.%u", getpid());
+	if ((dump = fopen(tmpnam, "w+")) == NULL) {
+		LOG(log_error, logtype_afpd, "dircache_dump: %s",
+		    strerror(errno));
+		return;
+	}
+	setbuf(dump, NULL);
 
-    fprintf(dump, "Number of cache entries in LRU queue: %lu\n", queue_count);
-    fprintf(dump, "Configured maximum cache size: %u\n\n", dircache_maxsize);
+	fprintf(dump, "Number of cache entries in LRU queue: %lu\n",
+		queue_count);
+	fprintf(dump, "Configured maximum cache size: %u\n\n",
+		dircache_maxsize);
 
-    fprintf(dump, "Primary CNID index:\n");
-    fprintf(dump, "       VID     DID    CNID STAT PATH\n");
-    fprintf(dump, "====================================================================\n");
-    hash_scan_begin(&hs, dircache);
-    i = 1;
-    while ((hn = hash_scan_next(&hs))) {
-        dir = hnode_get(hn);
-        fprintf(dump, "%05u: %3u  %6u  %6u %s    %s\n",
-                i++,
-                ntohs(dir->d_vid),
-                ntohl(dir->d_pdid),
-                ntohl(dir->d_did),
-                dir->d_flags & DIRF_ISFILE ? "f" : "d",
-                cfrombstr(dir->d_fullpath));
-    }
+	fprintf(dump, "Primary CNID index:\n");
+	fprintf(dump, "       VID     DID    CNID STAT PATH\n");
+	fprintf(dump,
+		"====================================================================\n");
+	hash_scan_begin(&hs, dircache);
+	i = 1;
+	while ((hn = hash_scan_next(&hs))) {
+		dir = hnode_get(hn);
+		fprintf(dump, "%05u: %3u  %6u  %6u %s    %s\n",
+			i++,
+			ntohs(dir->d_vid),
+			ntohl(dir->d_pdid),
+			ntohl(dir->d_did),
+			dir->d_flags & DIRF_ISFILE ? "f" : "d",
+			cfrombstr(dir->d_fullpath));
+	}
 
-    fprintf(dump, "\nSecondary DID/name index:\n");
-    fprintf(dump, "       VID     DID    CNID STAT PATH\n");
-    fprintf(dump, "====================================================================\n");
-    hash_scan_begin(&hs, index_didname);
-    i = 1;
-    while ((hn = hash_scan_next(&hs))) {
-        dir = hnode_get(hn);
-        fprintf(dump, "%05u: %3u  %6u  %6u %s    %s\n",
-                i++,
-                ntohs(dir->d_vid),
-                ntohl(dir->d_pdid),
-                ntohl(dir->d_did),
-                dir->d_flags & DIRF_ISFILE ? "f" : "d",
-                cfrombstr(dir->d_fullpath));
-    }
+	fprintf(dump, "\nSecondary DID/name index:\n");
+	fprintf(dump, "       VID     DID    CNID STAT PATH\n");
+	fprintf(dump,
+		"====================================================================\n");
+	hash_scan_begin(&hs, index_didname);
+	i = 1;
+	while ((hn = hash_scan_next(&hs))) {
+		dir = hnode_get(hn);
+		fprintf(dump, "%05u: %3u  %6u  %6u %s    %s\n",
+			i++,
+			ntohs(dir->d_vid),
+			ntohl(dir->d_pdid),
+			ntohl(dir->d_did),
+			dir->d_flags & DIRF_ISFILE ? "f" : "d",
+			cfrombstr(dir->d_fullpath));
+	}
 
-    fprintf(dump, "\nLRU Queue:\n");
-    fprintf(dump, "       VID     DID    CNID STAT PATH\n");
-    fprintf(dump, "====================================================================\n");
+	fprintf(dump, "\nLRU Queue:\n");
+	fprintf(dump, "       VID     DID    CNID STAT PATH\n");
+	fprintf(dump,
+		"====================================================================\n");
 
-    for (i = 1; i <= queue_count; i++) {
-        if (n == index_queue)
-            break;
-        dir = (struct dir *)n->data;
-        fprintf(dump, "%05u: %3u  %6u  %6u %s    %s\n",
-                i,
-                ntohs(dir->d_vid),
-                ntohl(dir->d_pdid),
-                ntohl(dir->d_did),
-                dir->d_flags & DIRF_ISFILE ? "f" : "d",
-                cfrombstr(dir->d_fullpath));
-        n = n->next;
-    }
+	for (i = 1; i <= queue_count; i++) {
+		if (n == index_queue)
+			break;
+		dir = (struct dir *) n->data;
+		fprintf(dump, "%05u: %3u  %6u  %6u %s    %s\n",
+			i,
+			ntohs(dir->d_vid),
+			ntohl(dir->d_pdid),
+			ntohl(dir->d_did),
+			dir->d_flags & DIRF_ISFILE ? "f" : "d",
+			cfrombstr(dir->d_fullpath));
+		n = n->next;
+	}
 
-    fprintf(dump, "\n");
-    fflush(dump);
-    fclose(dump);
-    return;
+	fprintf(dump, "\n");
+	fflush(dump);
+	fclose(dump);
+	return;
 }

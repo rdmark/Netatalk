@@ -2,9 +2,6 @@ dnl configure.in for netatalk
 
 AC_INIT([netatalk], [m4_esyscmd([echo -n `cat VERSION`])])
 
-NETATALK_VERSION=`cat $srcdir/VERSION`
-AC_SUBST(NETATALK_VERSION)
-
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([subdir-objects])
 AM_CONFIG_HEADER(config.h)
@@ -20,7 +17,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
-AC_PROG_PERL
 AC_PROG_GREP
 AC_PROG_PS
 
@@ -28,13 +24,8 @@ AM_PROG_CC_C_O
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
-AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h limits.h stdint.h strings.h time.h sys/param.h sys/fcntl.h sys/file.h sys/ioctl.h sys/time.h sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h mntent.h syslog.h unistd.h termios.h sys/termios.h netdb.h sgtty.h ufs/quota.h mount.h statfs.h sys/types.h dlfcn.h errno.h sys/errno.h sys/uio.h langinfo.h locale.h sys/filio.h)
-AC_CHECK_HEADER(sys/cdefs.h,,
-	AC_MSG_RESULT([enabling generic cdefs.h from tree])
-	CFLAGS="-I\$(top_srcdir)/sys/generic $CFLAGS"
-)
 AC_CHECK_HEADERS([sys/mount.h], , , 
 [#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -71,7 +62,6 @@ AC_HEADER_MAJOR
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_UTIME_NULL
-AC_FUNC_WAIT3
 AC_CHECK_FUNCS(getcwd gethostname gettimeofday getusershell mkdir rmdir select socket strdup strcasestr strstr strtoul strchr memcpy)
 AC_CHECK_FUNCS(backtrace_symbols setlocale nl_langinfo strlcpy strlcat setlinebuf dirfd pselect access pread pwrite)
 AC_CHECK_FUNCS(waitpid getcwd strdup strndup strnlen strtoul strerror chown fchown chmod fchmod chroot link mknod mknod64)
@@ -143,6 +133,23 @@ dnl specific configuration comes in here:
 dnl --------------------------------------------------------------------------
 
 
+netatalk_cv_systemd_enable=no
+AC_MSG_CHECKING([for enabling and starting systemd services with make install])
+AC_ARG_ENABLE(systemd-start,
+ 	[  --enable-systemd-start   make install also enables and starts systemd services],[
+        if test x"$enableval" = x"yes"; then
+		AC_DEFINE(SYSTEMD_START, 1, [Define if make install enables systemd services])
+		netatalk_systemd_start=yes
+		AC_MSG_RESULT([no])
+	else
+		AC_DEFINE(SYSTEMD_START, 0, [Define if make install enables systemd services])
+		AC_MSG_RESULT([yes])
+        fi],[
+		AC_DEFINE(SYSTEMD_START, 0, [Define if make install enables systemd services])
+		AC_MSG_RESULT([yes])
+	]
+)
+
 netatalk_cv_admin_group=yes
 AC_MSG_CHECKING([for administrative group support])
 AC_ARG_ENABLE(admin-group,
@@ -159,8 +166,6 @@ AC_ARG_ENABLE(admin-group,
 		AC_MSG_RESULT([yes])
 	]
 )
-
-NETATALK_AFS_CHECK
 
 NETATALK_CONFIG_DIRS
 
@@ -189,104 +194,10 @@ AC_ARG_WITH(cracklib,
 AC_MSG_CHECKING([for cracklib support])
 AC_MSG_RESULT([$netatalk_cv_with_cracklib])
 
-netatalk_cv_ddp_enabled=no
-AC_MSG_CHECKING([whether to enable DDP])
-AC_ARG_ENABLE(ddp,
-	[  --enable-ddp            enable DDP (AppleTalk)],[
-	if test "$enableval" = "yes"; then 
-		AC_MSG_RESULT([yes])
-		netatalk_cv_ddp_enabled=yes
-	else
-		AC_MSG_RESULT([yes])
-		AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-		AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
-	]
-)
-
-AC_MSG_CHECKING([whether to enable debug code])
-AC_ARG_ENABLE(debug1,
-	[  --enable-debug1         enable debug code],[
-	if test "$enableval" != "no"; then
-		if test "$enableval" = "yes"; then
-			AC_DEFINE(DEBUG1, 1, [Define if debugging information should be included])
-		else
-			AC_DEFINE_UNQUOTED(DEBUG1, $enableval, [Define if debugging information should be included])
-		fi 
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
-
-AC_MSG_CHECKING([whether to enable verbose debug code])
-AC_ARG_ENABLE(debug,
-	[  --enable-debug          enable verbose debug code],[
-	if test "$enableval" != "no"; then
-		if test "$enableval" = "yes"; then
-			AC_DEFINE(DEBUG, 1, [Define if verbose debugging information should be included])
-		else
-			AC_DEFINE_UNQUOTED(DEBUG, $enableval, [Define if verbose debugging information should be included])
-		fi 
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-        AC_DEFINE(NDEBUG, 1, [Disable assertions])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-        AC_DEFINE(NDEBUG, 1, [Disable assertions])
-	]
-)
-
-AC_MSG_CHECKING([whether to enable debugging with debuggers])
-AC_ARG_ENABLE(debugging,
-	[  --enable-debugging      disable SIGALRM timers and DSI tickles (eg for debugging with gdb/dbx/...)],[
-	if test "$enableval" != "no"; then
-		if test "$enableval" = "yes"; then
-			AC_DEFINE(DEBUGGING, 1, [Define if you want to disable SIGALRM timers and DSI tickles])
-		else
-			AC_DEFINE_UNQUOTED(DEBUGGING, $enableval, [Define if you want to disable SIGALRM timers and DSI tickles])
-		fi 
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
+netatalk_cv_ddp_enabled=yes
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 AC_CHECK_ICONV
-
-dnl ----------- A NOTE ABOUT DROPKLUDGE
-dnl The trouble with this fix is that if you know what the file is called, it
-dnl can be read from the Unix side.  That's okay for most academic institutions
-dnl since the students don't have telnet access to the Mac servers.  There is
-dnl currently no one working on further development/fixes of DROPKLUDGE.
-dnl -----------
-
-netatalk_cv_dropkludge=no
-AC_MSG_CHECKING([whether to enable experimental dropbox support])
-AC_ARG_ENABLE(dropkludge,
-	[  --enable-dropkludge     enable the experimental dropbox fix (INSECURE!) ],[
-	if test "$enableval" = "yes"; then 
-		AC_DEFINE(DROPKLUDGE, 1, [Define if you want to use the experimental dropkludge support])
-		AC_MSG_RESULT([yes])
-		netatalk_cv_dropkludge=yes
-	else
-		AC_MSG_RESULT([no])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
 
 netatalk_cv_force_uidgid=no
 AC_MSG_CHECKING([whether to enable forcing of uid/gid per volume])
@@ -355,8 +266,6 @@ else
 	AC_MSG_RESULT([no])
 fi
 	
-	
-	
 netatalk_cv_use_shellcheck=yes
 AC_MSG_CHECKING([whether checking for a valid shell should be enabled])
 AC_ARG_ENABLE(shell-check,
@@ -389,56 +298,6 @@ AC_ARG_ENABLE(locking,
 		AC_MSG_RESULT([no])
 	]
 
-)
-
-AC_ARG_ENABLE(redhat,
-	[  --enable-redhat         obsoleted ],[
-	echo "ERROR: --enable-redhat is obsoleted. Use --enable-redhat-sysv or --enable-redhat-systemd."
-	exit 1
-	]
-)
-
-AC_ARG_ENABLE(redhat-sysv,
-	[  --enable-redhat-sysv    use redhat-style sysv (upstart) configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=redhat-sysv
-	fi
-	AC_MSG_RESULT([enabling redhat-style sysv support])
-	]
-)
-
-AC_ARG_ENABLE(redhat-systemd,
-	[  --enable-redhat-systemd use redhat-style systemd (>=Fedora15) configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=redhat-systemd
-	fi
-	AC_MSG_RESULT([enabling redhat-style systemd support])
-	]
-)
-
-AC_ARG_ENABLE(suse,
-	[  --enable-suse           obsoleted ],[
-	echo "ERROR: --enable-suse is obsoleted. Use --enable-suse-sysv or --enable-suse-systemd."
-	exit 1
-	]
-)
-
-AC_ARG_ENABLE(suse-sysv,
-	[  --enable-suse-sysv      use suse-style sysv configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=suse-sysv
-	fi
-	AC_MSG_RESULT([enabling suse-style sysv support])
-	]
-)
-
-AC_ARG_ENABLE(suse-systemd,
-	[  --enable-suse-systemd   use suse-style systemd (>=openSUSE12.1) configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=suse-systemd
-	fi
-	AC_MSG_RESULT([enabling suse-style systemd support])
-	]
 )
 
 AC_ARG_ENABLE(gentoo,
@@ -478,21 +337,21 @@ AC_ARG_ENABLE(systemd,
 
 dnl ----- timelord compilation (disabled by default)
 AC_MSG_CHECKING([whether timelord should be compiled])
-compile_timelord=no
+compile_timelord=yes
 AC_ARG_ENABLE(timelord,
 	[  --enable-timelord       enable compilation of timelord server],
 	[compile_timelord="$enableval"],
-	[compile_timelord="no"]
+	[compile_timelord="yes"]
 )
 AC_MSG_RESULT([$compile_timelord])
 
-dnl ----- a2boot compilation (disabled by default)
+dnl ----- a2boot compilation (enabled by default)
 AC_MSG_CHECKING([whether a2boot should be compiled])
-compile_a2boot=no
+compile_a2boot=yes
 AC_ARG_ENABLE(a2boot,
 	[  --enable-a2boot         enable compilation of Apple2 boot server],
 	[compile_a2boot="$enableval"],
-	[compile_a2boot="no"]
+	[compile_a2boot="yes"]
 )
 AC_MSG_RESULT([$compile_a2boot])
 
@@ -570,78 +429,25 @@ dnl ac_cv_target_os is now host_os, ac_cv_target_cpu is now host_cpu
 
 dnl --------------------- determine operating system from "target"
 case "$host_os" in
-	*aix*)				this_os=aix ;;
-	*kfreebsd*-gnu)			this_os=kfreebsd-gnu ;;
-	*freebsd*) 			this_os=freebsd ;;
-	*hpux11*)			this_os=hpux11 ;;
-	*irix*)				this_os=irix ;;
 	*linux*)   			this_os=linux ;;
-	*osx*)				this_os=macosx ;;
-	*darwin*)			this_os=macosx ;;
-	*netbsd*) 			this_os=netbsd ;;
-	*openbsd*) 			this_os=openbsd ;;
-	*osf*) 				this_os=tru64 ;;
+	*netbsd*) 			this_os=netbsd; CFLAGS="${CFLAGS} -I/usr/pkg/include"; LIBS="${LIBS} -L/usr/pkg/lib" ;;
 	*solaris*) 			this_os=solaris ;;
 esac
 
 case "$host_cpu" in
 	i386|i486|i586|i686|k7)		this_cpu=x86 ;;
-	alpha)						this_cpu=alpha ;;
-	mips)						this_cpu=mips ;;
-	powerpc|ppc)				this_cpu=ppc ;;
+	alpha)				this_cpu=alpha ;;
+	mips)				this_cpu=mips ;;
+	powerpc|ppc)			this_cpu=ppc ;;
 esac
 
 dnl --------------------- GNU source
 case "$this_os" in
 	linux)	AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
         ;;
-     kfreebsd-gnu) AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
-        ;;
 esac
 
 dnl --------------------- operating system specific flags (port from sys/*)
-
-dnl ----- AIX specific -----
-if test x"$this_os" = "xaix"; then
-	AC_MSG_RESULT([ * AIX specific configuration])
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
-
-	dnl This is probably a lie; AIX 4.3 supports a 64-bit long
-	dnl compilation environment.  It's enough to get things defined
-	dnl right in endian.h provided that long long is supported, though.
-	AC_DEFINE(HAVE_32BIT_LONGS, 1, [Define if the data type long has 32 bit])
-fi
-
-dnl ----- FreeBSD specific -----
-if test x"$this_os" = "xfreebsd"; then 
-	AC_MSG_RESULT([ * FreeBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EMLINK, errno returned by open with O_NOFOLLOW)
-fi
-
-dnl ----- GNU/kFreeBSD specific -----
-if test x"$this_os" = "xkfreebsd-gnu"; then 
-	AC_MSG_RESULT([ * GNU/kFreeBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EMLINK, errno returned by open with O_NOFOLLOW)
-fi
-
-dnl ----- HP-UX 11 specific -----
-if test x"$this_os" = "xhpux11"; then
-	AC_MSG_RESULT([ * HP-UX 11 specific configuration])
-
-	AC_DEFINE(_ISOC9X_SOURCE, 1, [Compatibility macro])
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
-fi
-
-dnl ----- IRIX specific -----
-if test x"$this_os" = "xirix"; then
-	AC_MSG_RESULT([ * IRIX specific configuration])
-
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
-fi
 
 dnl ----- Linux specific -----
 if test x"$this_os" = "xlinux"; then 
@@ -668,47 +474,14 @@ if test "x$ac_have_atalk_addr" = "xyes"; then
 	AC_DEFINE(HAVE_ATALK_ADDR, 1, [set if struct at_addr is called atalk_addr])
 fi
 
-	dnl ----- check if we need the quotactl wrapper
+dnl ----- check if we need the quotactl wrapper
 #	AC_CHECK_HEADERS(sys/quota.h linux/quota.h)
 #	AC_CHECK_FUNC(quotactl,,
 #		AC_DEFINE(NEED_QUOTACTL_WRAPPER, 1, [Define if the quotactl wrapper is needed])
 #		AC_MSG_RESULT([enabling quotactl wrapper])
 #	)
-
-        # For quotas on Linux XFS filesystems
-        
-        # For linux > 2.5.56
-        AC_CHECK_HEADERS(linux/dqblk_xfs.h,,
-		[AC_CHECK_HEADERS(linux/xqm.h linux/xfs_fs.h)
-        	AC_CHECK_HEADERS(xfs/libxfs.h xfs/xqm.h xfs/xfs_fs.h)]
-	)
-
-
-	dnl ----- as far as I can tell, dbtob always does the wrong thing
-	dnl ----- on every single version of linux I've ever played with.
-	dnl ----- see etc/afpd/quota.c
-	AC_DEFINE(HAVE_BROKEN_DBTOB, 1, [Define if dbtob is broken])
-
-
-	dnl ----- Linux/alpha specific -----
-	if test x"$this_cpu" = "xalpha"; then 
-		AC_MSG_RESULT([enabling gcc memcpy bug workaround])
-		AC_DEFINE(HAVE_GCC_MEMCPY_BUG, 1, [Define if memcpy is buggy])
-	fi
-	need_dash_r=no
-
-
-fi
-
-dnl ----- Mac OSX specific -----
-if test x"$this_os" = "xmacosx"; then 
-	AC_MSG_RESULT([ * Mac OSX specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(HAVE_2ARG_DBTOB, 1, [Define if dbtob takes two arguments])
-	dnl AC_DEFINE(NO_DLFCN_H)
-	AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
 	AC_DEFINE(NO_QUOTA_SUPPORT, 1, [Define if Quota support should be disabled])
-	AC_DEFINE(MACOSX_SERVER, 1, [Define if compiling for MacOS X Server])
+
 fi
 
 dnl ----- NetBSD specific -----
@@ -716,22 +489,9 @@ if test x"$this_os" = "xnetbsd"; then
 	AC_MSG_RESULT([ * NetBSD specific configuration])
 	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
 	AC_DEFINE(NETBSD, 1, [Define if OS is NetBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EFTYPE, errno returned by open with O_NOFOLLOW)
+	AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EFTYPE, errno returned by open with O_NOFOLLOW)
 
-	CFLAGS="-I\$(top_srcdir)/sys/netbsd $CFLAGS"
 	need_dash_r=yes 
-
-	dnl ----- NetBSD does not have crypt.h, uses unistd.h -----
-	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
-fi
-
-dnl ----- OpenBSD specific -----
-if test x"$this_os" = "xopenbsd"; then 
-	AC_MSG_RESULT([ * OpenBSD specific configuration])
-    AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	dnl ----- OpenBSD does not have crypt.h, uses unistd.h -----
-	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
-    AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
 fi
 
 dnl ----- Solaris specific -----
@@ -828,23 +588,6 @@ netatalk_cv_HAVE_TIMEOUT_ID_T=yes,netatalk_cv_HAVE_TIMEOUT_ID_T=no,netatalk_cv_H
 	AC_SUBST(KLDFLAGS)
 fi
 
-dnl ----- Tru64 specific -----
-if test x"$this_os" = "xtru64"; then 
-	AC_MSG_RESULT([ * Tru64 specific configuration])
-	AC_DEFINE(NO_DDP, 1, [Define if DDP should be disabled])
-	AC_DEFINE(HAVE_64BIT_LONGS, 1, [Define if the data type long has 64 bit])
-	dnl AC_DEFINE(USE_MOUNT_H)
-	AC_DEFINE(USE_OLD_RQUOTA, 1, [Define to use old rquota])
-	dnl AC_DEFINE(USE_UFS_QUOTA_H)
-	AC_DEFINE(TRU64, 1, [Define on Tru64 platforms])
-	AC_DEFINE(_OSF_SOURCE, 1, [Define if the *passwd UAMs should be used])
-	AC_DEFINE(_XOPEN_SOURCE_EXTENDED, 1, [Define for Berkeley DB 4])
-	AC_CHECK_LIB(security,set_auth_parameters)
-	CFLAGS="-I\$(top_srcdir)/sys/tru64 $CFLAGS"
-	need_dash_r=no
-	sysv_style=tru64
-fi
-
 dnl ------ Check for sendfile() --------
 netatalk_cv_search_sendfile=yes
 AC_ARG_ENABLE(sendfile,
@@ -864,11 +607,6 @@ if test x"$netatalk_cv_search_sendfile" = x"yes"; then
     *solaris*)
         AC_DEFINE(SENDFILE_FLAVOR_SOLARIS, 1, [Solaris sendfile()])
         AC_SEARCH_LIBS(sendfile, sendfile)
-        AC_CHECK_FUNC([sendfile], [netatalk_cv_HAVE_SENDFILE=yes])
-        ;;
-
-    *freebsd*)
-        AC_DEFINE(SENDFILE_FLAVOR_BSD, 1, [Define if the sendfile() function uses BSD semantics])
         AC_CHECK_FUNC([sendfile], [netatalk_cv_HAVE_SENDFILE=yes])
         ;;
 
@@ -914,8 +652,8 @@ dnl --------------------- check for building PGP UAM module
 AC_MSG_CHECKING([whether the PGP UAM should be build])
 AC_ARG_ENABLE(pgp-uam,
 	[  --enable-pgp-uam        enable build of PGP UAM module],[
-	if test "$enableval" = "yes"; then 
-		if test "x$neta_cv_have_openssl" = "xyes"; then 
+	if test "$enableval" = "yes"; then
+		if test "x$neta_cv_have_openssl" = "xyes"; then
 			AC_DEFINE(UAM_PGP, 1, [Define if the PGP UAM module should be compiled])
 			compile_pgp=yes
 			AC_MSG_RESULT([yes])
@@ -959,7 +697,7 @@ AC_ARG_ENABLE(krbV-uam,
 			])
 		fi
 	]
-	
+
 )
 
 AC_MSG_CHECKING([whether Kerberos V UAM should be build])
@@ -971,7 +709,6 @@ fi
 AM_CONDITIONAL(USE_GSSAPI, test x"$netatalk_cv_build_krb5_uam" = x"yes")
 
 dnl --------------------- overwrite the config files . . . or not.
-
 AC_MSG_CHECKING([whether configuration files should be overwritten])
 AC_ARG_ENABLE(overwrite,
 	[  --enable-overwrite      overwrite configuration files during installation],
@@ -1015,19 +752,20 @@ if test x"$with_ldap" = x"yes"; then
 fi
 
 dnl --------------------- check for ACL support
+with_acl_support=no
 AC_MSG_CHECKING(whether to support ACLs)
 AC_ARG_WITH(acls,
     [AS_HELP_STRING([--with-acls],
-        [Include ACL support (default=auto)])],
+        [Include ACL support (default=no)])],
     [ case "$withval" in
       yes|no)
           with_acl_support="$withval"
 		  ;;
       *)
-          with_acl_support=auto
+          with_acl_support=no
           ;;
       esac ],
-    [with_acl_support=auto])
+    [with_acl_support=no])
 AC_MSG_RESULT($with_acl_support)
 
 if test x"$with_acl_support" = x"no"; then
@@ -1040,35 +778,10 @@ fi
 if test x"$with_acl_support" = x"yes" ; then
 	AC_MSG_NOTICE(checking whether ACL support is available:)
 	case "$host_os" in
-	*sysv5*)
-		AC_MSG_NOTICE(Using UnixWare ACLs)
-		AC_DEFINE(HAVE_UNIXWARE_ACLS,1,[Whether UnixWare ACLs are available])
-		;;
 	*solaris*)
 		AC_MSG_NOTICE(Using solaris ACLs)
 		AC_DEFINE(HAVE_SOLARIS_ACLS,1,[Whether solaris ACLs are available])
 		ACL_LIBS="$ACL_LIBS -lsec"
-		;;
-	*hpux*)
-		AC_MSG_NOTICE(Using HPUX ACLs)
-		AC_DEFINE(HAVE_HPUX_ACLS,1,[Whether HPUX ACLs are available])
-		;;
-	*irix*)
-		AC_MSG_NOTICE(Using IRIX ACLs)
-		AC_DEFINE(HAVE_IRIX_ACLS,1,[Whether IRIX ACLs are available])
-		;;
-	*aix*)
-		AC_MSG_NOTICE(Using AIX ACLs)
-		AC_DEFINE(HAVE_AIX_ACLS,1,[Whether AIX ACLs are available])
-		;;
-	*osf*)
-		AC_MSG_NOTICE(Using Tru64 ACLs)
-		AC_DEFINE(HAVE_TRU64_ACLS,1,[Whether Tru64 ACLs are available])
-		ACL_LIBS="$ACL_LIBS -lpacl"
-		;;
-	*darwin*)
-		AC_MSG_NOTICE(ACLs on Darwin currently not supported)
-		AC_DEFINE(HAVE_NO_ACLS,1,[Whether no ACLs support is available])
 		;;
 	*)
 		AC_CHECK_LIB(acl,acl_get_file,[ACL_LIBS="$ACL_LIBS -lacl"])
@@ -1152,37 +865,10 @@ AC_CHECK_HEADERS(sys/attributes.h attr/xattr.h sys/xattr.h sys/extattr.h sys/uio
 
 case "$this_os" in
 
-  *osf*)
-	AC_SEARCH_LIBS(getproplist, [proplist])
-	AC_CHECK_FUNCS([getproplist fgetproplist setproplist fsetproplist],
-                   [neta_cv_eas_sys_found=yes],
-                   [neta_cv_eas_sys_not_found=yes])
-	AC_CHECK_FUNCS([delproplist fdelproplist add_proplist_entry get_proplist_entry],,
-                   [neta_cv_eas_sys_not_found=yes])
-	AC_CHECK_FUNCS([sizeof_proplist_entry],,
-                   [neta_cv_eas_sys_not_found=yes])
-  ;;
-
   *solaris*)
 	AC_CHECK_FUNCS([attropen],
                    [neta_cv_eas_sys_found=yes],
                    [neta_cv_eas_sys_not_found=yes])
-  ;;
-
-  'freebsd')
-    AC_CHECK_FUNCS([extattr_delete_fd extattr_delete_file extattr_delete_link],
-                   [neta_cv_eas_sys_found=yes],
-                   [neta_cv_eas_sys_not_found=yes])
-    AC_CHECK_FUNCS([extattr_get_fd extattr_get_file extattr_get_link],,
-                   [neta_cv_eas_sys_not_found=yes])
-    AC_CHECK_FUNCS([extattr_list_fd extattr_list_file extattr_list_link],,
-                   [neta_cv_eas_sys_not_found=yes])
-    AC_CHECK_FUNCS([extattr_set_fd extattr_set_file extattr_set_link],,
-                   [neta_cv_eas_sys_not_found=yes])
-  ;;
-
-  *freebsd4* | *dragonfly* )
-    AC_DEFINE(BROKEN_EXTATTR, 1, [Does extattr API work])
   ;;
 
   *)
@@ -1214,29 +900,6 @@ case "$this_os" in
     fi
   ;;
 esac
-
-# Do xattr functions take additional options like on Darwin?
-if test x"$ac_cv_func_getxattr" = x"yes" ; then
-	AC_CACHE_CHECK([whether xattr interface takes additional options], smb_attr_cv_xattr_add_opt, [
-		old_LIBS=$LIBS
-		LIBS="$LIBS $ACL_LIBS"
-		AC_TRY_COMPILE([
-			#include <sys/types.h>
-			#if HAVE_ATTR_XATTR_H
-			#include <attr/xattr.h>
-			#elif HAVE_SYS_XATTR_H
-			#include <sys/xattr.h>
-			#endif
-		],[
-			getxattr(0, 0, 0, 0, 0, 0);
-		],
-	        [smb_attr_cv_xattr_add_opt=yes],
-		[smb_attr_cv_xattr_add_opt=no;LIBS=$old_LIBS])
-	])
-	if test x"$smb_attr_cv_xattr_add_opt" = x"yes"; then
-		AC_DEFINE(XATTR_ADD_OPT, 1, [xattr functions have additional options])
-	fi
-fi
 
 if test "x$neta_cv_eas_sys_found" = "xyes" ; then
    if test "x$neta_cv_eas_sys_not_found" != "xyes" ; then
@@ -1274,18 +937,17 @@ if test x"$neta_cv_REALPATH_TAKES_NULL" = x"yes"; then
     AC_DEFINE(REALPATH_TAKES_NULL,1,[Whether the realpath function allows NULL])
 fi
 
-dnl --------------------- Netatalk Webmin
-NETATALK_WEBMIN
-
 dnl --------------------- last minute substitutions
+
+dnl Comment/change this to deal with gcc "helpful" warnings
+
+CFLAGS="-Wall -Werror $CFLAGS"
 
 AC_SUBST(LIBS)
 AC_SUBST(CFLAGS)
 AC_SUBST(OVERWRITE_CONFIG)
 
 AM_CONDITIONAL(SOLARIS_MODULE, test x$solaris_module = xyes)
-AM_CONDITIONAL(COMPILE_TIMELORD, test x$compile_timelord = xyes)
-AM_CONDITIONAL(COMPILE_A2BOOT, test x$compile_a2boot = xyes)
 AM_CONDITIONAL(HAVE_LIBGCRYPT, test x$neta_cv_have_libgcrypt = xyes)
 AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
 AM_CONDITIONAL(HAVE_ACLS, test x"$with_acl_support" = x"yes")
@@ -1293,26 +955,21 @@ AM_CONDITIONAL(HAVE_LDAP, test x"$with_ldap" = x"yes")
 AM_CONDITIONAL(USE_DHX, test x$neta_cv_compile_dhx = xyes)
 AM_CONDITIONAL(USE_DHX2, test x$neta_cv_compile_dhx2 = xyes)
 AM_CONDITIONAL(USE_RANDNUM, test x$neta_cv_have_openssl = xyes)
-AM_CONDITIONAL(USE_KERBEROS, test x$compile_kerberos = xyes)
 AM_CONDITIONAL(USE_PAM_SO, test x$use_pam_so = xyes)
 AM_CONDITIONAL(USE_PAM, test x$netatalk_cv_install_pam = xyes)
 AM_CONDITIONAL(BUILD_PAM, test x$compile_pam = xyes)
-AM_CONDITIONAL(USE_PGP, test x$compile_pgp = xyes)
 AM_CONDITIONAL(DEFAULT_HOOK, test x$neta_cv_have_libgcrypt != xyes && test x$neta_cv_have_openssl != xyes)
 AM_CONDITIONAL(USE_NETBSD, test x$sysv_style = xnetbsd)
 AM_CONDITIONAL(USE_REDHAT_SYSV, test x$sysv_style = xredhat-sysv)
 AM_CONDITIONAL(USE_SUSE_SYSV, test x$sysv_style = xsuse-sysv)
 AM_CONDITIONAL(USE_SHADOWPW, test x$shadowpw = xyes)
-AM_CONDITIONAL(USE_TRU64, test x$sysv_style = xtru64)
 AM_CONDITIONAL(USE_SOLARIS, test x$sysv_style = xsolaris)
 AM_CONDITIONAL(USE_GENTOO, test x$sysv_style = xgentoo)
 AM_CONDITIONAL(USE_DEBIAN, test x$sysv_style = xdebian)
 AM_CONDITIONAL(USE_SYSTEMD, test x$sysv_style = xsystemd || test x$sysv_style = xredhat-systemd || test x$sysv_style = xsuse-systemd)
 AM_CONDITIONAL(USE_UNDEF, test x$sysv_style = x)
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
-AM_CONDITIONAL(USE_APPLETALK, test x$netatalk_cv_ddp_enabled = xyes)
-AM_CONDITIONAL(USE_CUPS, test x$enable_cups = xyes)
-AM_CONDITIONAL(HAVE_ATFUNCS, test x"$ac_neta_haveatfuncs" = x"yes")
+AM_CONDITIONAL(SYSTEMD_START, test x$netatalk_systemd_start = xyes)
 
 dnl --------------------- generate files
 
@@ -1354,7 +1011,6 @@ AC_OUTPUT([Makefile
 	etc/atalkd/Makefile
 	etc/cnid_dbd/Makefile
 	etc/uams/Makefile
-	etc/uams/uams_krb4/Makefile
 	etc/papd/Makefile
 	etc/psf/Makefile
 	include/Makefile
@@ -1366,16 +1022,13 @@ AC_OUTPUT([Makefile
 	libatalk/atp/Makefile
 	libatalk/bstring/Makefile
 	libatalk/cnid/Makefile
-	libatalk/cnid/cdb/Makefile
 	libatalk/cnid/last/Makefile
 	libatalk/cnid/dbd/Makefile
-	libatalk/cnid/tdb/Makefile
 	libatalk/compat/Makefile
 	libatalk/dsi/Makefile
 	libatalk/nbp/Makefile
 	libatalk/netddp/Makefile
 	libatalk/util/Makefile
-	libatalk/tdb/Makefile
 	libatalk/unicode/Makefile
 	libatalk/unicode/charsets/Makefile
 	libatalk/vfs/Makefile
@@ -1387,14 +1040,8 @@ AC_OUTPUT([Makefile
 	man/man5/Makefile
 	man/man8/Makefile
 	sys/Makefile
-	sys/generic/Makefile
-	sys/generic/sys/Makefile
 	sys/netatalk/Makefile
-	sys/netbsd/Makefile
-	sys/netbsd/netatalk/Makefile
 	sys/solaris/Makefile
-	sys/sunos/Makefile
-	sys/ultrix/Makefile
 	test/Makefile
 	test/afpd/Makefile
 	],

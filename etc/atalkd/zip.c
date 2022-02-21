@@ -5,9 +5,7 @@
  * All Rights Reserved. See COPYRIGHT.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,10 +16,6 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
-#ifdef TRU64
-#include <sys/mbuf.h>
-#include <net/route.h>
-#endif /* TRU64 */
 #include <net/if.h>
 #include <net/route.h>
 #include <netatalk/endian.h>
@@ -47,6 +41,7 @@
 
 struct ziptab	*ziptab = NULL, *ziplast = NULL;
 
+extern int debug;
 
 static int zonecheck(struct rtmptab *rtmp, struct interface *iface)
 {
@@ -740,10 +735,9 @@ int zip_packet(struct atport *ap,struct sockaddr_at *from, char *data, int len)
 	    break;
 
 	case ZIPOP_NOTIFY :
-#ifdef DEBUG
-	    printf( "zip notify from %u.%u\n", ntohs( from->sat_addr.s_net ),
+	    if ( debug ) 
+	        printf( "zip notify from %u.%u\n", ntohs( from->sat_addr.s_net ),
 		    from->sat_addr.s_node );
-#endif /* DEBUG */
 	    break;
 
 	default :
@@ -932,9 +926,10 @@ int zip_getnetinfo(struct interface *iface)
      */
     *data++ = 0;
 
-#ifdef BSD4_4
+    memset(&sat, 0, sizeof( struct sockaddr_at ));
+#ifdef __NetBSD__
     sat.sat_len = sizeof( struct sockaddr_at );
-#endif /* BSD4_4 */
+#endif /* __NetBSD__ */
     sat.sat_family = AF_APPLETALK;
     sat.sat_addr.s_net = 0;
     sat.sat_addr.s_node = ATADDR_BCAST;

@@ -5,13 +5,11 @@
  * All Rights Reserved.
  */
 
-# if defined( ultrix ) || defined( BSD4_4 )
+#if defined( __NetBSD__ )
 #include <net/if_llc.h>
-# else /* ultrix || BSD4_4 */
+#else				/* __NetBSD__ */
 
-#if defined( sun ) && !defined( __svr4__ )
 #include <net/if_ieee802.h>
-#endif /* sun && !__svr4__ */
 
 /*
  * Copyright (c) 1988 Regents of the University of California.
@@ -29,28 +27,28 @@
  */
 
 struct llc {
-	u_char	llc_dsap;
-	u_char	llc_ssap;
+	u_char llc_dsap;
+	u_char llc_ssap;
 	union {
-	    struct {
-		u_char control;
-		u_char format_id;
-		u_char class;
-		u_char window_x2;
-	    } type_u;
-	    struct {
-		u_char num_snd_x2;
-		u_char num_rcv_x2;
-	    } type_i;
-	    struct {
-		u_char control;
-		u_char num_rcv_x2;
-	    } type_s;
-	    struct {
-		u_char control;
-		u_char org_code[3];
-		u_short ether_type;
-	    } type_snap;
+		struct {
+			u_char control;
+			u_char format_id;
+			u_char class;
+			u_char window_x2;
+		} type_u;
+		struct {
+			u_char num_snd_x2;
+			u_char num_rcv_x2;
+		} type_i;
+		struct {
+			u_char control;
+			u_char num_rcv_x2;
+		} type_s;
+		struct {
+			u_char control;
+			u_char org_code[3];
+			u_short ether_type;
+		} type_snap;
 	} llc_un;
 };
 #define llc_control llc_un.type_u.control
@@ -70,14 +68,6 @@ struct llc {
 #define LLC_ISO_LSAP	0xfe
 #define LLC_SNAP_LSAP	0xaa
 
-# endif /* ultrix && BSD4_4 */
-
-#if defined( sun ) || defined( ibm032 )
-#define SIOCPHASE1	_IOW(i, 100, struct ifreq)	/* AppleTalk phase 1 */
-#define SIOCPHASE2	_IOW(i, 101, struct ifreq)	/* AppleTalk phase 2 */
-#endif /* sun || ibm032 */
-
-#if defined( ultrix ) || defined( BSD4_4 ) || defined( _IBMR2 )
 #define SIOCPHASE1	_IOW('i', 100, struct ifreq)	/* AppleTalk phase 1 */
 #define SIOCPHASE2	_IOW('i', 101, struct ifreq)	/* AppleTalk phase 2 */
-#endif /* ultrix || BSD4_4 || _IBMR2 */
+#endif				/* __NetBSD__ */

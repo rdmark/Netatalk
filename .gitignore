@@ -27,8 +27,8 @@ test-driver
 *.tar.gz
 *.diff.gz
 *~
-.gitignore
 *.o
 *.orig
 *.rej
 *.diff
+*.swp
