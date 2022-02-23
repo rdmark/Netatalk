@@ -647,67 +647,6 @@ fi
 dnl -- check for crypt
 AC_CRYPT
 
-dnl --------------------- check for building PGP UAM module
-
-AC_MSG_CHECKING([whether the PGP UAM should be build])
-AC_ARG_ENABLE(pgp-uam,
-	[  --enable-pgp-uam        enable build of PGP UAM module],[
-	if test "$enableval" = "yes"; then
-		if test "x$neta_cv_have_openssl" = "xyes"; then
-			AC_DEFINE(UAM_PGP, 1, [Define if the PGP UAM module should be compiled])
-			compile_pgp=yes
-			AC_MSG_RESULT([yes])
-		else
-			AC_MSG_RESULT([no])
-		fi
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
-
-dnl --------------------- check for building Kerberos v4 UAM module
-
-AC_MSG_CHECKING([whether the Kerberos IV UAM should be build])
-AC_ARG_ENABLE(krb4-uam,
-	[  --enable-krb4-uam       enable build of Kerberos v4 UAM module],[
-	if test "$enableval" = "yes"; then
-		AC_DEFINE(UAM_KRB4, 1, [Define if the Kerberos 4 UAM module should be compiled])
-		compile_kerberos=yes
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
-
-dnl --------------------- check for building Kerberos V UAM module
-
-netatalk_cv_build_krb5_uam=no
-AC_ARG_ENABLE(krbV-uam,
-	[  --enable-krbV-uam       enable build of Kerberos V UAM module],
-	[
-		if test x"$enableval" = x"yes"; then
-			NETATALK_GSSAPI_CHECK([
-				netatalk_cv_build_krb5_uam=yes
-			],[
-				AC_MSG_ERROR([need GSSAPI to build Kerberos V UAM])
-			])
-		fi
-	]
-
-)
-
-AC_MSG_CHECKING([whether Kerberos V UAM should be build])
-if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then
-	AC_MSG_RESULT([yes])
-else
-	AC_MSG_RESULT([no])
-fi
-AM_CONDITIONAL(USE_GSSAPI, test x"$netatalk_cv_build_krb5_uam" = x"yes")
-
 dnl --------------------- overwrite the config files . . . or not.
 AC_MSG_CHECKING([whether configuration files should be overwritten])
 AC_ARG_ENABLE(overwrite,
@@ -717,8 +656,8 @@ AC_ARG_ENABLE(overwrite,
 )
 AC_MSG_RESULT([$OVERWRITE_CONFIG])
 
-dnl --------------------- check for LDAP support, for client-side ACL visibility
-AC_MSG_CHECKING(for LDAP (necessary for client-side ACL visibility))
+dnl --------------------- check for LDAP support
+AC_MSG_CHECKING(for LDAP)
 AC_ARG_WITH(ldap,
     [AS_HELP_STRING([--with-ldap],
         [LDAP support (default=auto)])],
@@ -749,111 +688,6 @@ fi
 
 if test x"$with_ldap" = x"yes"; then
 	AC_DEFINE(HAVE_LDAP,1,[Whether LDAP is available])
-fi
-
-dnl --------------------- check for ACL support
-with_acl_support=no
-AC_MSG_CHECKING(whether to support ACLs)
-AC_ARG_WITH(acls,
-    [AS_HELP_STRING([--with-acls],
-        [Include ACL support (default=no)])],
-    [ case "$withval" in
-      yes|no)
-          with_acl_support="$withval"
-		  ;;
-      *)
-          with_acl_support=no
-          ;;
-      esac ],
-    [with_acl_support=no])
-AC_MSG_RESULT($with_acl_support)
-
-if test x"$with_acl_support" = x"no"; then
-	AC_MSG_RESULT(Disabling ACL support)
-	AC_DEFINE(HAVE_NO_ACLS,1,[Whether no ACLs support should be built in])
-else
-    with_acl_support=yes
-fi
-
-if test x"$with_acl_support" = x"yes" ; then
-	AC_MSG_NOTICE(checking whether ACL support is available:)
-	case "$host_os" in
-	*solaris*)
-		AC_MSG_NOTICE(Using solaris ACLs)
-		AC_DEFINE(HAVE_SOLARIS_ACLS,1,[Whether solaris ACLs are available])
-		ACL_LIBS="$ACL_LIBS -lsec"
-		;;
-	*)
-		AC_CHECK_LIB(acl,acl_get_file,[ACL_LIBS="$ACL_LIBS -lacl"])
-		case "$host_os" in
-		*linux*)
-			AC_CHECK_LIB(attr,getxattr,[ACL_LIBS="$ACL_LIBS -lattr"])
-			;;
-		esac
-		AC_CACHE_CHECK([for POSIX ACL support],netatalk_cv_HAVE_POSIX_ACLS,[
-			acl_LIBS=$LIBS
-			LIBS="$LIBS $ACL_LIBS"
-			AC_TRY_LINK([
-				#include <sys/types.h>
-				#include <sys/acl.h>
-			],[
-				acl_t acl;
-				int entry_id;
-				acl_entry_t *entry_p;
-				return acl_get_entry(acl, entry_id, entry_p);
-			],
-			[netatalk_cv_HAVE_POSIX_ACLS=yes],
-			[netatalk_cv_HAVE_POSIX_ACLS=no
-                with_acl_support=no])
-			LIBS=$acl_LIBS
-		])
-		if test x"$netatalk_cv_HAVE_POSIX_ACLS" = x"yes"; then
-			AC_MSG_NOTICE(Using POSIX ACLs)
-			AC_DEFINE(HAVE_POSIX_ACLS,1,[Whether POSIX ACLs are available])
-			AC_CACHE_CHECK([for acl_get_perm_np],netatalk_cv_HAVE_ACL_GET_PERM_NP,[
-				acl_LIBS=$LIBS
-				LIBS="$LIBS $ACL_LIBS"
-				AC_TRY_LINK([
-					#include <sys/types.h>
-					#include <sys/acl.h>
-				],[
-					acl_permset_t permset_d;
-					acl_perm_t perm;
-					return acl_get_perm_np(permset_d, perm);
-				],
-				[netatalk_cv_HAVE_ACL_GET_PERM_NP=yes],
-				[netatalk_cv_HAVE_ACL_GET_PERM_NP=no])
-				LIBS=$acl_LIBS
-			])
-			if test x"$netatalk_cv_HAVE_ACL_GET_PERM_NP" = x"yes"; then
-				AC_DEFINE(HAVE_ACL_GET_PERM_NP,1,[Whether acl_get_perm_np() is available])
-			fi
-
-			AC_CACHE_CHECK([for acl_from_mode], netatalk_cv_HAVE_ACL_FROM_MODE,[
-				acl_LIBS=$LIBS
-				LIBS="$LIBS $ACL_LIBS"
-                AC_CHECK_FUNCS(acl_from_mode,
-				[netatalk_cv_HAVE_ACL_FROM_MODE=yes],
-				[netatalk_cv_HAVE_ACL_FROM_MODE=no])
-				LIBS=$acl_LIBS
-			])
-			if test x"netatalk_cv_HAVE_ACL_FROM_MODE" = x"yes"; then
-				AC_DEFINE(HAVE_ACL_FROM_MODE,1,[Whether acl_from_mode() is available])
-			fi
-
-
-		else
-			AC_MSG_NOTICE(ACL support is not avaliable)
-			AC_DEFINE(HAVE_NO_ACLS,1,[Whether no ACLs support is available])
-		fi
-		;;
-    esac
-fi
-
-if test x"$with_acl_support" = x"yes" ; then
-   AC_CHECK_HEADERS([acl/libacl.h])
-    AC_DEFINE(HAVE_ACLS,1,[Whether ACLs support is available])
-    AC_SUBST(ACL_LIBS)
 fi
 
 dnl --------------------- check for Extended Attributes support
@@ -950,7 +784,6 @@ AC_SUBST(OVERWRITE_CONFIG)
 AM_CONDITIONAL(SOLARIS_MODULE, test x$solaris_module = xyes)
 AM_CONDITIONAL(HAVE_LIBGCRYPT, test x$neta_cv_have_libgcrypt = xyes)
 AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
-AM_CONDITIONAL(HAVE_ACLS, test x"$with_acl_support" = x"yes")
 AM_CONDITIONAL(HAVE_LDAP, test x"$with_ldap" = x"yes")
 AM_CONDITIONAL(USE_DHX, test x$neta_cv_compile_dhx = xyes)
 AM_CONDITIONAL(USE_DHX2, test x$neta_cv_compile_dhx2 = xyes)

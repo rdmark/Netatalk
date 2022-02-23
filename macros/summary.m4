@@ -33,20 +33,9 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	if test "x$neta_cv_have_openssl" = "xyes"; then
 		AC_MSG_RESULT([         RANDNUM (afppasswd)])
 	fi
-	if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then
-		AC_MSG_RESULT([         Kerberos V])
-	fi
-	if test x"$compile_kerberos" = x"yes"; then
-		AC_MSG_RESULT([         Kerberos IV])
-	fi
-	if test x"$compile_pgp" = x"yes"; then
-		AC_MSG_RESULT([         PGP])
-	fi
 	AC_MSG_RESULT([         clrtxt  ($uams_using_options)])
 	AC_MSG_RESULT([         guest])
 	AC_MSG_RESULT([    Options:])
-	AC_MSG_RESULT([         CUPS support:            $netatalk_cv_use_cups])
-	AC_MSG_RESULT([         Apple 2 boot support:    $compile_a2boot])
 	AC_MSG_RESULT([         SLP support:             $netatalk_cv_srvloc])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
 	AC_MSG_RESULT([         tcp wrapper support:     $netatalk_cv_tcpwrap])
@@ -58,7 +47,6 @@ dnl	fi
 	AC_MSG_RESULT([         valid shell check:       $netatalk_cv_use_shellcheck])
 	AC_MSG_RESULT([         cracklib support:        $netatalk_cv_with_cracklib])
 	AC_MSG_RESULT([         force volume uid/gid:    $netatalk_cv_force_uidgid])
-	AC_MSG_RESULT([         ACL support:             $with_acl_support])
 	AC_MSG_RESULT([         LDAP support:            $with_ldap])
 	if test x"$use_pam_so" = x"yes" -a x"$netatalk_cv_install_pam" = x"no"; then
 		AC_MSG_RESULT([])
@@ -102,11 +90,6 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([    BDB:])
 		AC_MSG_RESULT([        LIBS   = $BDB_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $BDB_CFLAGS])
-	fi
-	if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then
-		AC_MSG_RESULT([    GSSAPI:])
-		AC_MSG_RESULT([        LIBS   = $GSSAPI_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $GSSAPI_CFLAGS])
 	fi
 	if test x"$netatalk_cv_srvloc" = x"yes"; then
 		AC_MSG_RESULT([    SRVLOC:])
