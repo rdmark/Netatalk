@@ -491,25 +491,13 @@ The AFP protocol mostly refers to files and directories by ID and not by name\&.
 \&.AppleDB
 folder in the volume root\&.
 .PP
-cdb
-.RS 4
-"Concurrent database", backend is based on Sleepycat\*(Aqs Berkely DB\&. With this backend several
-\fBafpd\fR
-deamons access the CNID database directly\&. Berkeley DB locking is used to synchronize access, if more than one
-\fBafpd\fR
-process is active for a volume\&. The drawback is, that the crash of a single
-\fBafpd\fR
-process might corrupt the database\&.
-.RE
-.PP
 dbd
 .RS 4
 Access to the CNID database is restricted to the
 \fBcnid_metad\fR
 daemon process\&.
 \fBafpd\fR
-processes communicate with the daemon for database reads and updates\&. If built with Berkeley DB transactions the probability for database corruption is practically zero, but performance can be slower than with
-\fBcdb\fR
+processes communicate with the daemon for database reads and updates\&. If built with Berkeley DB transactions the probability for database corruption is practically zero.
 .RE
 .PP
 last
@@ -630,17 +618,6 @@ crlf
 Enables crlf translation for TEXT files, automatically converting macintosh line breaks into Unix ones\&. Use of this option might be dangerous since some older programs store binary data files as type "TEXT" when saving and switch the filetype in a second step\&.
 \fBAfpd\fR
 will potentially destroy such files when "erroneously" changing bytes in order to do line break translation\&.
-.RE
-.PP
-dropbox
-.RS 4
-Allows a volume to be declared as being a "dropbox\&." Note that netatalk must be compiled with dropkludge support for this to function\&.
-\fIWarning\fR: This option is deprecated and might not work as expected\&.
-.RE
-.PP
-dropkludge
-.RS 4
-same as "dropbox"\&.
 .RE
 .PP
 mswindows

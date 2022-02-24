@@ -110,21 +110,11 @@ uams_dhx2\&.so
 .RS 4
 (uams_dhx2_pam\&.so or uams_dhx2_passwd\&.so) Allow Diffie\-Hellman eXchange 2 (DHX2) for authentication\&.
 .RE
-.PP
-uam_gss\&.so
-.RS 4
-Allow Kerberos V for authentication (optional)
-.RE
 .RE
 .PP
 \-uampath \fI[path]\fR
 .RS 4
 Sets the default path for UAMs for this server (default is :ETCDIR:/uams)\&.
-.RE
-.PP
-\-k5keytab \fI[path]\fR, \-k5service \fI[service]\fR, \-k5realm \fI[realm]\fR
-.RS 4
-These are required if the server supports the Kerberos 5 authentication UAM\&.
 .RE
 .PP
 \-ntdomain, \-ntseparator
@@ -395,30 +385,6 @@ Maximum possible entries in the directory cache\&. The cache stores directories 
 Default size is 8192, maximum size is 131072\&. Given value is rounded up to nearest power of 2\&. Each entry takes about 100 bytes, which is not much, but remember that every afpd child process for every connected user has its cache\&.
 .RE
 .PP
-\-fcelistener \fIhost[:port]\fR
-.RS 4
-Enables sending FCE events to the specified
-\fIhost\fR, default
-\fIport\fR
-is 12250 if not specified\&. Specifying mutliple listeners is done by having this option once for each of them\&.
-.RE
-.PP
-\-fceevents \fIfmod,fdel,ddel,fcre,dcre,tmsz\fR
-.RS 4
-Speficies which FCE events are active, default is
-\fIfmod,fdel,ddel,fcre,dcre\fR\&.
-.RE
-.PP
-\-fcecoalesce \fIall|delete|create\fR
-.RS 4
-Coalesce FCE events\&.
-.RE
-.PP
-\-fceholdfmod \fIseconds\fR
-.RS 4
-This determines the time delay in seconds which is always waited if another file modification for the same file is done by a client before sending an FCE file modification event (fmod)\&. For example saving a file in Photoshop would generate multiple events by itself because the application is opening, modifying and closing a file mutliple times for every "save"\&. Defautl: 60 seconds\&.
-.RE
-.PP
 \-guestname \fI[name]\fR
 .RS 4
 Specifies the user that guests should use (default is "nobody")\&. The name should be quoted\&.
@@ -444,11 +410,6 @@ and should be quoted\&. Extended characters are allowed\&.
 \-mimicmodel \fImodel\fR
 .RS 4
 Specifies the icon model that appears on clients\&. Defaults to off\&. Examples: RackMac (same as Xserve), PowerBook, PowerMac, Macmini, iMac, MacBook, MacBookPro, MacBookAir, MacPro, AppleTV1,1, AirPort\&.
-.RE
-.PP
-\-noacl2maccess
-.RS 4
-Don\'t map filesystem ACLs to effective permissions\&.
 .RE
 .PP
 \-nodebug
@@ -626,20 +587,6 @@ Specify the number of tickles to send before timing out a connection\&. The defa
 .\}
 .nf
 \- \-maccodepage mac_cyrillic \-unixcodepage utf8
-.fi
-.if n \{\
-.RE
-.\}
-.PP
-\fBExample.\ \&afpd.conf setup for Kerberos V auth with newline escaping\fR
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\- \-uamlist uams_dhx\&.so,uams_dhx2\&.so,uams_guest\&.so,uams_gss\&.so \e 
-\-k5service afpserver \-k5keytab /path/to/afpserver\&.keytab \e 
-\-k5realm YOUR\&.REALM \-fqdn your\&.fqdn\&.namel:548
 .fi
 .if n \{\
 .RE
