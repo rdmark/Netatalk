@@ -23,7 +23,6 @@
 #include <atalk/cnid.h>
 #include <atalk/unix.h>
 #include <atalk/globals.h>
-#include <atalk/fce_api.h>
 
 #include "directory.h"
 #include "dircache.h"

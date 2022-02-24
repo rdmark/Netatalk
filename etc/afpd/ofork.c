@@ -18,7 +18,6 @@
 #include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
 #include <atalk/globals.h>
-#include <atalk/fce_api.h>
 
 #include "volume.h"
 #include "directory.h"

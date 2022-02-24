@@ -27,7 +27,6 @@
 #include <atalk/bstradd.h>
 #include <atalk/acl.h>
 #include <atalk/globals.h>
-#include <atalk/fce_api.h>
 
 #include "directory.h"
 #include "dircache.h"
