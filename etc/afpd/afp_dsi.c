@@ -32,7 +32,6 @@
 #include <atalk/uuid.h>
 #include <atalk/paths.h>
 #include <atalk/server_ipc.h>
-#include <atalk/fce_api.h>
 
 #include <atalk/globals.h>
 #include "switch.h"
@@ -786,8 +785,6 @@ void afp_over_dsi(AFPObj * obj)
 			break;
 		}
 		pending_request(dsi);
-
-		fce_pending_events(obj);
 	}
 
 	/* error */
