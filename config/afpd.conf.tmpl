@@ -247,11 +247,6 @@
 #                         two independent afpd instances to have the same
 #                         signature and thus cause clients to be redirected
 #                         automatically to server (s)he logged in first.
-#     -k5keytab <path>
-#     -k5service <service>
-#     -k5realm <realm>
-#                         These are required if the server supports
-#                         Kerberos 5 authentication
 #     -ntdomain
 #     -ntseparator
 #                         Use for eg. winbind authentication, prepends
@@ -269,25 +264,6 @@
 #                         entry takes about 100 bytes, which is not much, but
 #                         remember that every afpd child process for every
 #                         connected user has its cache.
-#     -fcelistener host[:port]
-#                         Enables sending FCE events to the specified host,
-#                         default port is 12250 if not specified. Specifying
-#                         mutliple listeners is done by having this option
-#                         once for each of them.
-#     -fceevents fmod,fdel,ddel,fcre,dcre,tmsz
-#                         Speficies which FCE events are active, default is
-#                         fmod,fdel,ddel,fcre,dcre.
-#     -fcecoalesce all|delete|create
-#                         Coalesce FCE events.
-#     -fceholdfmod seconds
-#                         This determines the time delay in seconds which is
-#                         always waited if another file modification for the
-#                         same file is done by a client before sending an FCE
-#                         file modification event (fmod). For example saving
-#                         a file in Photoshop would generate multiple events
-#                         by itself because the application is opening,
-#                         modifying and closing a file mutliple times for
-#                         every "save". Defautl: 60 seconds.
 #     -keepsessions       Enable "Continuous AFP Service". This means the
 #                         ability to stop the master afpd process with a
 #                         SIGQUIT signal, possibly install an afpd update and
@@ -299,7 +275,6 @@
 #                         reconnect fails, the sessions are in an undefined
 #                         state. Therefor it's absolutely critical to restart
 #                         the master process in time!
-#     -noacl2maccess      Don't map filesystem ACLs to effective permissions.
 #
 #   Codepage Options:
 #     -unixcodepage <CODEPAGE>  Specifies the servers unix codepage,
