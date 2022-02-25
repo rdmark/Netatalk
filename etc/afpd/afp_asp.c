@@ -36,11 +36,6 @@
 #include "fork.h"
 #include "dircache.h"
 
-#ifdef FORCE_UIDGID
-#warning UIDGID
-#include "uid.h"
-#endif				/* FORCE_UIDGID */
-
 extern int debug;
 static AFPObj *child;
 
@@ -375,11 +370,6 @@ void afp_over_asp(AFPObj * obj)
 							     asp->data,
 							     &asp->
 							     datalen);
-#ifdef FORCE_UIDGID
-				/* bring everything back to old euid, egid */
-				if (obj->force_uid)
-					restore_uidgid(&obj->uidgid);
-#endif				/* FORCE_UIDGID */
 			} else {
 				LOG(log_error, logtype_afpd,
 				    "bad function %X", func);
@@ -419,11 +409,6 @@ void afp_over_asp(AFPObj * obj)
 							     asp->data,
 							     &asp->
 							     datalen);
-#ifdef FORCE_UIDGID
-				/* bring everything back to old euid, egid */
-				if (obj->force_uid)
-					restore_uidgid(&obj->uidgid);
-#endif				/* FORCE_UIDGID */
 			} else {
 				LOG(log_error, logtype_afpd,
 				    "(write) bad function %X", func);

@@ -363,11 +363,6 @@ static int login(AFPObj * obj, struct passwd *pwd, void (*logout)(void),
 	obj->uid = geteuid();
 	obj->logout = logout;
 
-#ifdef FORCE_UIDGID
-	obj->force_uid = 1;
-	save_uidgid(&obj->uidgid);
-#endif
-
 	/* pam_umask or similar might have changed our umask */
 	(void) umask(obj->options.umask);
 
