@@ -21,9 +21,15 @@ A breakdown of optional packages:
 - ``` libavahi-client-dev ``` -- Needed for zeroconf service discovery on Mac OS X / macOS
 - ``` libgcrypt20-dev ``` -- Needed for the DHX2 UAM that allows you to authenticate with a Mac OS X / macOS client
 
-An example configuration that enables systemd services, as well as Zeroconf for Bonjour service discovery on Mac OS X:
+An example configuration that enables systemd services and starts then during installation, as well as Zeroconf for Bonjour service discovery on Mac OS X 10.2+:
 ```
-$ ./configure --enable-systemd --enable-zeroconf
+$ ./configure --enable-systemd --enable-systemd-start --enable-zeroconf
+```
+
+The same, but with SLP support instead for Mac OS X 10.0 and 10.1 service discovery:
+```
+$ apt install libslp-dev
+$ ./configure --enable-systemd --enable-systemd-start --enable-srvloc --disable-zeroconf
 ```
 
 # Documentation
