@@ -14,19 +14,23 @@ Follow the installation steps in the [official Netatalk 2.2 documentation](http:
 
 As supplementary information when installing on Debian derivate Linux distros, you need at least these apt packages:
 ```
-libcups2-dev libssl-dev libdb-dev autotools-dev automake libtool
+$ apt install libssl-dev libdb-dev autotools-dev automake libtool
 ```
 
-A breakdown of optional packages:
-- ``` libavahi-client-dev ``` -- Needed for zeroconf service discovery on Mac OS X / macOS
-- ``` libgcrypt20-dev ``` -- Needed for the DHX2 UAM that allows you to authenticate with a Mac OS X / macOS client
-
-An example configuration that enables systemd services and starts then during installation, as well as Zeroconf for Bonjour service discovery on Mac OS X 10.2+:
+## Configuration Examples
+Classic Mac OS AppleTalk service discovery support only, with CUPS to enable printer sharing, running as systemd services that are enabled and started during installation.
 ```
+$ apt install libcups2-dev cups
+$ ./configure --enable-systemd --enable-systemd-start
+```
+
+Supporting Mac OS X 10.2 through macOS Mavericks: libgrypt to build the DHX2 UAM, as well as libavahi for Zeroconf (Bonjour) service discovery.
+```
+$ apt install libgcrypt20-dev libavahi-client-dev
 $ ./configure --enable-systemd --enable-systemd-start --enable-zeroconf
 ```
 
-The same, but with SLP support instead for Mac OS X 10.0 and 10.1 service discovery:
+Same as the above, but with SLP support instead of Zeroconf, for Mac OS X 10.0 and 10.1 service discovery.
 ```
 $ apt install libslp-dev
 $ ./configure --enable-systemd --enable-systemd-start --enable-srvloc --disable-zeroconf
