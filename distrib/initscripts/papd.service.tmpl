@@ -1,14 +1,14 @@
 # This file is part of Netatalk :VERSION:.
 
 [Unit]
-Description=Macintosh time server daemon
+Description=AppleTalk PAP printer server daemon
 After=syslog.target network.target atalkd.service
 Requires=atalkd.service
 
 [Service]
 Type=forking
 GuessMainPID=no
-ExecStart=:SBINDIR:/timelord -l
+ExecStart=:SBINDIR:/papd
 Restart=always
 RestartSec=1
 

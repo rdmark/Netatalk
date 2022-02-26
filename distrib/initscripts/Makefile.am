@@ -17,46 +17,44 @@ pkgconfdir = @PKGCONFDIR@
 	    <$< >$@
 
 GENERATED_FILES = \
+	rc.a2boot.netbsd	\
 	rc.afpd.netbsd		\
 	rc.atalk.redhat-sysv	\
-	rc.atalk.systemd	\
 	rc.atalkd.netbsd	\
 	rc.atalk.suse-sysv	\
 	rc.cnid_metad.netbsd	\
 	rc.papd.netbsd		\
 	rc.timelord.netbsd	\
-	rc.a2boot.netbsd	\
 	rc.atalk.sysv		\
 	rc.atalk.gentoo		\
 	rc.atalk.debian		\
-	service.afpd.systemd	\
-	service.cnid.systemd	\
-	service.atalkd.systemd	\
-	service.papd.systemd	\
-	service.timelord.systemd	\
-	service.a2boot.systemd
+	a2boot.service		\
+	afpd.service		\
+	cnid.service		\
+	atalkd.service		\
+	papd.service		\
+	timelord.service
 
 TEMPLATES = \
+	rc.a2boot.netbsd.tmpl		\
 	rc.afpd.netbsd.tmpl		\
 	rc.atalk.redhat-sysv.tmpl	\
-	rc.atalk.systemd.tmpl		\
 	rc.atalkd.netbsd.tmpl		\
 	rc.atalk.suse-sysv.tmpl		\
 	rc.cnid_metad.netbsd.tmpl	\
 	rc.papd.netbsd.tmpl		\
 	rc.timelord.netbsd.tmpl		\
-	rc.a2boot.netbsd.tmpl		\
 	rc.atalk.sysv.tmpl		\
 	rc.atalk.gentoo.tmpl		\
 	rc.atalk.debian.tmpl		\
-	service.afpd.systemd.tmpl	\
-	service.cnid.systemd.tmpl	\
-	service.atalkd.systemd.tmpl	\
-	service.papd.systemd.tmpl	\
-	service.timelord.systemd.tmpl	\
-	service.a2boot.systemd.tmpl
+	a2boot.service.tmpl		\
+	afpd.service.tmpl		\
+	cnidi.service.tmpl		\
+	atalkd.service.tmpl		\
+	papd.service.tmpl		\
+	timelord.service.tmpl
 
-CLEANFILES = $(GENERATED_FILES) $(sysv_SCRIPTS) $(service_afpd_DATA) $(service_cnid_DATA) ${service_atalkd_DATA} ${service_papd_DATA} ${service_timelord_DATA} ${service_a2boot_DATA} afpd atalkd cnid_metad papd timelord
+CLEANFILES = $(GENERATED_FILES) $(sysv_SCRIPTS) $(service_DATA) a2boot afpd atalkd cnid_metad papd timelord
 EXTRA_DIST = $(TEMPLATES)
 
 # overwrite automake uninstall
@@ -93,9 +91,9 @@ endif
 
 if USE_SYSTEMD
 
-servicedir	= /lib/systemd/system
+servicedir = /lib/systemd/system
 
-service_DATA	= a2boot.service afpd.service atalkd.service cnid.service papd.service timelord.service
+service_DATA = a2boot.service afpd.service atalkd.service cnid.service papd.service timelord.service
 
 install-data-hook:
 	-systemctl daemon-reload
