@@ -724,7 +724,7 @@ int getstatus(struct printer *pr, rbuf_t *buf)
 #else
 	char path[MAXPATHLEN];
 	char getstatus_buffer[255];
-	char *temp;
+	char *temp = NULL;
 	FILE *fd = NULL;
 	int rc;
 
