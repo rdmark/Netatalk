@@ -31,109 +31,71 @@ static void parser_error(struct papfile *outfile)
 int ps(struct papfile *infile, struct papfile *outfile,
        struct sockaddr_at *sat)
 {
-    char			*start;
-    int				linelength, crlflength;
-    struct papd_comment		*comment;
+	char *start;
+	int linelength, crlflength;
+	struct papd_comment *comment;
 
-    for (;;) {
-        if ( infile->pf_state & PF_STW ) {
-            infile->pf_state &= ~PF_STW;
-            /* set up spool file */
-            if ( lp_open( outfile, sat ) < 0 && !state) {
-                LOG(log_error, logtype_papd, "lp_open failed" );
-                spoolerror( outfile, "Ignoring job." );
-            }
-            state = 1;
-        }
-        if ( infile->pf_state & PF_QUERY )
-        {
-            infile->pf_state |= PF_BOT;
-        }
-        if ( (comment = compeek()) ) {
-            switch( (*comment->c_handler)( infile, outfile, sat )) {
-            case CH_DONE :
-                continue;
+	for (;;) {
+		if (infile->pf_state & PF_STW) {
+			infile->pf_state &= ~PF_STW;
+			/* set up spool file */
+			if (lp_open(outfile, sat) < 0 && !state) {
+				LOG(log_error, logtype_papd,
+				    "lp_open failed");
+				spoolerror(outfile, "Ignoring job.");
+			}
+			state = 1;
+		}
 
-            case CH_MORE :
-                return( CH_MORE );
+		if (infile->pf_state & PF_QUERY) {
+			infile->pf_state |= PF_BOT;
+		}
+		if ((comment = compeek())) {
+			switch ((*comment->c_handler) (infile, outfile,
+						       sat)) {
+			case CH_DONE:
+				continue;
 
-            case CH_ERROR :
-                parser_error(outfile);
-                return( 0 );
+			case CH_MORE:
+				return (CH_MORE);
 
-            default :
-                return( CH_ERROR );
-            }
-        } else {
-            switch ( markline( infile, &start, &linelength, &crlflength )) {
-            case 0 :
-                /* eof on infile */
-                outfile->pf_state |= PF_EOF;
-                lp_close();
-                return( 0 );
+			case CH_ERROR:
+				parser_error(outfile);
+				return (0);
 
-            case -2:
-                parser_error(outfile);
-                return( 0 );
+			default:
+				return (CH_ERROR);
+			}
+		} else {
+			switch (markline
+				(infile, &start, &linelength,
+				 &crlflength)) {
+			case 0:
+				/* eof on infile */
+				outfile->pf_state |= PF_EOF;
+				lp_close();
+				return (0);
 
-            case -1 :
-                spoolreply( outfile, "Processing..." );
-                return( 0 );
-            }
+			case -2:
+				parser_error(outfile);
+				return (0);
 
-            if ( infile->pf_state & PF_BOT ) {
-                if (( comment = commatch( start, start+linelength, magics )) != NULL ) {
-                    compush( comment );
-                    continue;	/* top of for (;;) */
-                } else {
-                    CONSUME( infile, linelength + crlflength );
-                    continue; /* clear out the input queue if client sent data before magic string */
-                }
-                if ((comment = compeek())) {
-                    switch ((*comment->c_handler) (infile, outfile,
-                                       sat)) {
-                        case CH_DONE:
-                            continue;
+			case -1:
+                spoolreply(outfile, "Processing...");
+				return (0);
+			}
 
-                        case CH_MORE:
-                            return (CH_MORE);
-
-                        case CH_ERROR:
-                            parser_error(outfile);
-                            return (0);
-
-                        default:
-                            return (CH_ERROR);
-                    }
-                } else {
-                    switch (markline
-                        (infile, &start, &linelength,
-                         &crlflength)) {
-                        case 0:
-                            /* eof on infile */
-                            outfile->pf_state |= PF_EOF;
-                            lp_close();
-                            return (0);
-
-                        case -2:
-                            parser_error(outfile);
-                            return (0);
-
-                        case -1:
-                            spoolreply( outfile, "Processing..." );
-                            return (0);
-                    }
-
-                    if (infile->pf_state & PF_BOT) {
-                        if ((comment =
-                             commatch(start, start + linelength,
-                                  magics)) != NULL) {
-                            compush(comment);
-                            continue;	/* top of for (;;) */
-                        } else {
-                            CONSUME( infile, linelength + crlflength );
-                            continue; /* clear out the input queue if client sent data before magic string */
-                        }
+			if (infile->pf_state & PF_BOT) {
+				if ((comment =
+				     commatch(start, start + linelength,
+					      magics)) != NULL) {
+					compush(comment);
+					continue;	/* top of for (;;) */
+				}
+			else {
+			    CONSUME(infile, linelength + crlflength);
+			    continue; /* clear out the input queue if client sent data before magic string */
+			}
 #if 0
                         infile->pf_state &= ~PF_BOT;
 
@@ -164,27 +126,27 @@ int cm_psquery(struct papfile *in, struct papfile *out,
     char		*start;
     int			linelength, crlflength;
 
-    for (;;) {
-	if ( in->pf_state & PF_QUERY )
-	{
-	    /* handle eof at end of query job */
-	    compop();
-	    return (CH_DONE);
-	}
-	switch ( markline( in, &start, &linelength, &crlflength )) {
-	case 0 :
-	    /* eof on infile */
-	    out->pf_state |= PF_EOF;
-	    compop();
-	    return( CH_DONE );
+	for (;;) {
+        if (in->pf_state & PF_QUERY)
+        {
+            /* handle eof at end of query job */
+            compop();
+            return (CH_DONE);
+        }
+		switch (markline(in, &start, &linelength, &crlflength)) {
+		case 0:
+			/* eof on infile */
+			out->pf_state |= PF_EOF;
+			compop();
+			return (CH_DONE);
 
-	case -1 :
-	    spoolreply( out, "Processing..." );
-	    return( CH_MORE );
+		case -1:
+            spoolreply(out, "Processing...");
+			return (CH_MORE);
 
-        case -2 :
-            return( CH_ERROR );
-	}
+		case -2:
+			return (CH_ERROR);
+		}
 
 		if (in->pf_state & PF_BOT) {
 			in->pf_state &= ~PF_BOT;

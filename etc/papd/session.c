@@ -53,29 +53,29 @@ static struct iovec niov[PAP_MAXQUANTUM] = {
  */
 int session(ATP atp, struct sockaddr_at *sat)
 {
-    struct timeval	tv;
-    struct atp_block	atpb;
-    struct sockaddr_at	ssat;
-    struct papfile	infile, outfile;
-    fd_set		fds;
-    char		cbuf[ 578 ];
-    int			i, cc, timeout = 0, readpending = 0;
-    u_int16_t		seq = 0, rseq = 1, netseq;
-    u_char		readport; /* uninitialized, OK 310105 */
-    char		*start;
-    int			linelength, lflength;
+	struct timeval tv;
+	struct atp_block atpb;
+	struct sockaddr_at ssat;
+	struct papfile infile, outfile;
+	fd_set fds;
+	char cbuf[578];
+	int i, cc, timeout = 0, readpending = 0;
+	u_int16_t seq = 0, rseq = 1, netseq;
+	u_char readport;	/* uninitialized, OK 310105 */
+	char *start;
+	int linelength, lflength;
 
-    infile.pf_state = PF_BOT;
-    infile.pf_bufsize = 0;
-    infile.pf_datalen = 0;
-    infile.pf_buf = NULL;
-    infile.pf_data = NULL;
+	infile.pf_state = PF_BOT;
+	infile.pf_bufsize = 0;
+	infile.pf_datalen = 0;
+	infile.pf_buf = NULL;
+	infile.pf_data = NULL;
 
-    outfile.pf_state = PF_BOT;
-    outfile.pf_bufsize = 0;
-    outfile.pf_datalen = 0;
-    outfile.pf_buf = NULL;
-    outfile.pf_data = NULL;
+	outfile.pf_state = PF_BOT;
+	outfile.pf_bufsize = 0;
+	outfile.pf_datalen = 0;
+	outfile.pf_buf = NULL;
+	outfile.pf_data = NULL;
 
 	/*
 	 * Ask for data.
