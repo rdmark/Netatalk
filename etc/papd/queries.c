@@ -206,17 +206,6 @@ struct genquery {
 } genqueries[] = {
 	{ "UMICHCostPerPage", gq_pagecost },
 #ifdef notdef
-<<<<<<< HEAD
-    { "UMICHUserBalance", gq_balance },
-#endif /* notdef */
-    { "RBISpoolerID",	gq_rbispoolerid },
-    { "RBIUAMListQuery", gq_rbiuamlist },
-    { "Product", gq_product },
-    { "ADOIsBinaryOK?", gq_true },
-    { "UMICHListQueue", gq_true },
-    { "UMICHDeleteJob", gq_true },
-    { NULL, NULL },
-=======
 	{ "UMICHUserBalance", gq_balance },
 #endif				/* notdef */
 	{ "RBISpoolerID", gq_rbispoolerid },
@@ -226,7 +215,6 @@ struct genquery {
 	{ "UMICHListQueue", gq_true },
 	{ "UMICHDeleteJob", gq_true },
 	{ NULL, NULL },
->>>>>>> 23806097 (Fix merge conflict resolution mistake, and clean up code style after merging the papd patches.)
 };
 
 int cq_query(struct papfile *in, struct papfile *out)
