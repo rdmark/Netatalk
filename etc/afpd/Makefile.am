@@ -64,7 +64,7 @@ afpd_CFLAGS = \
 
 noinst_HEADERS = auth.h afp_config.h desktop.h directory.h file.h \
 	 filedir.h fork.h icon.h mangle.h misc.h status.h switch.h \
-	 uam_auth.h unix.h volume.h hash.h acls.h acl_mappings.h extattrs.h \
+	 uam_auth.h unix.h volume.h hash.h extattrs.h \
 	 dircache.h afp_zeroconf.h afp_avahi.h afp_mdns.h
 
 hash_SOURCES = hash.c
