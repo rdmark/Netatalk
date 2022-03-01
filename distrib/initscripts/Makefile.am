@@ -30,8 +30,8 @@ GENERATED_FILES = \
 	rc.atalk.debian		\
 	a2boot.service		\
 	afpd.service		\
-	cnid.service		\
 	atalkd.service		\
+	cnid.service		\
 	papd.service		\
 	timelord.service
 
@@ -49,8 +49,8 @@ TEMPLATES = \
 	rc.atalk.debian.tmpl		\
 	a2boot.service.tmpl		\
 	afpd.service.tmpl		\
-	cnidi.service.tmpl		\
 	atalkd.service.tmpl		\
+	cnid.service.tmpl		\
 	papd.service.tmpl		\
 	timelord.service.tmpl
 
