@@ -913,7 +913,7 @@ int afp_login_ext(AFPObj * obj, char *ibuf, size_t ibuflen, char *rbuf,
 	ibuflen -= len;
 
 	/* Pad */
-	if (ibuflen && ((unsigned long) ibuf & 1)) {	/* pad character */
+	if (ibuflen && ((u_int64_t) ibuf & 1)) {	/* pad character */
 		ibuf++;
 		ibuflen--;
 	}

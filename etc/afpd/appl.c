@@ -36,7 +36,7 @@ static int pathcmp(char *p, int plen, char *q, int qlen)
 	return ((plen == qlen && memcmp(p, q, plen) == 0) ? 0 : 1);
 }
 
-static int applopen(struct vol *vol, u_char creator[4], int flags,
+static int applopen(struct vol *vol, u_int8_t creator[4], int flags,
 		    int mode)
 {
 	char *dtf, *adt, *adts;
@@ -86,16 +86,16 @@ static int applopen(struct vol *vol, u_char creator[4], int flags,
 /*
  * copy appls to new file, deleting any matching (old) appl entries
  */
-static int copyapplfile(int sfd, int dfd, char *mpath, u_short mplen)
+static int copyapplfile(int sfd, int dfd, char *mpath, u_int16_t mplen)
 {
 	int cc;
 	char *p;
 	u_int16_t len;
-	u_char appltag[4];
+	u_int8_t appltag[4];
 	char buf[MAXPATHLEN];
 
 	while ((cc =
-		read(sfd, buf, sizeof(appltag) + sizeof(u_short))) > 0) {
+		read(sfd, buf, sizeof(appltag) + sizeof(u_int16_t))) > 0) {
 		p = buf + sizeof(appltag);
 		memcpy(&len, p, sizeof(len));
 		len = ntohs(len);
@@ -166,8 +166,8 @@ int afp_addappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 	u_int16_t vid, mplen;
 	struct path *path;
 	char *dtf, *p, *mp;
-	u_char creator[4];
-	u_char appltag[4];
+	u_int8_t creator[4];
+	u_int8_t appltag[4];
 	char *mpath, *tempfile;
 
 	*rbuflen = 0;
@@ -219,7 +219,7 @@ int afp_addappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 	mplen = mpath + AFPOBJ_TMPSIZ - mp;
 
 	/* write the new appl entry at start of temporary file */
-	p = mp - sizeof(u_short);
+	p = mp - sizeof(u_int16_t);
 	mplen = htons(mplen);
 	memcpy(p, &mplen, sizeof(mplen));
 	mplen = ntohs(mplen);
@@ -256,7 +256,7 @@ int afp_rmvappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 	u_int16_t vid, mplen;
 	struct path *path;
 	char *dtf, *mp;
-	u_char creator[4];
+	u_int8_t creator[4];
 	char *tempfile, *mpath;
 
 	*rbuflen = 0;
@@ -327,8 +327,8 @@ int afp_getappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 	int cc;
 	size_t buflen;
 	u_int16_t vid, aindex, bitmap, len;
-	u_char creator[4];
-	u_char appltag[4];
+	u_int8_t creator[4];
+	u_int8_t appltag[4];
 	char *buf, *cbuf;
 	struct path *path;
 #if defined(APPLCNAME)
@@ -337,63 +337,63 @@ int afp_getappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 	int i, h;
 #endif
 
-    memset(appltag, 0, sizeof(u_char) * 4);
-    ibuf += 2;
+	memset(appltag, 0, sizeof(u_int8_t) * 4);
+	ibuf += 2;
 
-    memcpy( &vid, ibuf, sizeof( vid ));
-    ibuf += sizeof( vid );
-    if (NULL == ( vol = getvolbyvid( vid )) ) {
-        *rbuflen = 0;
-        return( AFPERR_PARAM );
-    }
+	memcpy(&vid, ibuf, sizeof(vid));
+	ibuf += sizeof(vid);
+	if (NULL == (vol = getvolbyvid(vid))) {
+		*rbuflen = 0;
+		return (AFPERR_PARAM);
+	}
 
-    memcpy( creator, ibuf, sizeof( creator ));
-    ibuf += sizeof( creator );
+	memcpy(creator, ibuf, sizeof(creator));
+	ibuf += sizeof(creator);
 
-    memcpy( &aindex, ibuf, sizeof( aindex ));
-    ibuf += sizeof( aindex );
-    aindex = ntohs( aindex );
-    if ( aindex ) { /* index 0 == index 1 */
-        --aindex;
-    }
+	memcpy(&aindex, ibuf, sizeof(aindex));
+	ibuf += sizeof(aindex);
+	aindex = ntohs(aindex);
+	if (aindex) {		/* index 0 == index 1 */
+		--aindex;
+	}
 
-    memcpy( &bitmap, ibuf, sizeof( bitmap ));
-    bitmap = ntohs( bitmap );
-    ibuf += sizeof( bitmap );
+	memcpy(&bitmap, ibuf, sizeof(bitmap));
+	bitmap = ntohs(bitmap);
+	ibuf += sizeof(bitmap);
 
-    if ( applopen( vol, creator, O_RDONLY, 0666 ) != AFP_OK ) {
-        *rbuflen = 0;
-        return( AFPERR_NOITEM );
-    }
-    if ( aindex < sa.sdt_index ) {
-        if ( lseek( sa.sdt_fd, 0L, SEEK_SET ) < 0 ) {
-            *rbuflen = 0;
-            return( AFPERR_PARAM );
-        }
-        sa.sdt_index = 0;
-    }
+	if (applopen(vol, creator, O_RDONLY, 0666) != AFP_OK) {
+		*rbuflen = 0;
+		return (AFPERR_NOITEM);
+	}
+	if (aindex < sa.sdt_index) {
+		if (lseek(sa.sdt_fd, 0L, SEEK_SET) < 0) {
+			*rbuflen = 0;
+			return (AFPERR_PARAM);
+		}
+		sa.sdt_index = 0;
+	}
 
-    /* position to correct spot within appl file */
-    buf = obj->oldtmp;
-    while (( cc = read( sa.sdt_fd, buf, sizeof( appltag )
-                        + sizeof( u_short ))) > 0 ) {
-        p = buf + sizeof( appltag );
-        memcpy( &len, p, sizeof( len ));
-        len = ntohs( len );
-        p += sizeof( u_short );
-        if (( cc = read( sa.sdt_fd, p, len )) < len ) {
-            break;
-        }
-        if ( sa.sdt_index == aindex ) {
-            break;
-        }
-        sa.sdt_index++;
-    }
-    if ( cc <= 0 || sa.sdt_index != aindex ) {
-        *rbuflen = 0;
-        return( AFPERR_NOITEM );
-    }
-    sa.sdt_index++;
+	/* position to correct spot within appl file */
+	buf = obj->oldtmp;
+	while ((cc = read(sa.sdt_fd, buf, sizeof(appltag)
+			  + sizeof(u_int16_t))) > 0) {
+		p = buf + sizeof(appltag);
+		memcpy(&len, p, sizeof(len));
+		len = ntohs(len);
+		p += sizeof(u_int16_t);
+		if ((cc = read(sa.sdt_fd, p, len)) < len) {
+			break;
+		}
+		if (sa.sdt_index == aindex) {
+			break;
+		}
+		sa.sdt_index++;
+	}
+	if (cc <= 0 || sa.sdt_index != aindex) {
+		*rbuflen = 0;
+		return (AFPERR_NOITEM);
+	}
+	sa.sdt_index++;
 
 #ifdef APPLCNAME
 	/*

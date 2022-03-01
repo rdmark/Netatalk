@@ -138,7 +138,7 @@ int afp_getfildirparams(AFPObj * obj _U_, char *ibuf, size_t ibuflen _U_,
 	rbuf += sizeof(fbitmap);
 	dbitmap = htons(dbitmap);
 	memcpy(rbuf, &dbitmap, sizeof(dbitmap));
-	rbuf += sizeof(dbitmap) + sizeof(u_char);
+	rbuf += sizeof(dbitmap) + sizeof(u_int8_t);
 	*rbuf = 0;
 
 	return (AFP_OK);

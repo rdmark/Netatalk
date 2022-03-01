@@ -815,8 +815,8 @@ static int crlf(struct ofork *of)
 
 
 static ssize_t read_file(struct ofork *ofork, int eid,
-			 off_t offset, u_char nlmask,
-			 u_char nlchar, char *rbuf,
+			 off_t offset, u_int8_t nlmask,
+			 u_int8_t nlchar, char *rbuf,
 			 size_t *rbuflen, const int xlate)
 {
 	ssize_t cc;
@@ -891,11 +891,11 @@ static int read_fork(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 	ssize_t cc, err;
 	int eid, xlate = 0;
 	u_int16_t ofrefnum;
-	u_char nlmask, nlchar;
+	u_int8_t nlmask, nlchar;
 
 	ibuf += 2;
 	memcpy(&ofrefnum, ibuf, sizeof(ofrefnum));
-	ibuf += sizeof(u_short);
+	ibuf += sizeof(u_int16_t);
 
 	if (NULL == (ofork = of_find(ofrefnum))) {
 		LOG(log_error, logtype_afpd,
@@ -1366,7 +1366,7 @@ static int write_fork(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 		}
 
 		if (obj->options.flags & OPTION_DEBUG) {
-			printf("(write) len: %ld\n", (unsigned long) *rbuflen);
+			printf("(write) len: %ld\n", (u_int64_t) *rbuflen);
 			bprint(rbuf, *rbuflen);
 		}
 
@@ -1527,12 +1527,12 @@ int afp_getforkparams(AFPObj * obj _U_, char *ibuf, size_t ibuflen _U_,
 	}
 
 	if (AFP_OK != (ret = getforkparams(ofork, bitmap,
-					   rbuf + sizeof(u_short),
+					   rbuf + sizeof(u_int16_t),
 					   &buflen))) {
 		return (ret);
 	}
 
-	*rbuflen = buflen + sizeof(u_short);
+	*rbuflen = buflen + sizeof(u_int16_t);
 	bitmap = htons(bitmap);
 	memcpy(rbuf, &bitmap, sizeof(bitmap));
 	return (AFP_OK);
