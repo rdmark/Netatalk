@@ -1,5 +1,44 @@
+Changes in 2.x v220301
+======================
+
+* NEW: Introduce the --enable-systemd-start configure time option
+       which enables and starts systemd services with 'make install'.
+* UPD: Support for Unicode 14.0
+* REM: Remove DROPKLUDGE.
+* REM: Remove AFS support.
+* REM: Remove PGP UAM.
+* REM: Remove Kerberos UAMs.
+* REM: Remove ACL support.
+* REM: Remove FCL.
+* REM: Remove the Force UID/GID feature.
+* REM: Remove Webmin support.
+* REM: Remove CDB and TDB CNID backends.
+* REM: Remove support for obsolete platforms.
+* REM: Remove now redundant feature checks.
+* REM: Remove many deprecated configure options.
+* REM: Remove workarounds for obsolete OS bugs.
+* FIX: Massive code style cleanup and refactoring.
+* FIX: Remove unused variables and functions.
+* FIX: Explicitly initialize variables.
+* FIX: Explicit types and signedness of variables.
+* FIX: Prevent possible buffer overflows and memory leaks.
+* UPD: Enable -Wall -Werror so that warnings are treated as errors
+       by the compiler -- the codebase now passes this test.
+* UPD: Use a simpler logging scheme and change
+       the default log level to INFO.
+* UPD: Always keep file locking enabled.
+* FIX: Improve handling of system calls.
+* UPD: Remove Perl as dependency, and rewrite the macusers
+       script in shell script.
+* UPD: Always build and install atalkd, papd, a2boot, and timelord.
+* FIX: Support compilation on OmniOS
+* FIX: afpd: Update timestamps when copying files in an
+       AFP 3 compliant way.
+* FIX: afpd: Fix NFS detection; allow to use on remote FUSE systems.
+       (Netatalk 3 backport.)
+
 Changes in 2.x v220101
-================
+======================
 
 * NEW: Stable systemd service unit configurations for all daemons.
        Use '--enable-systemd' to configure and install.
