@@ -20,6 +20,7 @@ ltmain.sh
 autom4te.cache
 autoscan.log
 test-driver
+patches
 *.rpm
 *.deb
 *.dsc
@@ -28,6 +29,7 @@ test-driver
 *.diff.gz
 *~
 *.o
+<<<<<<< HEAD
 *.orig
 *.rej
 *.diff
