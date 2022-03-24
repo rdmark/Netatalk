@@ -36,6 +36,8 @@ Changes in 2.x v220301
        AFP 3 compliant way.
 * FIX: afpd: Fix NFS detection; allow to use on remote FUSE systems.
        (Netatalk 3 backport.)
+* FIX: CVE-2022-23123
+* FIX: CVE-2022-23125
 
 Changes in 2.x v220101
 ======================
