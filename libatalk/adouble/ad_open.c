@@ -510,14 +510,14 @@ static int ad_convert(struct adouble *ad, const char *path)
 }
 #endif				/* AD_VERSION == AD_VERSION2 */
 
-/* -------------------------------------
-   Read an AppleDouble buffer, returns 0 on success, -1 if an entry was malformatted
-*/
-static int parse_entries(struct adouble *ad, char *buf,
-			  u_int16_t nentries)
+/**
+ * Read an AppleDouble buffer, returns 0 on success, -1 if an entry was malformatted
+ **/
+static int parse_entries(struct adouble *ad, u_int16_t nentries,
+                          size_t valid_data_len)
 {
 	u_int32_t eid, len, off;
-	int ret = 0;
+	char *buf = ad->ad_data + AD_HEADER_LEN;
 
 	/* now, read in the entry bits */
 	for (; nentries > 0; nentries--) {
@@ -532,19 +532,18 @@ static int parse_entries(struct adouble *ad, char *buf,
 		buf += sizeof(len);
 
 		if (eid && eid < ADEID_MAX && off < sizeof(ad->ad_data) &&
-		    (off + len <= sizeof(ad->ad_data)
-		     || eid == ADEID_RFORK)) {
+		   (off + len <= valid_data_len || eid == ADEID_RFORK)) {
 			ad->ad_eid[eid].ade_off = off;
 			ad->ad_eid[eid].ade_len = len;
-		} else if (ret == 0) {
-			ret = -1;
-			LOG(log_debug, logtype_default,
-			    "ad_refresh: nentries %hd  eid %d", nentries,
-			    eid);
+		} else {
+			LOG(log_warning, logtype_default,
+				"ad_refresh: nentries %hd  eid %d",
+				nentries, eid );
+			return -1;
 		}
 	}
 
-	return ret;
+	return 0;
 }
 
 
@@ -559,7 +558,6 @@ static int ad_header_read(struct adouble *ad, struct stat *hst)
 {
 	char *buf = ad->ad_data;
 	u_int16_t nentries;
-	int len;
 	ssize_t header_len;
 	static int warning = 0;
 	struct stat st;
@@ -620,27 +618,25 @@ static int ad_header_read(struct adouble *ad, struct stat *hst)
 	memcpy(ad->ad_filler, buf + ADEDOFF_FILLER, sizeof(ad->ad_filler));
 	memcpy(&nentries, buf + ADEDOFF_NENTRIES, sizeof(nentries));
 	nentries = ntohs(nentries);
-
-	/* read in all the entry headers. if we have more than the
-	 * maximum, just hope that the rfork is specified early on. */
-	len = nentries * AD_ENTRY_LEN;
-
-	if (len + AD_HEADER_LEN > sizeof(ad->ad_data))
-		len = sizeof(ad->ad_data) - AD_HEADER_LEN;
-
-	buf += AD_HEADER_LEN;
-	if (len > header_len - AD_HEADER_LEN) {
-		LOG(log_debug, logtype_default,
-		    "ad_header_read: can't read entry info.");
+	if (nentries > 16) {
+		LOG(log_error, logtype_default, "ad_open: too many entries: %d",
+				nentries);
 		errno = EIO;
 		return -1;
 	}
 
-	/* figure out all of the entry offsets and lengths. if we aren't
-	 * able to read a resource fork entry, bail. */
-	nentries = len / AD_ENTRY_LEN;
-	if (parse_entries(ad, buf, nentries) != 0) {
-		LOG(log_warning, logtype_default, "ad_header_read: malformed AppleDouble");
+	if ((nentries * AD_ENTRY_LEN) + AD_HEADER_LEN > header_len) {
+		LOG(log_error, logtype_default, "ad_header_read: too many entries: %zd",
+				header_len);
+		errno = EIO;
+		return -1;
+	}
+
+	if (parse_entries(ad, nentries, header_len) != 0) {
+		LOG(log_warning, logtype_default,
+				"ad_header_read(): malformed AppleDouble");
+		errno = EIO;
+		return -1;
 	}
 	if (!ad_getentryoff(ad, ADEID_RFORK)
 	    || (ad_getentryoff(ad, ADEID_RFORK) > sizeof(ad->ad_data))
