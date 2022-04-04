@@ -173,7 +173,7 @@ void afp_options_init(struct afp_options *options)
 	options->server_notif = 1;
 	options->authprintdir = NULL;
 	options->signatureopt = "auto";
-	options->umask = 0022;
+	options->umask = 0;
 #ifdef ADMIN_GRP
 	options->admingid = 0;
 #endif				/* ADMIN_GRP */
