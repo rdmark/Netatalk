@@ -1,4 +1,4 @@
-Changes in 2.x v220301
+Changes in 2.x v220401
 ======================
 
 * NEW: Introduce the --enable-systemd-start configure time option
