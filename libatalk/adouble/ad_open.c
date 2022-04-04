@@ -511,13 +511,13 @@ static int ad_convert(struct adouble *ad, const char *path)
 #endif				/* AD_VERSION == AD_VERSION2 */
 
 /* -------------------------------------
-   read in the entries
+   Read an AppleDouble buffer, returns 0 on success, -1 if an entry was malformatted
 */
-static void parse_entries(struct adouble *ad, char *buf,
+static int parse_entries(struct adouble *ad, char *buf,
 			  u_int16_t nentries)
 {
 	u_int32_t eid, len, off;
-	int warning = 0;
+	int ret = 0;
 
 	/* now, read in the entry bits */
 	for (; nentries > 0; nentries--) {
@@ -536,13 +536,15 @@ static void parse_entries(struct adouble *ad, char *buf,
 		     || eid == ADEID_RFORK)) {
 			ad->ad_eid[eid].ade_off = off;
 			ad->ad_eid[eid].ade_len = len;
-		} else if (!warning) {
-			warning = 1;
+		} else if (ret == 0) {
+			ret = -1;
 			LOG(log_debug, logtype_default,
 			    "ad_refresh: nentries %hd  eid %d", nentries,
 			    eid);
 		}
 	}
+
+	return ret;
 }
 
 
@@ -637,7 +639,9 @@ static int ad_header_read(struct adouble *ad, struct stat *hst)
 	/* figure out all of the entry offsets and lengths. if we aren't
 	 * able to read a resource fork entry, bail. */
 	nentries = len / AD_ENTRY_LEN;
-	parse_entries(ad, buf, nentries);
+	if (parse_entries(ad, buf, nentries) != 0) {
+		LOG(log_warning, logtype_default, "ad_header_read: malformed AppleDouble");
+	}
 	if (!ad_getentryoff(ad, ADEID_RFORK)
 	    || (ad_getentryoff(ad, ADEID_RFORK) > sizeof(ad->ad_data))
 	    ) {
