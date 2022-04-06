@@ -329,7 +329,7 @@ static int getvolparams(const AFPObj *obj, uint16_t bitmap, struct vol *vol, str
             slash++;
         else
             slash = vol->v_path;
-        if (ad_getentryoff(&ad, ADEID_NAME)) {
+        if (ad_getentryoff(&ad, ADEID_NAME) && ad_entry(&ad, ADEID_NAME)) {
             ad_setentrylen( &ad, ADEID_NAME, strlen( slash ));
             memcpy(ad_entry( &ad, ADEID_NAME ), slash,
                    ad_getentrylen( &ad, ADEID_NAME ));

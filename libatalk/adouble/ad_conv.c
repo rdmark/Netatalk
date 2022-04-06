@@ -93,6 +93,7 @@ static int ad_conv_v22ea_hf(const char *path, const struct stat *sp, const struc
         goto copy;
     if (ad_getentryoff(&adv2, ADEID_FINDERI)
         && (ad_getentrylen(&adv2, ADEID_FINDERI) == ADEDLEN_FINDERI)
+        && (ad_entry(&adv2, ADEID_FINDERI))
         && (memcmp(ad_entry(&adv2, ADEID_FINDERI), emptyad, ADEDLEN_FINDERI) != 0))
         goto copy;
     if (ad_getentryoff(&adv2, ADEID_FILEDATESI)) {
@@ -101,7 +102,7 @@ static int ad_conv_v22ea_hf(const char *path, const struct stat *sp, const struc
         if ((ctime != mtime) || (mtime != sp->st_mtime))
             goto copy;
     }
-    if (ad_getentryoff(&adv2, ADEID_AFPFILEI)) {
+    if (ad_getentryoff(&adv2, ADEID_AFPFILEI) && ad_entry(&adv2, ADEID_AFPFILEI)) {
         if (memcmp(ad_entry(&adv2, ADEID_AFPFILEI), &afpinfo, ADEDLEN_AFPFILEI) != 0)
             goto copy;
     }

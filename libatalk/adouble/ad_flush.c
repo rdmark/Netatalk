@@ -185,7 +185,11 @@ int ad_rebuild_adouble_header_osx(struct adouble *ad, char *adbuf)
     memcpy(buf, &temp, sizeof( temp ));
     buf += sizeof( temp );
 
-    memcpy(adbuf + ADEDOFF_FINDERI_OSX, ad_entry(ad, ADEID_FINDERI), ADEDLEN_FINDERI);
+    if (ad_entry(ad, ADEID_FINDERI)) {
+        memcpy(adbuf + ADEDOFF_FINDERI_OSX, ad_entry(ad, ADEID_FINDERI), ADEDLEN_FINDERI);
+    } else {
+        LOG(log_debug, logtype_ad, "ad_rebuild_adouble_header_osx(%s): invalid FinderInfo", ad->ad_name);
+    }
 
     /* rfork */
     temp = htonl( EID_DISK(ADEID_RFORK) );
@@ -213,6 +217,10 @@ int ad_copy_header(struct adouble *add, struct adouble *ads)
     uint32_t       eid;
     uint32_t       len;
 
+    if (add->valid_data_len == 0) {
+        LOG(log_error, logtype_ad, "ad_copy_header(%s): dst invalid valid_data_len", add->ad_name);
+        return -1;
+    }
     for ( eid = 0; eid < ADEID_MAX; eid++ ) {
         if ( ads->ad_eid[ eid ].ade_off == 0 || add->ad_eid[ eid ].ade_off == 0 )
             continue;
@@ -226,6 +234,14 @@ int ad_copy_header(struct adouble *add, struct adouble *ads)
         case ADEID_RFORK:
             continue;
         default:
+            if (!ad_entry(ads, eid)) {
+                LOG(log_debug, logtype_ad, "ad_copy_header(%s): invalid src eid[%d]", ads->ad_name, eid);
+                continue;
+            }
+            if (!ad_entry(add, eid)) {
+                LOG(log_debug, logtype_ad, "ad_copy_header(%s): invalid dst eid[%d]", add->ad_name, eid);
+                continue;
+            }
             ad_setentrylen( add, eid, len );
             memcpy( ad_entry( add, eid ), ad_entry( ads, eid ), len );
         }
@@ -234,10 +250,14 @@ int ad_copy_header(struct adouble *add, struct adouble *ads)
 
     if (((ads->ad_vers == AD_VERSION2) && (add->ad_vers == AD_VERSION_EA))
         || ((ads->ad_vers == AD_VERSION_EA) && (add->ad_vers == AD_VERSION2))) {
-        cnid_t id;
-        memcpy(&id, ad_entry(add, ADEID_PRIVID), sizeof(cnid_t));
-        id = htonl(id);
-        memcpy(ad_entry(add, ADEID_PRIVID), &id, sizeof(cnid_t));
+        if (ad_entry(add, ADEID_PRIVID)) {
+            cnid_t id;
+            memcpy(&id, ad_entry(add, ADEID_PRIVID), sizeof(cnid_t));
+            id = htonl(id);
+            memcpy(ad_entry(add, ADEID_PRIVID), &id, sizeof(cnid_t));
+        } else {
+            LOG(log_debug, logtype_ad, "ad_copy_header(%s): invalid PRIVID", add->ad_name);
+        }
     }
     return 0;
 }

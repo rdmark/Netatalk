@@ -293,7 +293,7 @@ const char *openflags2logstr(int oflags)
         first = 0;
     }
     return buf;
-}    
+}
 
 static uint32_t get_eid(uint32_t eid)
 {
@@ -330,11 +330,13 @@ int ad_init_offsets(struct adouble *ad)
 
     memset(ad->ad_data, 0, sizeof(ad->ad_data));
 
-    if (ad->ad_vers == AD_VERSION2)
+    if (ad->ad_vers == AD_VERSION2) {
         eid = entry_order2;
-    else if (ad->ad_vers == AD_VERSION_EA)
+        ad->valid_data_len = AD_DATASZ2;
+    } else if (ad->ad_vers == AD_VERSION_EA) {
         eid = entry_order_ea;
-    else
+        ad->valid_data_len = AD_DATASZ_EA;
+    } else
         return -1;
 
     while (eid->id) {
@@ -366,6 +368,10 @@ static int new_ad_header(struct adouble *ad, const char *path, struct stat *stp,
     if (ad_init_offsets(ad) != 0)
         return -1;
 
+    if (!ad_entry(ad, ADEID_FINDERI)) {
+        LOG(log_debug, logtype_ad, "new_ad_header(\"%s\"): invalid FinderInfo", path);
+        return -1;
+    }
     /* set default creator/type fields */
     memcpy(ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRTYPEOFF,"\0\0\0\0", 4);
     memcpy(ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRCREATOFF,"\0\0\0\0", 4);
@@ -417,7 +423,7 @@ static int parse_entries(struct adouble *ad, uint16_t nentries, size_t valid_dat
 
         if (!eid
             || eid > ADEID_MAX
-            || off >= valid_data_len
+            || off > valid_data_len
             || ((eid != ADEID_RFORK) && (off + len >  valid_data_len)))
         {
             LOG(log_warning, logtype_ad, "parse_entries: bogus eid: %u, off: %u, len: %u",
@@ -615,15 +621,23 @@ static int ad_convert_osx(const char *path, struct adouble *ad)
         EC_EXIT_STATUS(0);
     struct adouble adea;
     ad_init_old(&adea, AD_VERSION_EA, ad->ad_options);
+    if (ad_init_offsets(&adea) != 0) {
+        LOG(log_error, logtype_ad, "ad_init_offsets failed");
+        EC_FAIL;
+    }
 
     if (ad_open(&adea, path + 2, ADFLAGS_HF | ADFLAGS_RDWR | ADFLAGS_CREATE, 0666) < 0) {
         LOG(log_error, logtype_ad, "create metadata: %s\n", strerror(errno));
         EC_FAIL;
     }
     if (adea.ad_mdp->adf_flags & O_CREAT) {
-        memcpy(ad_entry(&adea, ADEID_FINDERI),
-               ad_entry(ad, ADEID_FINDERI),
-               ADEDLEN_FINDERI);
+        if (ad_entry(ad, ADEID_FINDERI)) {
+            memcpy(ad_entry(&adea, ADEID_FINDERI),
+                   ad_entry(ad, ADEID_FINDERI),
+                   ADEDLEN_FINDERI);
+        } else {
+            LOG(log_debug, logtype_ad, "ad_convert_osx(%s): invalid FinderInfo", fullpathname(path));
+        }
         ad_flush(&adea);
     }
     ad_close(&adea, ADFLAGS_HF);
@@ -1270,7 +1284,7 @@ EC_CLEANUP:
         ad_data_fileno(ad), ad->ad_data_fork.adf_refcount,
         ad_meta_fileno(ad), ad->ad_mdp->adf_refcount,
         ad_reso_fileno(ad), ad->ad_rfp->adf_refcount);
-        
+
     EC_EXIT;
 }
 
@@ -1639,10 +1653,14 @@ void *ad_entry(const struct adouble *ad, int eid)
 
 	valid = ad_entry_check_size(eid, bufsize, off, len);
 	if (!valid) {
+        LOG(log_debug, logtype_ad, "ad_entry(%s, %d): invalid off: %d, len: %llu, buf: %llu",
+            ad->ad_name, eid, off, len, bufsize);
 		return NULL;
 	}
 
-	if (off == 0 || len == 0) {
+	if (off == 0) {
+        LOG(log_debug, logtype_ad, "ad_entry(%s, %d): invalid off: %d, len: %llu",
+            ad->ad_name, eid, off, len);
 		return NULL;
 	}
 
@@ -2039,7 +2057,7 @@ int ad_metadata(const char *name, int flags, struct adouble *adp)
     int   ret, err, oflags;
 
     /* Sanitize flags */
-    oflags = (flags & (ADFLAGS_CHECK_OF | ADFLAGS_DIR)) | ADFLAGS_HF | ADFLAGS_RDONLY;    
+    oflags = (flags & (ADFLAGS_CHECK_OF | ADFLAGS_DIR)) | ADFLAGS_HF | ADFLAGS_RDONLY;
 
     if ((ret = ad_open(adp, name, oflags)) < 0 && errno == EACCES) {
         become_root();
