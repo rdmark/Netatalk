@@ -6,9 +6,7 @@
  * modified from main.c. this handles afp options.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>

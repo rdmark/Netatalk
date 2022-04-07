@@ -18,9 +18,7 @@
  * @sa include/atalk/adouble.h
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
 #include <sys/param.h>

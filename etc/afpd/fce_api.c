@@ -30,9 +30,7 @@
  * the listener has lost at least one filesystem event
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 

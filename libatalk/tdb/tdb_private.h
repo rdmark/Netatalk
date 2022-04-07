@@ -1,14 +1,14 @@
- /* 
+ /*
    Unix SMB/CIFS implementation.
 
    trivial database library - private includes
 
    Copyright (C) Andrew Tridgell              2005
-   
+
      ** NOTE! The following LGPL license applies to the tdb
      ** library. This does NOT imply that all of Samba is released
      ** under the LGPL
-   
+
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -23,9 +23,7 @@
    License along with this library; if not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <unistd.h>
 #include <stdint.h>
@@ -275,5 +273,3 @@ void tdb_io_init(struct tdb_context *tdb);
 int tdb_expand(struct tdb_context *tdb, tdb_off_t size);
 int tdb_rec_free_read(struct tdb_context *tdb, tdb_off_t off,
 		      struct tdb_record *rec);
-
-

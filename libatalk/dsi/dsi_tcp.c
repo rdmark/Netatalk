@@ -6,9 +6,7 @@
  * protocol specific initialization and shutdown procedures. all the
  * read/write stuff is done in dsi_stream.c.  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
