@@ -27,7 +27,7 @@
 #define _ATALK_ATP_H 1
 
  
-#include <sys/cdefs.h>
+#include <sys/types.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <netatalk/at.h>

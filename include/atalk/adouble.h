@@ -41,7 +41,7 @@
 #define __USE_MISC
 #include <unistd.h>
 
-#include <sys/cdefs.h>
+#include <sys/types.h>
 
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>

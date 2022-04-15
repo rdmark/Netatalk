@@ -15,7 +15,7 @@
 
 
 #include <sys/types.h>
-#include <sys/cdefs.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netatalk/at.h>
 
