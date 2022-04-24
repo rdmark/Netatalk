@@ -14,7 +14,7 @@ Follow the installation steps in the [official Netatalk 2.2 documentation](http:
 
 As supplementary information when installing on Debian derivate Linux distros, you need at least these apt packages:
 ```
-$ apt install libssl-dev libdb-dev autotools-dev automake libtool
+$ apt install libssl-dev libdb-dev autotools-dev automake libtool pkg-config
 ```
 
 ## Configuration Examples
