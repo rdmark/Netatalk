@@ -1,22 +1,21 @@
 dnl configure.in for netatalk
 
-AC_INIT([netatalk], [m4_esyscmd([echo -n `cat VERSION`])])
+AC_INIT([netatalk],[m4_esyscmd([echo -n `cat VERSION`])])
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([subdir-objects])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIRS([macros])
 AM_MAINTAINER_MODE([enable])
 
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_CC_C99
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+_LT_SET_OPTION([LT_INIT],[dlopen])
+LT_INIT
 AC_PROG_GREP
 AC_PROG_PS
 
@@ -25,7 +24,7 @@ AM_PROG_CC_C_O
 dnl Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h limits.h stdint.h strings.h time.h sys/param.h sys/fcntl.h sys/file.h sys/ioctl.h sys/time.h sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h mntent.h syslog.h unistd.h termios.h sys/termios.h netdb.h sgtty.h ufs/quota.h mount.h statfs.h sys/types.h dlfcn.h errno.h sys/errno.h sys/uio.h langinfo.h locale.h sys/filio.h)
+AC_CHECK_HEADERS(fcntl.h limits.h stdint.h strings.h time.h sys/param.h fcntl.h sys/file.h sys/ioctl.h sys/time.h sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h mntent.h syslog.h unistd.h termios.h termios.h netdb.h sgtty.h ufs/quota.h mount.h statfs.h sys/types.h dlfcn.h errno.h sys/uio.h langinfo.h locale.h sys/filio.h)
 AC_CHECK_HEADERS([sys/mount.h], , , 
 [#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -40,16 +39,15 @@ AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
-AC_STRUCT_ST_RDEV
-AC_HEADER_TIME
+
 AC_STRUCT_TM
 
 dnl --------------------------------------------------------------------------
 dnl check if dlsym needs to add an underscore, uses libtool macros 
 dnl --------------------------------------------------------------------------
-AC_LTDL_DLLIB
+LT_LIB_DLLOAD
 AC_CHECK_FUNCS(dlopen dlsym dlclose)
-AC_LTDL_DLSYM_USCORE
+LT_FUNC_DLSYM_USCORE
 if test x"$libltdl_cv_need_uscore" = xyes; then
     AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
 fi
@@ -60,7 +58,6 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MEMCMP
 AC_HEADER_MAJOR
 AC_FUNC_MMAP
-AC_TYPE_SIGNAL
 AC_FUNC_UTIME_NULL
 AC_CHECK_FUNCS(getcwd gethostname gettimeofday getusershell mkdir rmdir select socket strdup strcasestr strstr strtoul strchr memcpy)
 AC_CHECK_FUNCS(backtrace_symbols setlocale nl_langinfo strlcpy strlcat setlinebuf dirfd pselect access pread pwrite)
@@ -439,17 +436,16 @@ if test x"$this_os" = "xlinux"; then
 	dnl ----- kernel 2.6 changed struct at_addr to atalk_addr
 	AC_MSG_CHECKING([for struct atalk_addr])
 dnl	AC_COMPILE_IFELSE([
-	AC_TRY_COMPILE([
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/socket.h>
 #include <asm/types.h>
 #include <linux/atalk.h>
 
 	struct atalk_addr foo;
-],
-[ ], [
+]], [[ ]])],[
 		ac_have_atalk_addr=yes
 		AC_MSG_RESULT([yes])
-	], [
+	],[
 		AC_MSG_RESULT([no])
 	])
 
@@ -554,13 +550,11 @@ if test x"$this_os" = "xsolaris"; then
 	   fi
 
            AC_CACHE_CHECK([for timeout_id_t],netatalk_cv_HAVE_TIMEOUT_ID_T,[
-           AC_TRY_LINK([\
+           AC_LINK_IFELSE([AC_LANG_PROGRAM([[\
 #include <sys/stream.h>
-#include <sys/ddi.h>],
-[\
+#include <sys/ddi.h>]], [[\
 timeout_id_t dummy;
-],
-netatalk_cv_HAVE_TIMEOUT_ID_T=yes,netatalk_cv_HAVE_TIMEOUT_ID_T=no,netatalk_cv_HAVE_TIMEOUT_ID_T=cross)])
+]])],[netatalk_cv_HAVE_TIMEOUT_ID_T=yes],[netatalk_cv_HAVE_TIMEOUT_ID_T=no])])
 
 	   AC_DEFINE(HAVE_TIMEOUT_ID_T, test x"$netatalk_cv_HAVE_TIMEOUT_ID" = x"yes", [define for timeout_id_t])
 	fi
@@ -728,7 +722,7 @@ AC_DEFINE_UNQUOTED(EA_MODULES,["$neta_cv_eas"],[Available Extended Attributes mo
 dnl --------------------- Check if realpath() takes NULL
 AC_CACHE_CHECK([if the realpath function allows a NULL argument],
     neta_cv_REALPATH_TAKES_NULL, [
-        AC_TRY_RUN([
+        AC_RUN_IFELSE([AC_LANG_SOURCE([[
             #include <stdio.h>
             #include <limits.h>
             #include <signal.h>
@@ -742,11 +736,8 @@ AC_CACHE_CHECK([if the realpath function allows a NULL argument],
                 signal(SIGSEGV, exit_on_core);
                 newpath = realpath("/tmp", NULL);
                 exit((newpath != NULL) ? 0 : 1);
-            }],
-            neta_cv_REALPATH_TAKES_NULL=yes,
-            neta_cv_REALPATH_TAKES_NULL=no,
-            neta_cv_REALPATH_TAKES_NULL=cross
-        )
+            }]])],[neta_cv_REALPATH_TAKES_NULL=yes],[neta_cv_REALPATH_TAKES_NULL=no],[neta_cv_REALPATH_TAKES_NULL=cross
+        ])
     ]
 )
 
@@ -789,7 +780,7 @@ AM_CONDITIONAL(SYSTEMD_START, test x$netatalk_systemd_start = xyes)
 
 dnl --------------------- generate files
 
-AC_OUTPUT([Makefile
+AC_CONFIG_FILES([Makefile
 	bin/Makefile
 	bin/ad/Makefile
 	bin/adv1tov2/Makefile
@@ -860,9 +851,10 @@ AC_OUTPUT([Makefile
 	sys/solaris/Makefile
 	test/Makefile
 	test/afpd/Makefile
-	],
-	[chmod a+x distrib/config/netatalk-config contrib/shell_utils/apple_*]
-)
+	])
+AC_CONFIG_COMMANDS([default],[chmod a+x distrib/config/netatalk-config contrib/shell_utils/apple_*
+],[])
+AC_OUTPUT
 
 AC_NETATALK_LIBS_SUMMARY
 AC_NETATALK_CONFIG_SUMMARY

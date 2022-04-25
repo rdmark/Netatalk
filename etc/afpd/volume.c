@@ -1719,10 +1719,10 @@ static int getvolparams(u_int16_t bitmap, struct vol *vol, struct stat *st,
 	int bit = 0, isad = 1;
 	u_int32_t aint;
 	u_short ashort;
-	u_int32_t bfree, btotal, bsize;
-	VolSpace xbfree, xbtotal;	/* extended bytes */
-	char *data, *nameoff = NULL;
-	char *slash;
+	u_int32_t bfree = 0, btotal = 0, bsize = 0;
+	VolSpace xbfree = 0, xbtotal = 0;	/* extended bytes */
+	char *data = NULL, *nameoff = NULL;
+	char *slash = NULL;
 
 	LOG(log_debug, logtype_afpd, "getvolparams: Volume '%s'",
 	    vol->v_localname);

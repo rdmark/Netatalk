@@ -7,7 +7,7 @@
 
 #include "config.h"
 
-#include <sys/errno.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/systm.h>

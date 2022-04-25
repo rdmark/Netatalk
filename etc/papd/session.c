@@ -8,7 +8,7 @@
 #include "config.h"
 
 #ifdef HAVE_SYS_ERRNO_H
-#include <sys/errno.h>
+#include <errno.h>
 #endif				/* HAVE_SYS_ERRNO_H */
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
