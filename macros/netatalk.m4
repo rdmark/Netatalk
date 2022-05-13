@@ -4,7 +4,7 @@ dnl Check for docbook
 AC_DEFUN([AX_CHECK_DOCBOOK], [
   # It's just rude to go over the net to build
   XSLTPROC_FLAGS=--nonet
-  DOCBOOK_ROOT=
+  DOCBOOK_ROOT=$(BREW --prefix docbook-xsl)/docbook-xsl
   XSLTPROC_WORKS=no
 
   AC_ARG_WITH(docbook,
