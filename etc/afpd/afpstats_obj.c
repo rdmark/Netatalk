@@ -58,7 +58,7 @@ static void afpstats_obj_class_intern_init(gpointer klass)
 GType afpstats_obj_get_type(void)
 {
 	static volatile gsize g_define_type_id__volatile = 0;
-	if (g_once_init_enter(&g_define_type_id__volatile)) {
+	if (g_once_init_enter((gsize *)&g_define_type_id__volatile)) {
 		GType g_define_type_id = g_type_register_static_simple(
             G_TYPE_OBJECT,
             g_intern_static_string("AFPStatsObj"),
@@ -96,7 +96,7 @@ gboolean afpstats_obj_get_users(AFPStatsObj *obj, gchar ***ret, GError **error)
                                              child->afpch_state == DSI_EXTSLEEP ? "sleeping" :
                                              child->afpch_state == DSI_DISCONNECTED ? "disconnected" :
                                              "unknown",
-                                             child->afpch_volumes ? child->afpch_volumes : "-"); 
+                                             child->afpch_volumes ? child->afpch_volumes : "-");
             }
             child = child->afpch_next;
         }
