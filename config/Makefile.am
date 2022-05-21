@@ -47,9 +47,6 @@ uninstall-local:
 	done
 	rm -f $(DESTDIR)$(localstatedir)/netatalk/README
 	rm -f $(DESTDIR)$(localstatedir)/netatalk/CNID/README
-if USE_DEBIAN_SYSV
-	rm -f $(DESTDIR)/etc/default/netatalk
-endif
 
 install-config-files: $(CONFFILES) $(GENFILES)
 	$(mkinstalldirs) $(DESTDIR)$(pkgconfdir)

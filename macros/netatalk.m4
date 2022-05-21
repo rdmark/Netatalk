@@ -266,22 +266,7 @@ AC_DEFUN([AC_NETATALK_LOCKFILE], [
         ac_cv_netatalk_lock=""
     )
     if test -z "$ac_cv_netatalk_lock" ; then
-        ac_cv_netatalk_lock=/var/spool/locks/netatalk
-        if test x"$atalk_cv_fhs_compat" = x"yes" ; then
-            ac_cv_netatalk_lock=/var/run/netatalk.pid
-        else
-            case "$host_os" in
-            *freebsd*)
-                ac_cv_netatalk_lock=/var/spool/lock/netatalk
-                ;;
-            *netbsd*|*openbsd*)
-                ac_cv_netatalk_lock=/var/run/netatalk.pid
-                ;;
-            *linux*)
-                ac_cv_netatalk_lock=/var/lock/netatalk
-                ;;
-            esac
-        fi
+        ac_cv_netatalk_lock=/var/run/netatalk.pid
     fi
     AC_DEFINE_UNQUOTED(PATH_NETATALK_LOCK, ["$ac_cv_netatalk_lock"], [netatalk lockfile path])
     AC_SUBST(PATH_NETATALK_LOCK, ["$ac_cv_netatalk_lock"])
@@ -453,86 +438,16 @@ AC_ARG_ENABLE(shell-check,
 dnl Check for optional initscript install
 AC_DEFUN([AC_NETATALK_INIT_STYLE], [
     AC_ARG_WITH(init-style,
-                [  --with-init-style       use OS specific init config [[redhat-sysv|redhat-systemd|suse-sysv|suse-systemd|gentoo-openrc|gentoo-systemd|netbsd|debian-sysv|debian-systemd|solaris|openrc|systemd]]],
-                init_style="$withval", init_style=none
+                [  --with-init-style       use OS specific init config [[macos-launchd]]],
+                init_style="$withval", init_style=macos-launchd
     )
     case "$init_style" in
-    "redhat")
-	    AC_MSG_ERROR([--with-init-style=redhat is obsoleted. Use redhat-sysv or redhat-systemd.])
-        ;;
-    "redhat-sysv")
-	    AC_MSG_RESULT([enabling redhat-style sysv initscript support])
-	    ac_cv_init_dir="/etc/rc.d/init.d"
+    "macos-launchd")
+	    AC_MSG_RESULT([enabling macOS-style launchd initscript support])
+	    ac_cv_init_dir="/Library/LaunchDaemons"
 	    ;;
-    "redhat-systemd")
-	    AC_MSG_RESULT([enabling redhat-style systemd support])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-	    ;;
-    "suse")
-	    AC_MSG_ERROR([--with-init-style=suse is obsoleted. Use suse-sysv or suse-systemd.])
-        ;;
-    "suse-sysv")
-	    AC_MSG_RESULT([enabling suse-style sysv initscript support])
-	    ac_cv_init_dir="/etc/init.d"
-	    ;;
-    "suse-systemd")
-	    AC_MSG_RESULT([enabling suse-style systemd support (>=openSUSE12.1)])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-	    ;;
-    "gentoo")
-	    AC_MSG_ERROR([--with-init-style=gentoo is obsoleted. Use gentoo-openrc or gentoo-systemd.])
-        ;;
-    "gentoo-openrc")
-	    AC_MSG_RESULT([enabling gentoo-style openrc support])
-	    ac_cv_init_dir="/etc/init.d"
-        ;;
-    "gentoo-systemd")
-	    AC_MSG_RESULT([enabling gentoo-style systemd support])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-        ;;
-    "netbsd")
-	    AC_MSG_RESULT([enabling netbsd-style initscript support])
-	    ac_cv_init_dir="/etc/rc.d"
-        ;;
-    "debian")
-	    AC_MSG_ERROR([--with-init-style=debian is obsoleted. Use debian-sysv or debian-systemd.])
-        ;;
-    "debian-sysv")
-	    AC_MSG_RESULT([enabling debian-style sysv initscript support])
-	    ac_cv_init_dir="/etc/init.d"
-        ;;
-    "debian-systemd")
-	    AC_MSG_RESULT([enabling debian-style systemd support])
-	    ac_cv_init_dir="/lib/systemd/system"
-	    ;;
-    "solaris")
-	    AC_MSG_RESULT([enabling solaris-style SMF support])
-	    ac_cv_init_dir="/lib/svc/manifest/network/"
-        ;;
-    "openrc")
-	    AC_MSG_RESULT([enabling general openrc support])
-	    ac_cv_init_dir="/etc/init.d"
-        ;;
-    "systemd")
-	    AC_MSG_RESULT([enabling general systemd support])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-        ;;
-    "none")
-	    AC_MSG_RESULT([disabling init-style support])
-	    ac_cv_init_dir="none"
-        ;;
-    *)
-	    AC_MSG_ERROR([illegal init-style])
-        ;;
     esac
-    AM_CONDITIONAL(USE_NETBSD, test x$init_style = xnetbsd)
-    AM_CONDITIONAL(USE_REDHAT_SYSV, test x$init_style = xredhat-sysv)
-    AM_CONDITIONAL(USE_SUSE_SYSV, test x$init_style = xsuse-sysv)
-    AM_CONDITIONAL(USE_SOLARIS, test x$init_style = xsolaris)
-    AM_CONDITIONAL(USE_OPENRC, test x$init_style = xopenrc || test x$init_style = xgentoo-openrc)
-    AM_CONDITIONAL(USE_DEBIAN_SYSV, test x$init_style = xdebian-sysv)
-    AM_CONDITIONAL(USE_SYSTEMD, test x$init_style = xsystemd || test x$init_style = xredhat-systemd || test x$init_style = xsuse-systemd || test x$init_style = xgentoo-systemd)
-    AM_CONDITIONAL(USE_DEBIAN_SYSTEMD, test x$init_style = xdebian-systemd)
+    AM_CONDITIONAL(USE_MACOS_LAUNCHD, test x$init_style = xmacos-launchd)
     AM_CONDITIONAL(USE_UNDEF, test x$init_style = xnone)
 
     AC_ARG_WITH(init-dir,

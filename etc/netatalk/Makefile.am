@@ -4,7 +4,7 @@ pkgconfdir = @PKGCONFDIR@
 
 sbin_PROGRAMS = netatalk
 
-netatalk_SOURCES = netatalk.c afp_avahi.c afp_mdns.c afp_zeroconf.c
+netatalk_SOURCES = netatalk.c afp_mdns.c afp_zeroconf.c
 netatalk_CFLAGS = \
 	@ZEROCONF_CFLAGS@ \
 	-D_PATH_CONFDIR=\"$(pkgconfdir)/\" \
@@ -22,4 +22,4 @@ netatalk_LDFLAGS =
 netatalk_CFLAGS += @LIBEVENT_CFLAGS@
 netatalk_LDFLAGS += @LIBEVENT_LDFLAGS@ -levent
 
-noinst_HEADERS = afp_zeroconf.h afp_avahi.h afp_mdns.h
+noinst_HEADERS = afp_zeroconf.h afp_mdns.h

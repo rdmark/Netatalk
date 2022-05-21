@@ -139,7 +139,7 @@ AC_NETATALK_SHADOW
 dnl Check for optional valid-shell-check support
 AC_NETATALK_SHELL_CHECK
 
-dnl Check for optional sysv initscript install
+dnl Check for optional initscript install
 AC_NETATALK_INIT_STYLE
 
 dnl Path where UAM modules shall be installed
@@ -255,7 +255,7 @@ AC_CONFIG_FILES([
   distrib/Makefile
   distrib/config/Makefile
   distrib/config/netatalk-config
-  distrib/initscripts/Makefile
+  distrib/initscript/Makefile
   distrib/m4/Makefile
   doc/Makefile
   doc/html.xsl
