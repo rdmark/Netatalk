@@ -154,12 +154,6 @@ AC_NETATALK_PATH_SSL
 dnl Check for Berkeley DB library
 AC_NETATALK_PATH_BDB
 
-dnl Check for crypt
-AC_NETATALK_CRYPT
-
-dnl Check for building PGP UAM module
-AC_NETATALK_PGP_UAM
-
 dnl Check for building Kerberos V UAM module
 AC_NETATALK_KRB5_UAM
 
@@ -216,15 +210,12 @@ AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
 AM_CONDITIONAL(HAVE_LDAP, test x"$netatalk_cv_ldap" = x"yes")
 AM_CONDITIONAL(USE_DHX, test x$neta_cv_compile_dhx = xyes)
 AM_CONDITIONAL(USE_DHX2, test x$neta_cv_compile_dhx2 = xyes)
-AM_CONDITIONAL(USE_RANDNUM, test x$neta_cv_have_openssl = xyes)
 AM_CONDITIONAL(USE_PAM_SO, test x$use_pam_so = xyes)
 AM_CONDITIONAL(USE_PAM, test x$netatalk_cv_install_pam = xyes)
 AM_CONDITIONAL(BUILD_PAM, test x$compile_pam = xyes)
-AM_CONDITIONAL(USE_PGP, test x$compile_pgp = xyes)
 AM_CONDITIONAL(DEFAULT_HOOK, test x$neta_cv_have_libgcrypt != xyes && test x$neta_cv_have_openssl != xyes)
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
 AM_CONDITIONAL(HAVE_ATFUNCS, test x"$ac_neta_haveatfuncs" = x"yes")
-AM_CONDITIONAL(USE_SHADOWPW, test x$shadowpw = xyes)
 
 dnl Enable silent Automake rules if present
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])

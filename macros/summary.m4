@@ -29,17 +29,9 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
         if test "x$neta_cv_compile_dhx2" = "xyes"; then
                 AC_MSG_RESULT([         DHX2    ($uams_using_options)])
         fi
-	if test "x$neta_cv_have_openssl" = "xyes"; then
-		AC_MSG_RESULT([         RANDNUM (afppasswd)])
-	fi
 	if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then
 		AC_MSG_RESULT([         Kerberos V])
 	fi
-	if test x"$compile_pgp" = x"yes"; then
-		AC_MSG_RESULT([         PGP])
-	fi
-	AC_MSG_RESULT([         clrtxt  ($uams_using_options)])
-	AC_MSG_RESULT([         guest])
 	AC_MSG_RESULT([    Options:])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
 	AC_MSG_RESULT([         tcp wrapper support:     $netatalk_cv_tcpwrap])
@@ -83,9 +75,9 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 	dnl # Display summary of libraries detected
 
 	AC_MSG_RESULT([Compilation summary:])
-	AC_MSG_RESULT([    CPPFLAGS       = $CPPFLAGS])
-	AC_MSG_RESULT([    CFLAGS         = $CFLAGS])
-	AC_MSG_RESULT([    LIBS           = $LIBS])
+	AC_MSG_RESULT([    CPPFLAGS   = $CPPFLAGS])
+	AC_MSG_RESULT([    CFLAGS     = $CFLAGS])
+	AC_MSG_RESULT([    LIBS       = $LIBS])
 	AC_MSG_RESULT([    PTHREADS:])
 	AC_MSG_RESULT([        LIBS   = $PTHREAD_LIBS])
 	AC_MSG_RESULT([        CFLAGS = $PTHREAD_CFLAGS])
@@ -94,11 +86,11 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $SSL_CFLAGS])
 	fi
-        if test x"$neta_cv_have_libgcrypt" = x"yes"; then
-                AC_MSG_RESULT([    LIBGCRYPT:])
-                AC_MSG_RESULT([        LIBS   = $LIBGCRYPT_LIBS])
-                AC_MSG_RESULT([        CFLAGS = $LIBGCRYPT_CFLAGS])
-        fi
+  if test x"$neta_cv_have_libgcrypt" = x"yes"; then
+    AC_MSG_RESULT([    LIBGCRYPT:])
+    AC_MSG_RESULT([        LIBS   = $LIBGCRYPT_LIBS])
+    AC_MSG_RESULT([        CFLAGS = $LIBGCRYPT_CFLAGS])
+  fi
 	if test x"$netatalk_cv_use_pam" = x"yes"; then
 		AC_MSG_RESULT([    PAM:])
 		AC_MSG_RESULT([        LIBS   = $PAM_LIBS])

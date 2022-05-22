@@ -519,26 +519,6 @@ AC_DEFUN([AC_NETATALK_SET_RPATH], [
 	AC_MSG_RESULT([$enable_rpath])
 ])
 
-dnl Check for building PGP UAM module
-AC_DEFUN([AC_NETATALK_PGP_UAM], [
-AC_MSG_CHECKING([whether the PGP UAM should be build])
-AC_ARG_ENABLE(pgp-uam,
-	[  --enable-pgp-uam        enable build of PGP UAM module],[
-	if test "$enableval" = "yes"; then
-		if test "x$neta_cv_have_openssl" = "xyes"; then
-			AC_DEFINE(UAM_PGP, 1, [Define if the PGP UAM module should be compiled])
-			compile_pgp=yes
-			AC_MSG_RESULT([yes])
-		else
-			AC_MSG_RESULT([no])
-		fi
-	fi
-	],[
-		AC_MSG_RESULT([no])
-	]
-)
-])
-
 dnl Check for building Kerberos V UAM module
 AC_DEFUN([AC_NETATALK_KRB5_UAM], [
 netatalk_cv_build_krb5_uam=no
