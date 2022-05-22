@@ -64,12 +64,3 @@ test_SOURCES += $(top_srcdir)/etc/afpd/spotlight.c
 test_LDADD += $(top_builddir)/etc/spotlight/libspotlight.la
 test_CFLAGS += @TRACKER_CFLAGS@
 endif
-
-if WITH_DTRACE
-DTRACE_OBJ = test-afp_dsi.o test-fork.o test-appl.o test-catsearch.o test-directory.o test-enumerate.o test-file.o test-filedir.o
-afp_dtrace.o: $(top_srcdir)/include/atalk/afp_dtrace.d $(DTRACE_OBJ)
-	if test -f afp_dtrace.o ; then rm -f afp_dtrace.o ; fi
-	$(LIBTOOL) --mode=execute dtrace -G -s $(top_srcdir)/include/atalk/afp_dtrace.d -o afp_dtrace.o $(DTRACE_OBJ)
-test_LDADD += afp_dtrace.o @DTRACE_LIBS@
-CLEANFILES += afp_dtrace.o
-endif

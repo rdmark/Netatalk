@@ -172,13 +172,6 @@ static void show_version_extended(void )
 #else
 	puts( "No" );
 #endif
-
-	printf( "         DTrace probes:\t" );
-#ifdef WITH_DTRACE
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
 }
 
 /*

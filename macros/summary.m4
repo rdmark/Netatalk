@@ -54,7 +54,6 @@ dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([         LDAP support:            $netatalk_cv_ldap])
 	AC_MSG_RESULT([         AFP stats via dbus:      $atalk_cv_with_dbus])
-	AC_MSG_RESULT([         dtrace probes:           $WDTRACE])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
 	if test "x$init_style" != x"none"; then

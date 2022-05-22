@@ -194,8 +194,8 @@ AC_NETATALK_TALLOC
 dnl Check for Tracker
 AC_NETATALK_SPOTLIGHT
 
-dnl Check for dtrace
-AC_NETATALK_DTRACE
+dnl libatalk API checks
+AC_DEVELOPER
 
 dnl Check for dbus-glib, for AFP stats on dbus
 AC_NETATALK_DBUS_GLIB

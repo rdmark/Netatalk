@@ -54,7 +54,6 @@ afpd_CFLAGS = \
 	@GSSAPI_CFLAGS@ @KRB5_CFLAGS@ @PTHREAD_CFLAGS@\
 	-DAPPLCNAME \
 	-DSERVERTEXT=\"$(SERVERTEXT)/\" \
-	-D_PATH_AFPDPWFILE=\"$(pkgconfdir)/afppasswd\" \
 	-D_PATH_AFPDUAMPATH=\"$(UAMS_PATH)/\" \
 	-D_PATH_CONFDIR=\"$(pkgconfdir)/\" \
 	-D_PATH_STATEDIR='"$(localstatedir)/netatalk/"'
@@ -80,15 +79,6 @@ afpstats_service_glue.h: afpstats-service.xml
 afpd_SOURCES += afpstats.c afpstats_obj.c
 afpd_CFLAGS  += $(DBUS_CFLAGS) $(DBUS_GLIB_CFLAGS) $(DBUS_GTHREAD_CFLAGS) -DDBUS_COMPILATION
 afpd_LDFLAGS += $(DBUS_LIBS) $(DBUS_GLIB_LIBS) $(DBUS_GTHREAD_LIBS) -ldbus-glib-1
-endif
-
-if WITH_DTRACE
-DTRACE_OBJ = afpd-afp_dsi.o afpd-fork.o afpd-appl.o afpd-catsearch.o afpd-directory.o afpd-enumerate.o afpd-file.o afpd-filedir.o
-afp_dtrace.o: $(top_srcdir)/include/atalk/afp_dtrace.d $(DTRACE_OBJ)
-	if test -f afp_dtrace.o ; then rm -f afp_dtrace.o ; fi
-	$(LIBTOOL) --mode=execute dtrace -G -s $(top_srcdir)/include/atalk/afp_dtrace.d -o afp_dtrace.o $(DTRACE_OBJ)
-afpd_LDADD += afp_dtrace.o @DTRACE_LIBS@
-CLEANFILES += afp_dtrace.o
 endif
 
 noinst_HEADERS = auth.h afp_config.h desktop.h directory.h fce_api_internal.h file.h \

@@ -1,7 +1,7 @@
 # Makefile.am for include/atalk/
 
 atalkincludedir = $(includedir)/atalk
-BUILT_SOURCES = 
+BUILT_SOURCES =
 CLEANFILES =
 
 atalkinclude_HEADERS = \
@@ -50,10 +50,3 @@ noinst_HEADERS = \
 	spotlight.h
 
 EXTRA_DIST = afp_dtrace.d
-
-if WITH_DTRACE
-BUILT_SOURCES += afp_dtrace.h
-CLEANFILES += afp_dtrace.h
-afp_dtrace.h: $(top_srcdir)/include/atalk/afp_dtrace.d
-	$(LIBTOOL) --mode=execute dtrace -o afp_dtrace.h -h -s $(top_srcdir)/include/atalk/afp_dtrace.d
-endif
