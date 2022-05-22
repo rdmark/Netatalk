@@ -15,6 +15,7 @@ uninstall: uninstall-startup
 if USE_MACOS_LAUNCHD
 
 bin_SCRIPTS = netatalkd
+EXTRA_DIST = netatalkd
 launchd_PLIST = com.netatalk.daemon.plist
 
 install-data-hook:

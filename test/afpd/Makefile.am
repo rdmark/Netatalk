@@ -31,9 +31,7 @@ test_SOURCES =  test.c subtests.c afpfunc_helpers.c \
 				$(top_srcdir)/etc/afpd/hash.c \
 				$(top_srcdir)/etc/afpd/mangle.c \
 				$(top_srcdir)/etc/afpd/messages.c \
-				$(top_srcdir)/etc/afpd/nfsquota.c \
 				$(top_srcdir)/etc/afpd/ofork.c \
-				$(top_srcdir)/etc/afpd/quota.c \
 				$(top_srcdir)/etc/afpd/status.c \
 				$(top_srcdir)/etc/afpd/spotlight_marshalling.c \
 				$(top_srcdir)/etc/afpd/switch.c \
