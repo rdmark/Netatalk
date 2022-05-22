@@ -248,34 +248,6 @@ powerpc64:yes | s390x:yes | sparc*:yes | x86_64:yes | i386:yes)
 esac
 ])
 
-dnl Check for optional cracklib support
-AC_DEFUN([AC_NETATALK_CRACKLIB], [
-netatalk_cv_with_cracklib=no
-AC_ARG_WITH(cracklib,
-	[  --with-cracklib[[=DICT]]  enable/set location of cracklib dictionary [[no]]],[
-	if test "x$withval" != "xno" ; then
-		cracklib="$withval"
-		AC_CHECK_LIB(crack, main, [
-			AC_DEFINE(USE_CRACKLIB, 1, [Define if cracklib should be used])
-			LIBS="$LIBS -lcrack"
-			if test "$cracklib" = "yes"; then
-				cracklib="/usr/$atalk_libname/cracklib_dict"
-			fi
-			AC_DEFINE_UNQUOTED(_PATH_CRACKLIB, "$cracklib",
-				[path to cracklib dictionary])
-			AC_MSG_RESULT([setting cracklib dictionary to $cracklib])
-			netatalk_cv_with_cracklib=yes
-			],[
-			AC_MSG_ERROR([cracklib not found!])
-			]
-		)
-	fi
-	]
-)
-AC_MSG_CHECKING([for cracklib support])
-AC_MSG_RESULT([$netatalk_cv_with_cracklib])
-])
-
 dnl Check whether to enable debug code
 AC_DEFUN([AC_NETATALK_DEBUG], [
 AC_MSG_CHECKING([whether to enable verbose debug code])

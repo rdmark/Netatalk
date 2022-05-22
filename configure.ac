@@ -106,9 +106,6 @@ AC_NETATALK_AFS_CHECK
 dnl --with-pkgconfdir check to change configuration directory location
 AC_NETATALK_CONFIG_DIRS
 
-dnl Check for optional cracklib support
-AC_NETATALK_CRACKLIB
-
 dnl Check whether to enable debug code
 AC_NETATALK_DEBUG
 
@@ -225,7 +222,6 @@ AC_CONFIG_FILES([
   Makefile
   bin/Makefile
   bin/ad/Makefile
-  bin/afppasswd/Makefile
   bin/cnid/Makefile
   bin/cnid/cnid2_create
   bin/megatron/Makefile

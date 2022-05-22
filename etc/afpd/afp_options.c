@@ -136,13 +136,6 @@ static void show_version_extended(void )
 	puts( "No" );
 #endif
 
-	printf( "      cracklib support:\t" );
-#ifdef USE_CRACKLIB
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
 	printf( "            EA support:\t" );
 	puts( EA_MODULES );
 
