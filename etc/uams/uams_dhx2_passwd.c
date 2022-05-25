@@ -26,10 +26,6 @@
 #include <sys/time.h>
 #include <time.h>
 
-#ifdef SHADOWPW
-#include <shadow.h>
-#endif
-
 #ifdef HAVE_LIBGCRYPT
 #include <gcrypt.h>
 #endif
@@ -154,22 +150,11 @@ static int dhx2_setup(void *obj, char *ibuf _U_, size_t ibuflen _U_,
     size_t nwritten;
     gcry_mpi_t g, Ma;
     char *Ra_binary = NULL;
-#ifdef SHADOWPW
-    struct spwd *sp;
-#endif /* SHADOWPW */
     uint16_t uint16;
 
     *rbuflen = 0;
 
     /* Initialize passwd/shadow */
-#ifdef SHADOWPW
-    if (( sp = getspnam( dhxpwd->pw_name )) == NULL ) {
-        LOG(log_info, logtype_uams, "DHX2: no shadow passwd entry for this user");
-        return AFPERR_NOTAUTH;
-    }
-    dhxpwd->pw_passwd = sp->sp_pwdp;
-#endif /* SHADOWPW */
-
     if (!dhxpwd->pw_passwd)
         return AFPERR_NOTAUTH;
 
@@ -483,9 +468,6 @@ static int logincont2(void *obj _U_, struct passwd **uam_pwd,
                       char *ibuf, size_t ibuflen,
                       char *rbuf _U_, size_t *rbuflen)
 {
-#ifdef SHADOWPW
-    struct spwd *sp;
-#endif /* SHADOWPW */
     int ret;
     char *p;
     gcry_mpi_t retServerNonce;
@@ -550,25 +532,6 @@ static int logincont2(void *obj _U_, struct passwd **uam_pwd,
         ret = AFP_OK;
     }
 
-#ifdef SHADOWPW
-    if (( sp = getspnam( dhxpwd->pw_name )) == NULL ) {
-        LOG(log_info, logtype_uams, "no shadow passwd entry for %s", dhxpwd->pw_name);
-        ret = AFPERR_NOTAUTH;
-        goto exit;
-    }
-
-    /* check for expired password */
-    if (sp && sp->sp_max != -1 && sp->sp_lstchg) {
-        time_t now = time(NULL) / (60*60*24);
-        int32_t expire_days = sp->sp_lstchg - now + sp->sp_max;
-        if ( expire_days < 0 ) {
-            LOG(log_info, logtype_uams, "password for user %s expired", dhxpwd->pw_name);
-            ret = AFPERR_PWDEXPR;
-            goto exit;
-        }
-    }
-#endif /* SHADOWPW */
-
 error_ctx:
     gcry_cipher_close(ctx);
 error_noctx:
@@ -629,4 +592,3 @@ UAM_MODULE_EXPORT struct uam_export uams_dhx2_passwd = {
 };
 
 #endif /* UAM_DHX2 */
-

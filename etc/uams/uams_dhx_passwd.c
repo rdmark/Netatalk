@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1990,1993 Regents of The University of Michigan.
- * Copyright (c) 1999 Adrian Sun (asun@u.washington.edu) 
+ * Copyright (c) 1999 Adrian Sun (asun@u.washington.edu)
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -19,10 +19,6 @@
 #include <time.h>
 #include <pwd.h>
 #include <arpa/inet.h>
-
-#ifdef SHADOWPW
-#include <shadow.h>
-#endif /* SHADOWPW */
 
 #if defined(GNUTLS_DHX)
 #include <gnutls/openssl.h>
@@ -71,9 +67,6 @@ static int pwd_login(void *obj, char *username, int ulen, struct passwd **uam_pw
     uint8_t p[] = {0xBA, 0x28, 0x73, 0xDF, 0xB0, 0x60, 0x57, 0xD4,
 		    0x3F, 0x20, 0x24, 0x74, 0x4C, 0xEE, 0xE7, 0x5B };
     uint8_t g = 0x07;
-#ifdef SHADOWPW
-    struct spwd *sp;
-#endif /* SHADOWPW */
     BIGNUM *bn, *gbn, *pbn;
     const BIGNUM *pub_key;
     uint16_t sessid;
@@ -98,18 +91,10 @@ static int pwd_login(void *obj, char *username, int ulen, struct passwd **uam_pw
     if (( dhxpwd = uam_getname(obj, username, ulen)) == NULL ) {
         return AFPERR_NOTAUTH;
     }
-    
+
     LOG(log_info, logtype_uams, "dhx login: %s", username);
     if (uam_checkuser(dhxpwd) < 0)
       return AFPERR_NOTAUTH;
-
-#ifdef SHADOWPW
-    if (( sp = getspnam( dhxpwd->pw_name )) == NULL ) {
-	LOG(log_info, logtype_uams, "no shadow passwd entry for %s", username);
-	return AFPERR_NOTAUTH;
-    }
-    dhxpwd->pw_passwd = sp->sp_pwdp;
-#endif /* SHADOWPW */
 
     if (!dhxpwd->pw_passwd)
       return AFPERR_NOTAUTH;
@@ -156,16 +141,16 @@ static int pwd_login(void *obj, char *username, int ulen, struct passwd **uam_pw
 
     /* figure out the key. use rbuf as a temporary buffer. */
     i = DH_compute_key((unsigned char *)rbuf, bn, dh);
-    
+
     /* set the key */
     CAST_set_key(&castkey, i, (unsigned char *)rbuf);
-    
+
     /* session id. it's just a hashed version of the object pointer. */
     sessid = dhxhash(obj);
     memcpy(rbuf, &sessid, sizeof(sessid));
     rbuf += sizeof(sessid);
     *rbuflen += sizeof(sessid);
-    
+
     /* send our public key */
     BN_bn2bin(pub_key, (unsigned char *)rbuf);
     rbuf += KEYSIZE;
@@ -177,17 +162,17 @@ static int pwd_login(void *obj, char *username, int ulen, struct passwd **uam_pw
 			     &i) < 0) {
       *rbuflen = 0;
       goto passwd_fail;
-    }    
+    }
     memcpy(rbuf, &randbuf, sizeof(randbuf));
 
 #if 0
     /* get the signature. it's always 16 bytes. */
-    if (uam_afpserver_option(obj, UAM_OPTION_SIGNATURE, 
+    if (uam_afpserver_option(obj, UAM_OPTION_SIGNATURE,
 			     (void *) &name, NULL) < 0) {
       *rbuflen = 0;
       goto passwd_fail;
     }
-    memcpy(rbuf + KEYSIZE, name, KEYSIZE); 
+    memcpy(rbuf + KEYSIZE, name, KEYSIZE);
 #else /* 0 */
     memset(rbuf + KEYSIZE, 0, KEYSIZE);
 #endif /* 0 */
@@ -238,10 +223,10 @@ static int passwd_login(void *obj, struct passwd **uam_pwd,
 	ibuflen--;
     }
     return (pwd_login(obj, username, ulen, uam_pwd, ibuf, ibuflen, rbuf, rbuflen));
-    
+
 }
 
-/* cleartxt login ext 
+/* cleartxt login ext
  * uname format :
     byte      3
     2 bytes   len (network order)
@@ -256,7 +241,7 @@ static int passwd_login_ext(void *obj, char *uname, struct passwd **uam_pwd,
     uint16_t  temp16;
 
     *rbuflen = 0;
-    
+
     if (uam_afpserver_option(obj, UAM_OPTION_USERNAME,
 			     (void *) &username, &ulen) < 0)
 	return AFPERR_MISC;
@@ -273,14 +258,11 @@ static int passwd_login_ext(void *obj, char *uname, struct passwd **uam_pwd,
     username[ len ] = '\0';
     return (pwd_login(obj, username, ulen, uam_pwd, ibuf, ibuflen, rbuf, rbuflen));
 }
-			
+
 static int passwd_logincont(void *obj, struct passwd **uam_pwd,
-			    char *ibuf, size_t ibuflen _U_, 
+			    char *ibuf, size_t ibuflen _U_,
 			    char *rbuf, size_t *rbuflen)
 {
-#ifdef SHADOWPW
-    struct spwd *sp;
-#endif /* SHADOWPW */
     unsigned char iv[] = "LWallace";
     BIGNUM *bn1, *bn2, *bn3;
     uint16_t sessid;
@@ -294,11 +276,11 @@ static int passwd_logincont(void *obj, struct passwd **uam_pwd,
     if (sessid != dhxhash(obj))
       return AFPERR_PARAM;
     ibuf += sizeof(sessid);
-   
+
     /* use rbuf as scratch space */
     CAST_cbc_encrypt((unsigned char *)ibuf, (unsigned char *)rbuf, CRYPT2BUFLEN, &castkey,
 		     iv, CAST_DECRYPT);
-    
+
     /* check to make sure that the random number is the same. we
      * get sent back an incremented random number. */
     if (!(bn1 = BN_bin2bn((unsigned char *)rbuf, KEYSIZE, NULL)))
@@ -308,7 +290,7 @@ static int passwd_logincont(void *obj, struct passwd **uam_pwd,
       BN_free(bn1);
       return AFPERR_PARAM;
     }
-      
+
     /* zero out the random number */
     memset(rbuf, 0, sizeof(randbuf));
     memset(randbuf, 0, sizeof(randbuf));
@@ -356,22 +338,6 @@ static int passwd_logincont(void *obj, struct passwd **uam_pwd,
       *uam_pwd = dhxpwd;
       err = AFP_OK;
     }
-#ifdef SHADOWPW
-    if (( sp = getspnam( dhxpwd->pw_name )) == NULL ) {
-	LOG(log_info, logtype_uams, "no shadow passwd entry for %s", dhxpwd->pw_name);
-	return (AFPERR_NOTAUTH);
-    }
-
-    /* check for expired password */
-    if (sp && sp->sp_max != -1 && sp->sp_lstchg) {
-        time_t now = time(NULL) / (60*60*24);
-        int32_t expire_days = sp->sp_lstchg - now + sp->sp_max;
-        if ( expire_days < 0 ) {
-                LOG(log_info, logtype_uams, "password for user %s expired", dhxpwd->pw_name);
-		err = AFPERR_PWDEXPR;
-        }
-    }
-#endif /* SHADOWPW */
     return err;
 #endif /* TRU64 */
 

@@ -127,9 +127,6 @@ AC_NETATALK_TCP_WRAPPERS
 dnl Check for PAM libs
 AC_NETATALK_PATH_PAM
 
-dnl Check for optional shadow password support
-AC_NETATALK_SHADOW
-
 dnl Check for optional valid-shell-check support
 AC_NETATALK_SHELL_CHECK
 

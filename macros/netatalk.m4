@@ -293,37 +293,6 @@ AC_ARG_ENABLE(debugging,
 
 ])
 
-dnl Check for optional shadow password support
-AC_DEFUN([AC_NETATALK_SHADOW], [
-netatalk_cv_use_shadowpw=no
-AC_ARG_WITH(shadow,
-	[  --with-shadow           enable shadow password support [[auto]]],
-	[netatalk_cv_use_shadowpw="$withval"],
-	[netatalk_cv_use_shadowpw=auto]
-)
-
-if test "x$netatalk_cv_use_shadowpw" != "xno"; then
-    AC_CHECK_HEADER([shadow.h])
-    if test x"$ac_cv_header_shadow_h" = x"yes"; then
-	netatalk_cv_use_shadowpw=yes
-	AC_DEFINE(SHADOWPW, 1, [Define if shadow passwords should be used])
-    else
-      if test "x$shadowpw" = "xyes"; then
-        AC_MSG_ERROR([shadow support not available])
-      else
-       	netatalk_cv_use_shadowpw=no
-      fi
-    fi
-fi
-
-AC_MSG_CHECKING([whether shadow support should be enabled])
-if test "x$netatalk_cv_use_shadowpw" = "xyes"; then
-	AC_MSG_RESULT([yes])
-else
-	AC_MSG_RESULT([no])
-fi
-])
-
 dnl Check for optional valid-shell-check support
 AC_DEFUN([AC_NETATALK_SHELL_CHECK], [
 netatalk_cv_use_shellcheck=yes
