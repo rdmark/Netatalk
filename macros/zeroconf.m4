@@ -54,13 +54,13 @@ AC_DEFUN([AC_NETATALK_ZEROCONF], [
             AC_CHECK_HEADER(
                 dns_sd.h,
                 AC_CHECK_LIB(
-                    dns_sd,
+                    System,
                     DNSServiceRegister,
                     AC_DEFINE(USE_ZEROCONF, 1, [Use DNS-SD registration]))
             )
 
-            if test "$ac_cv_lib_dns_sd_DNSServiceRegister" = yes; then
-                ZEROCONF_LIBS="-ldns_sd"
+            if test "$ac_cv_lib_System_DNSServiceRegister" = yes; then
+                ZEROCONF_LIBS="-lSystem"
                 AC_DEFINE(HAVE_MDNS, 1, [Use mDNSRespnder/DNS-SD registration])
                 found_zeroconf=yes
             fi
