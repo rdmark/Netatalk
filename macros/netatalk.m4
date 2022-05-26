@@ -174,10 +174,6 @@ rm -rf conftest*
 case $host_cpu:$atalk_cv_cc_64bit_output in
 powerpc64:yes | s390x:yes | sparc*:yes | x86_64:yes | i386:yes)
     case $target_os in
-    solaris2*)
-        AC_MSG_RESULT([yes])
-        atalk_libname="lib/64"
-        ;;
     *bsd* | dragonfly*)
         AC_MSG_RESULT([no])
         atalk_libname="lib"
@@ -277,7 +273,6 @@ case "$host_os" in
 	*netbsd*) 			this_os=netbsd ;;
 	*openbsd*) 			this_os=openbsd ;;
 	*osf*) 				this_os=tru64 ;;
-	*solaris*) 			this_os=solaris ;;
 esac
 
 case "$host_cpu" in
@@ -350,25 +345,10 @@ if test x"$this_os" = "xopenbsd"; then
 	dnl ----- OpenBSD does not have crypt.h, uses unistd.h -----
 	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
 fi
-
-dnl ----- Solaris specific -----
-if test x"$this_os" = "xsolaris"; then
-	AC_MSG_RESULT([ * Solaris specific configuration])
-	AC_DEFINE(__svr4__, 1, [Solaris compatibility macro])
-	AC_DEFINE(_ISOC9X_SOURCE, 1, [Compatibility macro])
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
-	AC_DEFINE(SOLARIS, 1, [Solaris compatibility macro])
-    AC_DEFINE(_XOPEN_SOURCE, 600, [Solaris compilation environment])
-    AC_DEFINE(__EXTENSIONS__,  1, [Solaris compilation environment])
-	init_style=solaris
-fi
 ])
 
-dnl Check whether to enable rpath (the default on Solaris and NetBSD)
+dnl Check whether to enable rpath
 AC_DEFUN([AC_NETATALK_SET_RPATH], [
-	AS_CASE("$this_os", [solaris|netbsd],
-		[default_rpath=yes],
-		[default_rpath=no])
 	AS_CASE("$this_os", [linux|kfreebsd],
 		[enable_dtags=yes],
 		[enable_dtags=no])

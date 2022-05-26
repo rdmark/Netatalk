@@ -52,16 +52,6 @@ enum {
     kXAttrReplace = 0x4
 };
 
-#if !defined(HAVE_SETXATTR)
-#define XATTR_CREATE  0x1       /* set value, fail if attr already exists */
-#define XATTR_REPLACE 0x2       /* set value, fail if attr does not exist */
-#endif
-
-#ifdef SOLARIS
-#define SMB_ATTR_PREFIX "SUNWsmb:"
-#define SMB_ATTR_PREFIX_LEN (sizeof (SMB_ATTR_PREFIX) - 1)
-#endif
-
 /* Names for our Extended Attributes adouble data */
 #define AD_EA_META "org.netatalk.Metadata"
 #define AD_EA_RESO "org.netatalk.ResourceFork"

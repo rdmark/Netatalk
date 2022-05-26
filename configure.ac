@@ -183,7 +183,6 @@ AC_SUBST(LIBS)
 AC_SUBST(CFLAGS)
 AC_SUBST(UAMS_PATH)
 
-AM_CONDITIONAL(SOLARIS_MODULE, test x$solaris_module = xyes)
 AM_CONDITIONAL(HAVE_LIBGCRYPT, test x$neta_cv_have_libgcrypt = xyes)
 AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
 AM_CONDITIONAL(HAVE_LDAP, test x"$netatalk_cv_ldap" = x"yes")
