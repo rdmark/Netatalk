@@ -33,7 +33,6 @@
 #include <atalk/vfs.h>
 #include <atalk/util.h>
 #include <atalk/unix.h>
-#include <atalk/compat.h>
 
 /**********************************************************************************
  * EA VFS funcs for storing EAs in nativa filesystem EAs

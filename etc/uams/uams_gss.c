@@ -18,7 +18,6 @@
 #include <atalk/afp.h>
 #include <atalk/uam.h>
 #include <atalk/util.h>
-#include <atalk/compat.h>
 #include <atalk/globals.h>
 
 /* Kerberos includes */

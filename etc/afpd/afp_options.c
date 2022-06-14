@@ -29,7 +29,6 @@
 
 #include <atalk/paths.h>
 #include <atalk/util.h>
-#include <atalk/compat.h>
 #include <atalk/globals.h>
 #include <atalk/fce_api.h>
 #include <atalk/errchk.h>

@@ -20,7 +20,6 @@
 #include <atalk/logger.h>
 #include <atalk/unix.h>
 #include <atalk/acl.h>
-#include <atalk/compat.h>
 #include <atalk/errchk.h>
 #include <atalk/ea.h>
 
@@ -161,7 +160,7 @@ EC_CLEANUP:
     EC_EXIT;
 }
 
-/* 
+/*
  * Supports *at semantics if HAVE_ATFUNCS, pass dirfd=-1 to ignore this
  */
 int copy_file(int dirfd, const char *src, const char *dst, mode_t mode)
@@ -248,7 +247,7 @@ EC_CLEANUP:
     EC_EXIT;
 }
 
-/* 
+/*
  * at wrapper for netatalk_unlink
  */
 int netatalk_unlinkat(int dirfd, const char *name)
@@ -299,7 +298,7 @@ int unix_rename(int sfd, const char *oldpath, int dfd, const char *newpath)
         dfd = AT_FDCWD;
 
     if (renameat(sfd, oldpath, dfd, newpath) < 0)
-        return -1;        
+        return -1;
 #else
     if (rename(oldpath, newpath) < 0)
         return -1;
@@ -308,7 +307,7 @@ int unix_rename(int sfd, const char *oldpath, int dfd, const char *newpath)
     return 0;
 }
 
-/* 
+/*
  * @brief stat/fsstatat multiplexer
  *
  * statat mulitplexes stat and fstatat. If we don't HAVE_ATFUNCS, dirfd is ignored.
@@ -325,13 +324,13 @@ int statat(int dirfd, const char *path, struct stat *st)
     return (fstatat(dirfd, path, st, 0));
 #else
     return (stat(path, st));
-#endif            
+#endif
 
     /* DEADC0DE */
     return -1;
 }
 
-/* 
+/*
  * @brief opendir wrapper for *at semantics support
  *
  * opendirat chdirs to dirfd if dirfd != -1 before calling opendir on path.

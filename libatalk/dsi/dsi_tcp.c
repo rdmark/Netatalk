@@ -45,7 +45,6 @@ int deny_severity = log_warning;
 #endif /* TCPWRAP */
 
 #include <atalk/dsi.h>
-#include <atalk/compat.h>
 #include <atalk/util.h>
 #include <atalk/errchk.h>
 
@@ -258,7 +257,7 @@ static void guess_interface(DSI *dsi, const char *hostname, const char *port)
     start = list = getifacelist();
     if (!start)
         return;
-        
+
     fd = socket(PF_INET, SOCK_STREAM, 0);
 
     while (list && *list) {
@@ -529,4 +528,3 @@ EC_CLEANUP:
         free(port);
     EC_EXIT;
 }
-

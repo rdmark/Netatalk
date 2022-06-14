@@ -34,7 +34,6 @@
 #include <atalk/ea.h>
 #include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
-#include <atalk/compat.h>
 #include <atalk/errchk.h>
 #include <atalk/volume.h>
 #include <atalk/dsi.h>
@@ -233,7 +232,7 @@ static int ad_conv_dehex(const char *path, const struct stat *sp, const struct v
 
     EC_ZERO( bfindreplace(newpath, str2e, strdot, 0) );
     EC_ZERO( bfindreplace(newpath, str2f, strcolon, 0) );
-    
+
     become_root();
     if (adflags != ADFLAGS_DIR) {
         if ((newadpath = strdup(vol->ad_path(bdata(newpath), 0))) == NULL) {
@@ -293,4 +292,3 @@ EC_CLEANUP:
     LOG(log_debug, logtype_ad,"ad_convert(\"%s\"): END: %d", fullpathname(path), ret);
     EC_EXIT;
 }
-

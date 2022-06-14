@@ -22,7 +22,6 @@ atalkinclude_HEADERS = \
 	bstrlib.h \
 	list.h \
 	globals.h \
-	compat.h \
 	uam.h \
 	iniparser.h \
 	dictionary.h \

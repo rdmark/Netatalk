@@ -23,7 +23,6 @@
 #include <atalk/util.h>
 #include <atalk/dsi.h>
 #include <atalk/afp.h>
-#include <atalk/compat.h>
 #include <atalk/server_child.h>
 #include <atalk/globals.h>
 #include <atalk/errchk.h>

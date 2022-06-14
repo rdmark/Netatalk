@@ -5,10 +5,10 @@
  * All Rights Reserved.  See COPYING.
  */
 
-/* 
+/*
    cnid_dbd metadaemon to start up cnid_dbd upon request from afpd.
    Here is how it works:
-   
+
                        via TCP socket
    1.       afpd          ------->        cnid_metad
 
@@ -87,7 +87,6 @@
 #include <atalk/logger.h>
 #include <atalk/cnid_bdb_private.h>
 #include <atalk/paths.h>
-#include <atalk/compat.h>
 #include <atalk/errchk.h>
 #include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
@@ -234,7 +233,7 @@ static struct server *test_usockfn(const char *path)
        }
     }
 
-    /* 
+    /*
        Create socketpair for comm between parent and child.
        We use it to pass fds from connecting afpd processes to our
        cnid_dbd child via fd passing.
@@ -346,7 +345,7 @@ EC_CLEANUP:
 }
 
 /* ------------------ */
-static void catch_child(int sig _U_) 
+static void catch_child(int sig _U_)
 {
     sigchild = 1;
 }

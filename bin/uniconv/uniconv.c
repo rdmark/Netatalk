@@ -39,7 +39,6 @@
 #include <atalk/unicode.h>
 #include <atalk/util.h>
 #include <atalk/logger.h>
-#include <atalk/compat.h>
 
 #include "atalk/cnid.h"
 #ifndef MAXPATHLEN

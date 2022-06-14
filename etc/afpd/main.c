@@ -20,7 +20,6 @@
 
 #include <atalk/logger.h>
 #include <atalk/adouble.h>
-#include <atalk/compat.h>
 #include <atalk/dsi.h>
 #include <atalk/afp.h>
 #include <atalk/paths.h>
@@ -80,7 +79,7 @@ static bool init_listening_sockets(const AFPObj *config)
 
     return true;
 }
- 
+
 static bool reset_listening_sockets(const AFPObj *config)
 {
     const DSI *dsi;
@@ -109,7 +108,7 @@ static void afp_goaway(int sig)
     case SIGUSR1 :
         nologin++;
         auth_unload();
-        LOG(log_info, logtype_afpd, "disallowing logins");        
+        LOG(log_info, logtype_afpd, "disallowing logins");
 
         if (server_children)
             server_child_kill(server_children, sig);
@@ -136,7 +135,7 @@ static void child_handler(void)
     int fd;
     int status;
     pid_t pid;
-  
+
 #ifndef WAIT_ANY
 #define WAIT_ANY (-1)
 #endif /* ! WAIT_ANY */
@@ -206,17 +205,17 @@ int main(int ac, char **av)
     obj.options.save_mask = umask(obj.options.umask);
 
     /* install child handler for asp and dsi. we do this before afp_goaway
-     * as afp_goaway references stuff from here. 
+     * as afp_goaway references stuff from here.
      * XXX: this should really be setup after the initial connections. */
     if (!(server_children = server_child_alloc(obj.options.connections))) {
         LOG(log_error, logtype_afpd, "main: server_child alloc: %s", strerror(errno) );
         afp_exit(EXITERR_SYS);
     }
-    
+
     sigemptyset(&sigs);
     pthread_sigmask(SIG_SETMASK, &sigs, NULL);
 
-    memset(&sv, 0, sizeof(sv));    
+    memset(&sv, 0, sizeof(sv));
     /* linux at least up to 2.4.22 send a SIGXFZ for vfat fs,
        even if the file is open with O_LARGEFILE ! */
 #ifdef SIGXFSZ
@@ -234,7 +233,7 @@ int main(int ac, char **av)
         LOG(log_error, logtype_afpd, "main: sigaction: %s", strerror(errno) );
         afp_exit(EXITERR_SYS);
     }
-    
+
     sv.sa_handler = afp_goaway; /* handler for all sigs */
 
     sigemptyset( &sv.sa_mask );
@@ -242,7 +241,7 @@ int main(int ac, char **av)
     sigaddset(&sv.sa_mask, SIGHUP);
     sigaddset(&sv.sa_mask, SIGTERM);
     sigaddset(&sv.sa_mask, SIGUSR1);
-    sigaddset(&sv.sa_mask, SIGQUIT);    
+    sigaddset(&sv.sa_mask, SIGQUIT);
     sv.sa_flags = SA_RESTART;
     if ( sigaction( SIGCHLD, &sv, NULL ) < 0 ) {
         LOG(log_error, logtype_afpd, "main: sigaction: %s", strerror(errno) );
@@ -346,7 +345,7 @@ int main(int ac, char **av)
      * while the children get handled by afp_over_{asp,dsi}.  this is
      * currently vulnerable to a denial-of-service attack if a
      * connection is made without an actual login attempt being made
-     * afterwards. establishing timeouts for logins is a possible 
+     * afterwards. establishing timeouts for logins is a possible
      * solution. */
     while (1) {
         pthread_sigmask(SIG_UNBLOCK, &sigs, NULL);
@@ -399,7 +398,7 @@ int main(int ac, char **av)
 
         if (ret == 0)
             continue;
-        
+
         if (ret < 0) {
             if (errno == EINTR)
                 continue;

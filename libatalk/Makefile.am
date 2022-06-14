@@ -15,7 +15,6 @@ libatalk_la_LIBADD  = \
 	adouble/libadouble.la	\
 	bstring/libbstring.la \
 	cnid/libcnid.la \
-	compat/libcompat.la	\
 	dsi/libdsi.la		\
 	iniparser/libiniparser.la \
 	talloc/libtalloc.la       \
@@ -28,7 +27,6 @@ libatalk_la_DEPENDENCIES = \
 	adouble/libadouble.la	\
 	bstring/libbstring.la \
 	cnid/libcnid.la \
-	compat/libcompat.la	\
 	dsi/libdsi.la		\
 	talloc/libtalloc.la       \
 	iniparser/libiniparser.la \

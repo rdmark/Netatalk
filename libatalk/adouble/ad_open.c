@@ -47,7 +47,6 @@
 #include <atalk/ea.h>
 #include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
-#include <atalk/compat.h>
 #include <atalk/errchk.h>
 #include <atalk/volume.h>
 
