@@ -8,14 +8,9 @@
 #include <pwd.h>
 #include <stdarg.h>
 
-#ifdef TRU64
-#include <sia.h>
-#include <siad.h>
-#endif /* TRU64 */
-
 /* just a label for exported bits */
 #ifndef UAM_MODULE_EXPORT
-#define UAM_MODULE_EXPORT 
+#define UAM_MODULE_EXPORT
 #endif
 
 /* type of uam */
@@ -28,7 +23,7 @@
 /* things for which we can have uams */
 #define UAM_SERVER_LOGIN         (1 << 0)
 #define UAM_SERVER_CHANGEPW      (1 << 1)
-#define UAM_SERVER_PRINTAUTH     (1 << 2) 
+#define UAM_SERVER_PRINTAUTH     (1 << 2)
 #define UAM_SERVER_LOGIN_EXT     (1 << 3)
 
 /* options */
@@ -90,12 +85,5 @@ extern UAM_MODULE_EXPORT int uam_checkuser (const struct passwd *);
 extern UAM_MODULE_EXPORT int uam_afp_read (void *, char *, size_t *,
 			     int (*)(void *, void *, const int));
 extern UAM_MODULE_EXPORT int uam_afpserver_option (void *, const int, void *, size_t *);
-
-#ifdef TRU64
-extern void uam_afp_getcmdline (int *, char ***);
-extern int uam_sia_validate_user (sia_collect_func_t *, int, char **,
-                                     char *, char *, char *, int, char *,
-                                     char *);
-#endif /* TRU64 */
 
 #endif

@@ -34,13 +34,6 @@
 #include "auth.h"
 #include "uam_auth.h"
 
-#ifdef TRU64
-#include <netdb.h>
-#include <sia.h>
-#include <siad.h>
-#include <signal.h>
-#endif /* TRU64 */
-
 /* --- server uam functions -- */
 
 /* uam_load. uams must have a uam_setup function. */
@@ -146,7 +139,7 @@ int uam_register(const int type, const char *path, const char *name, ...)
         uam->u.uam_login.logout = va_arg(ap, void *);
         uam->u.uam_login.login_ext = va_arg(ap, void *);
         break;
-    
+
     case UAM_SERVER_LOGIN: /* expect three arguments */
         uam->u.uam_login.login_ext = NULL;
         uam->u.uam_login.login = va_arg(ap, void *);
@@ -188,7 +181,7 @@ void uam_unregister(const int type, const char *name)
     free(uam);
 }
 
-/* --- helper functions for plugin uams --- 
+/* --- helper functions for plugin uams ---
  * name: user name
  * len:  size of name buffer.
 */
@@ -205,7 +198,7 @@ struct passwd *uam_getname(void *private, char *name, const int len)
 
     if ((pwent = getpwnam(name)))
         return pwent;
-        
+
     /* if we have a NT domain name try with it */
     if (obj->options.addomain || (obj->options.ntdomain && obj->options.ntseparator)) {
         /* FIXME What about charset ? */
@@ -218,9 +211,9 @@ struct passwd *uam_getname(void *private, char *name, const int len)
         bdestroy(princ);
 
         if (pwent) {
-            int len = strlen(pwent->pw_name);              
+            int len = strlen(pwent->pw_name);
             if (len < MAXUSERLEN) {
-                strncpy(name,pwent->pw_name, MAXUSERLEN);  
+                strncpy(name,pwent->pw_name, MAXUSERLEN);
             } else {
                 LOG(log_error, logtype_uams, "The name '%s' is longer than %d", pwent->pw_name, MAXUSERLEN);
             }
@@ -238,9 +231,9 @@ struct passwd *uam_getname(void *private, char *name, const int len)
         if ((p = strchr(pwent->pw_gecos, ',')))
             *p = '\0';
 
-	gecoslen = convert_string(obj->options.unixcharset, CH_UCS2, 
+	gecoslen = convert_string(obj->options.unixcharset, CH_UCS2,
 				pwent->pw_gecos, -1, user, sizeof(username));
-	pwnamelen = convert_string(obj->options.unixcharset, CH_UCS2, 
+	pwnamelen = convert_string(obj->options.unixcharset, CH_UCS2,
 				pwent->pw_name, -1, pwname, sizeof(username));
 	if ((size_t)-1 == gecoslen && (size_t)-1 == pwnamelen)
 		continue;
@@ -249,7 +242,7 @@ struct passwd *uam_getname(void *private, char *name, const int len)
         /* check against both the gecos and the name fields. the user
          * might have just used a different capitalization. */
 
-	if ( (namelen == gecoslen && strncasecmp_w((ucs2_t*)user, (ucs2_t*)username, len) == 0) || 
+	if ( (namelen == gecoslen && strncasecmp_w((ucs2_t*)user, (ucs2_t*)username, len) == 0) ||
 		( namelen == pwnamelen && strncasecmp_w ( (ucs2_t*) pwname, (ucs2_t*) username, len) == 0)) {
             strlcpy(name, pwent->pw_name, len);
             break;
@@ -391,7 +384,7 @@ int uam_afpserver_option(void *private, const int what, void *option,
         struct DSI *dsi = obj->dsi;
         const struct sockaddr *sa;
         static char hbuf[NI_MAXHOST];
-        
+
         sa = (struct sockaddr *)&dsi->client;
         if (getnameinfo(sa, sizeof(dsi->client), hbuf, sizeof(hbuf), NULL, 0, 0) == 0)
             *buf = hbuf;
@@ -442,7 +435,7 @@ int uam_afpserver_option(void *private, const int what, void *option,
 }
 
 /* if we need to maintain a connection, this is how we do it.
- * because an action pointer gets passed in, we can stream 
+ * because an action pointer gets passed in, we can stream
  * DSI connections */
 int uam_afp_read(void *handle, char *buf, size_t *buflen,
                  int (*action)(void *, void *, const int))
@@ -471,57 +464,6 @@ uam_afp_read_err:
     *buflen = 0;
     return len;
 }
-
-#ifdef TRU64
-void uam_afp_getcmdline( int *ac, char ***av )
-{
-    afp_get_cmdline( ac, av );
-}
-
-int uam_sia_validate_user(sia_collect_func_t * collect, int argc, char **argv,
-                         char *hostname, char *username, char *tty,
-                         int colinput, char *gssapi, char *passphrase)
-/* A clone of the Tru64 system function sia_validate_user() that calls
- * sia_ses_authent() rather than sia_ses_reauthent()   
- * Added extra code to take into account suspected SIA bug whereby it clobbers
- * the signal handler on SIGALRM (tickle) installed by Netatalk/afpd
- */
-{
-       SIAENTITY *entity = NULL;
-       struct sigaction act;
-       int rc;
-
-       if ((rc=sia_ses_init(&entity, argc, argv, hostname, username, tty,
-                            colinput, gssapi)) != SIASUCCESS) {
-               LOG(log_error, logtype_afpd, "cannot initialise SIA");
-               return SIAFAIL;
-       }
-
-       /* save old action for restoration later */
-       if (sigaction(SIGALRM, NULL, &act))
-               LOG(log_error, logtype_afpd, "cannot save SIGALRM handler");
-
-       if ((rc=sia_ses_authent(collect, passphrase, entity)) != SIASUCCESS) {
-               /* restore old action after clobbering by sia_ses_authent() */
-               if (sigaction(SIGALRM, &act, NULL))
-                       LOG(log_error, logtype_afpd, "cannot restore SIGALRM handler");
-
-               LOG(log_info, logtype_afpd, "unsuccessful login for %s",
-(hostname?hostname:"(null)"));
-               return SIAFAIL;
-       }
-       LOG(log_info, logtype_afpd, "successful login for %s",
-(hostname?hostname:"(null)"));
-
-       /* restore old action after clobbering by sia_ses_authent() */   
-       if (sigaction(SIGALRM, &act, NULL))
-               LOG(log_error, logtype_afpd, "cannot restore SIGALRM handler");
-
-       sia_ses_release(&entity);
-
-       return SIASUCCESS;
-}
-#endif /* TRU64 */
 
 /* --- papd-specific functions (just placeholders) --- */
 struct papfile;
