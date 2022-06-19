@@ -31,7 +31,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	fi
 	AC_MSG_RESULT([    Options:])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
-	AC_MSG_RESULT([         tcp wrapper support:     $netatalk_cv_tcpwrap])
 dnl	if test x"$netatalk_cv_linux_sendfile" != x; then
 dnl		AC_MSG_RESULT([         Linux sendfile support:  $netatalk_cv_linux_sendfile])
 dnl	fi
@@ -90,11 +89,6 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([    PAM:])
 		AC_MSG_RESULT([        LIBS   = $PAM_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $PAM_CFLAGS])
-	fi
-	if test x"$netatalk_cv_use_pam" = x"yes"; then
-		AC_MSG_RESULT([    WRAP:])
-		AC_MSG_RESULT([        LIBS   = $WRAP_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $WRAP_CFLAGS])
 	fi
 	if test x"$bdb_required" = x"yes"; then
 		AC_MSG_RESULT([    BDB:])

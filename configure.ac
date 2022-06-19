@@ -121,9 +121,6 @@ AC_NETATALK_CNID([bdb_required=yes],[bdb_required=no])
 dnl Check for optional Zeroconf support
 AC_NETATALK_ZEROCONF
 
-dnl Check for optional TCP-wrappers support
-AC_NETATALK_TCP_WRAPPERS
-
 dnl Check for PAM libs
 AC_NETATALK_PATH_PAM
 

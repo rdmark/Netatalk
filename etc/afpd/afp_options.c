@@ -112,15 +112,8 @@ static void show_version_extended(void )
 	puts( "No" );
 #endif
 
-	printf( "  TCP wrappers support:\t" );
-#ifdef TCPWRAP
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
-	printf( "   Admin group support:\t" );
-	puts( "Yes" );
+    printf("   Admin group support:\t");
+    puts("Yes");
 
 	printf( "    Valid shell checks:\t" );
 #ifndef DISABLE_SHELLCHECK

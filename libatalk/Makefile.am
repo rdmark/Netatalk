@@ -10,7 +10,7 @@ libatalk_la_CFLAGS = \
 	@PTHREAD_CFLAGS@
 
 libatalk_la_LIBADD  = \
-	@WRAP_LIBS@ @PTHREAD_LIBS@ @MYSQL_LIBS@ \
+	@PTHREAD_LIBS@ @MYSQL_LIBS@ \
 	acl/libacl.la \
 	adouble/libadouble.la	\
 	bstring/libbstring.la \

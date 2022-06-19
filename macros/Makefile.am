@@ -15,5 +15,4 @@ EXTRA_DIST = \
 	ps-check.m4		\
 	ssl-check.m4		\
 	summary.m4		\
-	tcp-wrappers.m4		\
 	util.m4
