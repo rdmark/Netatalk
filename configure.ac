@@ -68,7 +68,7 @@ if test x"$libltdl_cv_need_uscore" = xyes; then
     AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
 fi
 
-dnl Special hecks
+dnl Special checks
 ac_neta_haveatfuncs=yes
 AC_CHECK_FUNCS(openat renameat fstatat unlinkat, , ac_neta_haveatfuncs=no)
 if test x"$ac_neta_haveatfuncs" = x"yes" ; then
