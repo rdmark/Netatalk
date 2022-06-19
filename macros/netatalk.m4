@@ -139,59 +139,6 @@ AC_DEFUN([AC_NETATALK_TDB], [
     AM_CONDITIONAL(USE_BUILTIN_TDB, test x"$use_bundled_tdb" = x"yes")
 ])
 
-dnl Whether to disable bundled talloc
-AC_DEFUN([AC_NETATALK_TALLOC], [
-    AC_ARG_WITH(
-        talloc,
-        [AS_HELP_STRING([--with-talloc],[whether to use the bundled talloc (default: yes)])],
-        use_bundled_talloc=$withval,
-        use_bundled_talloc=yes
-    )
-    AC_MSG_CHECKING([whether to use bundled talloc])
-    AC_MSG_RESULT([$use_bundled_talloc])
-
-    if test x"$use_bundled_talloc" = x"yes" ; then
-        AC_DEFINE(USE_BUILTIN_TALLOC, 1, [Use internal talloc])
-    else
-        if test -z "$TALLOC_LIBS" ; then
-            PKG_CHECK_MODULES(TALLOC, talloc, , [AC_MSG_ERROR([couldn't find talloc with pkg-config])])
-        fi
-        use_bundled_talloc=no
-    fi
-
-    AC_SUBST(TALLOC_CFLAGS)
-    AC_SUBST(TALLOC_LIBS)
-    AM_CONDITIONAL(USE_BUILTIN_TALLOC, test x"$use_bundled_talloc" = x"yes")
-])
-
-dnl Filesystem Hierarchy Standard (FHS) compatibility
-AC_DEFUN([AC_NETATALK_FHS], [
-AC_MSG_CHECKING([whether to use Filesystem Hierarchy Standard (FHS) compatibility])
-AC_ARG_ENABLE(fhs,
-	[  --enable-fhs            use Filesystem Hierarchy Standard (FHS) compatibility],[
-	if test "$enableval" = "yes"; then
-		bindir="/bin"
-		sbindir="/sbin"
-		sysconfdir="/etc"
-		libdir="/lib"
-		localstatedir="/var"
-		mandir="/usr/share/man"
-		uams_path="${libdir}/netatalk"
-		PKGCONFDIR="${sysconfdir}"
-		SERVERTEXT="${localstatedir}/netatalk/msg"
-		use_pam_so=yes
-		AC_DEFINE(FHS_COMPATIBILITY, 1, [Define if you want compatibily with the FHS])
-		AC_MSG_RESULT([yes])
-        atalk_cv_fhs_compat=yes
-	else
-		AC_MSG_RESULT([no])
-        atalk_cv_fhs_compat=no
-	fi
-	],[
-		AC_MSG_RESULT([no])
-        atalk_cv_fhs_compat=no
-])])
-
 dnl netatalk lockfile path
 AC_DEFUN([AC_NETATALK_LOCKFILE], [
     AC_MSG_CHECKING([netatalk lockfile path])
