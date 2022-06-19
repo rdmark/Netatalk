@@ -293,25 +293,6 @@ AC_ARG_ENABLE(debugging,
 
 ])
 
-dnl Check for optional valid-shell-check support
-AC_DEFUN([AC_NETATALK_SHELL_CHECK], [
-netatalk_cv_use_shellcheck=yes
-AC_MSG_CHECKING([whether checking for a valid shell should be enabled])
-AC_ARG_ENABLE(shell-check,
-	[  --disable-shell-check   disable checking for a valid shell],[
-	if test "$enableval" = "no"; then
-		AC_DEFINE(DISABLE_SHELLCHECK, 1, [Define if shell check should be disabled])
-		AC_MSG_RESULT([no])
-		netatalk_cv_use_shellcheck=no
-	else
-		AC_MSG_RESULT([yes])
-	fi
-	],[
-		AC_MSG_RESULT([yes])
-	]
-)
-])
-
 dnl Check for optional initscript install
 AC_DEFUN([AC_NETATALK_INIT_STYLE], [
     AC_ARG_WITH(init-style,

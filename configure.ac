@@ -124,9 +124,6 @@ AC_NETATALK_ZEROCONF
 dnl Check for PAM libs
 AC_NETATALK_PATH_PAM
 
-dnl Check for optional valid-shell-check support
-AC_NETATALK_SHELL_CHECK
-
 dnl Check for optional initscript install
 AC_NETATALK_INIT_STYLE
 
