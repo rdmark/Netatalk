@@ -47,10 +47,6 @@ struct ofork {
 #define AFPFORK_MODIFIED (1<<6) /* used in FCE for modified files */
 #define AFPFORK_ERROR   (1<<7)  /* used to indicate an error in opening the fork */
 
-#ifdef AFS
-extern struct ofork *writtenfork;
-#endif
-
 #define of_name(a) (a)->of_ad->ad_name
 /* in ofork.c */
 extern struct ofork *of_alloc    (struct vol *, struct dir *,
@@ -94,6 +90,6 @@ int afp_closefork (AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf,  size_t 
 
 int afp_bytelock_ext (AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf,  size_t *rbuflen);
 int afp_read_ext (AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf,  size_t *rbuflen);
-int afp_write_ext (AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf,  size_t *rbuflen); 
+int afp_write_ext (AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf,  size_t *rbuflen);
 int afp_syncfork (AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf,  size_t *rbuflen);
 #endif

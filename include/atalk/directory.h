@@ -36,11 +36,7 @@
 
 /* setgid directories */
 #ifndef DIRBITS
-# if (defined AFS) || (defined FREEBSD)
-#  define DIRBITS 0
-# else /* AFS */
 #  define DIRBITS S_ISGID
-# endif /* AFS */
 #endif /* DIRBITS */
 
 /* reserved directory id's */
@@ -50,7 +46,6 @@
 /* struct dir.d_flags */
 #define DIRF_FSMASK	   (3<<0)
 #define DIRF_NOFS	   (0<<0)
-#define DIRF_AFS	   (1<<0)
 #define DIRF_UFS	   (1<<1)
 #define DIRF_ISFILE    (1<<3) /* it's cached file, not a directory */
 #define DIRF_OFFCNT    (1<<4) /* offsprings count is valid */
@@ -95,7 +90,7 @@ static inline int path_isadir(struct path *o_path)
     return o_path->d_dir != NULL;
 #if 0
     return o_path->m_name == '\0' || /* we are in a it */
-           !o_path->st_valid ||      /* in cache but we can't chdir in it */ 
+           !o_path->st_valid ||      /* in cache but we can't chdir in it */
            (!o_path->st_errno && S_ISDIR(o_path->st.st_mode)); /* not in cache an can't chdir */
 #endif
 }
