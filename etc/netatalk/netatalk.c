@@ -349,19 +349,19 @@ int main(int argc, char **argv)
         }
     }
 
-    if (check_lockfile("netatalk", PATH_NETATALK_LOCK) != 0)
+    if (check_lockfile("netatalk.pid", PATH_NETATALK_LOCK) != 0)
         exit(EXITERR_SYS);
 
     if (!debug && daemonize(0, 0) != 0)
         exit(EXITERR_SYS);
 
-    if (create_lockfile("netatalk", PATH_NETATALK_LOCK) != 0)
+    if (create_lockfile("netatalk.pid", PATH_NETATALK_LOCK) != 0)
         exit(EXITERR_SYS);
 
     sigfillset(&blocksigs);
     sigprocmask(SIG_SETMASK, &blocksigs, NULL);
 
-    if (afp_config_parse(&obj, "netatalk") != 0)
+    if (afp_config_parse(&obj, "netatalk.pid") != 0)
         netatalk_exit(EXITERR_CONF);
 
     load_volumes(&obj, LV_ALL);
