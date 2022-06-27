@@ -17,7 +17,6 @@ libatalk_la_LIBADD  = \
 	cnid/libcnid.la \
 	dsi/libdsi.la		\
 	iniparser/libiniparser.la \
-	talloc/libtalloc.la       \
 	unicode/libunicode.la \
 	util/libutil.la		\
 	vfs/libvfs.la
@@ -28,7 +27,6 @@ libatalk_la_DEPENDENCIES = \
 	bstring/libbstring.la \
 	cnid/libcnid.la \
 	dsi/libdsi.la		\
-	talloc/libtalloc.la       \
 	iniparser/libiniparser.la \
 	unicode/libunicode.la \
 	util/libutil.la		\
