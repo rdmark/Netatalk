@@ -184,18 +184,6 @@ remote: Counting objects: 2503, done.
 
         <itemizedlist>
           <listitem>
-            <para>Tracker for Spotlight<indexterm>
-                <primary>Spotlight</primary>
-              </indexterm> support</para>
-
-            <para>Netatalk uses <ulink
-            url="https://tracker.gnome.org">Tracker</ulink> as the
-            metadata backend. Recent Linux distributions will provide the
-            libtracker-sparql library which is available since Tracker version
-            0.7.</para>
-          </listitem>
-
-          <listitem>
             <para>mDNSresponderPOSIX or Avahi for Bonjour (aka
             Zeroconf)</para>
 

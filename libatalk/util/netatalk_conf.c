@@ -898,10 +898,6 @@ static struct vol *creatvol(AFPObj *obj,
         volume->v_flags |= AFPVOL_NOV2TOEACONV;
     if (getoption_bool(obj->iniconfig, section, "follow symlinks", preset, 0))
         volume->v_flags |= AFPVOL_FOLLOWSYM;
-    if (getoption_bool(obj->iniconfig, section, "spotlight", preset, obj->options.flags & OPTION_SPOTLIGHT_VOL)) {
-        volume->v_flags |= AFPVOL_SPOTLIGHT;
-        obj->options.flags |= OPTION_SPOTLIGHT;
-    }
     if (getoption_bool(obj->iniconfig, section, "delete veto files", preset, 0))
         volume->v_flags |= AFPVOL_DELVETO;
 
@@ -2011,22 +2007,16 @@ int afp_config_parse(AFPObj *AFPObj, char *processname)
         options->flags |= OPTION_NOSENDFILE;
     if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "recvfile", 0))
         options->flags |= OPTION_RECVFILE;
-    if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "solaris share reservations", 1))
-        options->flags |= OPTION_SHARE_RESERV;
     if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "afpstats", 0))
         options->flags |= OPTION_DBUS_AFPSTATS;
     if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "afp read locks", 0))
         options->flags |= OPTION_AFP_READ_LOCK;
-    if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "spotlight", 0))
-        options->flags |= OPTION_SPOTLIGHT_VOL;
     if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "veto message", 0))
         options->flags |= OPTION_VETOMSG;
     if (!atalk_iniparser_getboolean(config, INISEC_GLOBAL, "save password", 1))
         options->passwdbits |= PASSWD_NOSAVE;
     if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "set password", 0))
         options->passwdbits |= PASSWD_SET;
-    if (atalk_iniparser_getboolean(config, INISEC_GLOBAL, "spotlight expr", 1))
-        options->flags |= OPTION_SPOTLIGHT_EXPR;
 
     /* figure out options w values */
     options->loginmesg      = atalk_iniparser_getstrdup(config, INISEC_GLOBAL, "login message",  NULL);

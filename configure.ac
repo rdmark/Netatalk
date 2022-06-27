@@ -182,17 +182,11 @@ dnl Check for sendfile()
 AC_NETATALK_SENDFILE
 AC_NETATALK_RECVFILE
 
-dnl Check whether bundled libevent shall not be used
+dnl Check for libevent
 AC_NETATALK_LIBEVENT
 
 dnl Check whether bundled tdb shall be used
 AC_NETATALK_TDB
-
-dnl Check whether bundled talloc shall be used
-AC_NETATALK_TALLOC
-
-dnl Check for Tracker
-AC_NETATALK_SPOTLIGHT
 
 dnl libatalk API checks
 AC_DEVELOPER
@@ -270,7 +264,6 @@ AC_CONFIG_FILES([
   etc/afpd/Makefile
   etc/cnid_dbd/Makefile
   etc/netatalk/Makefile
-  etc/spotlight/Makefile
   etc/uams/Makefile
   include/Makefile
   include/atalk/Makefile

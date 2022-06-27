@@ -73,7 +73,7 @@ struct vol {
     VolSpace        v_tm_used;  /* used bytes on a TM volume */
     time_t          v_tm_cachetime; /* time at which v_tm_used was calculated last */
     VolSpace        v_appended; /* amount of data appended to files */
-    
+
     /* only when opening/closing volumes or in error */
     int             v_casefold;
     char            *v_configname;   /* as defined in afpc.conf */
@@ -118,7 +118,6 @@ typedef enum {
 #define AFPVOL_UQUOTA   (1<<4)
 
 #define AFPVOL_NOV2TOEACONV (1 << 5) /* no adouble:v2 to adouble:ea conversion */
-#define AFPVOL_SPOTLIGHT (1 << 6)   /* Index volume for Spotlight searches */
 #define AFPVOL_EA_SAMBA  (1 << 7)   /* Store Samba compatible xattrs (append 0 byte) */
 #define AFPVOL_RO        (1 << 8)   /* read-only volume */
 #define AFPVOL_CHMOD_PRESERVE_ACL (1 << 9) /* try to preserve ACLs */

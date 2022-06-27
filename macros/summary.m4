@@ -12,7 +12,7 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	AC_MSG_RESULT([    AFP:])
 	AC_MSG_RESULT([         Extended Attributes: $neta_cv_eas])
 	AC_MSG_RESULT([         ACL support: yes])
-	AC_MSG_RESULT([         Spotlight: $ac_cv_have_tracker])
+	AC_MSG_RESULT([         Spotlight: yes])
 	AC_MSG_RESULT([    CNID:])
 	AC_MSG_RESULT([         backends: $compiled_backends])
 	AC_MSG_RESULT([    UAMS:])
@@ -62,12 +62,6 @@ dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	if test x"$atalk_cv_with_dbus" = x"yes"; then
 		AC_MSG_RESULT([         dbus system directory:   $ac_cv_dbus_sysdir])
 	fi
-	if test x"$ac_cv_have_tracker" = x"yes"; then
-		AC_MSG_RESULT([         dbus daemon path:        $ac_cv_dbus_daemon])
-		AC_MSG_RESULT([         tracker prefix:          $ac_cv_tracker_prefix])
-		AC_MSG_RESULT([         tracker install prefix:  $ac_cv_tracker_install_prefix])
-		AC_MSG_RESULT([         tracker manager:         $ac_cv_tracker_install_prefix/bin/$TRACKER_MANAGING_COMMAND])
-	fi
 	if test x"$use_pam_so" = x"yes"; then
 	   if test x"$netatalk_cv_install_pam" = x"yes"; then
 		AC_MSG_RESULT([         pam config directory:    $ac_cv_pamdir])
@@ -95,11 +89,6 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 	AC_MSG_RESULT([    PTHREADS:])
 	AC_MSG_RESULT([        LIBS   = $PTHREAD_LIBS])
 	AC_MSG_RESULT([        CFLAGS = $PTHREAD_CFLAGS])
-	if test x"$ac_cv_have_tracker" = x"yes"; then
-		AC_MSG_RESULT([    TRACKER:])
-		AC_MSG_RESULT([        LIBS   = $TRACKER_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $TRACKER_CFLAGS])
-	fi
 	if test x"$neta_cv_have_openssl" = x"yes"; then
 		AC_MSG_RESULT([    SSL:])
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])
@@ -129,11 +118,6 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([    GSSAPI:])
 		AC_MSG_RESULT([        LIBS   = $GSSAPI_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $GSSAPI_CFLAGS])
-	fi
-	if test x"$netatalk_cv_use_cups" = x"yes"; then
-		AC_MSG_RESULT([    CUPS:])
-		AC_MSG_RESULT([        LIBS   = $CUPS_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $CUPS_CFLAGS])
 	fi
 	if test x"$netatalk_cv_zeroconf" = x"yes"; then
 		AC_MSG_RESULT([    ZEROCONF:])

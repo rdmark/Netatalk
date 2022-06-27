@@ -2,8 +2,8 @@
 
 SUFFIXES = .tmpl .
 
-TMPLFILES = afp.conf.tmpl dbus-session.conf.tmpl
-GENFILES = afp.conf dbus-session.conf
+TMPLFILES = afp.conf.tmpl
+GENFILES = afp.conf
 CLEANFILES = $(GENFILES)
 EXTRA_DIST = $(TMPLFILES) extmap.conf netatalk-dbus.conf
 

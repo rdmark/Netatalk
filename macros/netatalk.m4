@@ -94,84 +94,20 @@ AC_DEFUN([AC_NETATALK_DBUS_GLIB], [
   AM_CONDITIONAL(HAVE_DBUS_GLIB, test x$atalk_cv_with_dbus = xyes)
 ])
 
-dnl Tracker, for Spotlight
-AC_DEFUN([AC_NETATALK_SPOTLIGHT], [
-    ac_cv_have_tracker=no
-    ac_cv_tracker_pkg_version_default=0.12
-    ac_cv_tracker_pkg_version_min=0.12
-
-    dnl Tracker SPARQL
-    AC_ARG_WITH([tracker-pkgconfig-version],
-      [AS_HELP_STRING([--with-tracker-pkgconfig-version=VERSION],[Version suffix of the Tracker SPARQL pkg-config (default: 0.12)])],
-      [ac_cv_tracker_pkg_version=$withval],
-      [ac_cv_tracker_pkg_version=$ac_cv_tracker_pkg_version_default]
+dnl Whether to enable developer build
+AC_DEFUN([AC_DEVELOPER], [
+    AC_MSG_CHECKING([whether to enable developer build])
+    AC_ARG_ENABLE(
+        developer,
+        AS_HELP_STRING([--enable-developer], [whether to enable developer build (ABI checking)]),
+        enable_dev=$enableval,
+        enable_dev=no
     )
-
-    AC_ARG_WITH([tracker-prefix],
-      [AS_HELP_STRING([--with-tracker-prefix=PATH],[Prefix of Tracker (default: none)])],
-      [ac_cv_tracker_prefix=$withval],
-      [AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-       ac_cv_tracker_prefix="`$PKG_CONFIG --variable=prefix tracker-sparql-$ac_cv_tracker_pkg_version`"]
-    )
-
-    AC_ARG_WITH([tracker-install-prefix],
-      [AS_HELP_STRING([--with-tracker-install-prefix=PATH],[Install prefix for Tracker (default: none)])],
-      [ac_cv_tracker_install_prefix=$withval],
-      [ac_cv_tracker_install_prefix=$ac_cv_tracker_prefix]
-    )
-
-    AC_ARG_WITH([dbus-daemon],
-      [AS_HELP_STRING([--with-dbus-daemon=PATH],[Path to DBus daemon (default: /bin/dbus-daemon)])],
-      [ac_cv_dbus_daemon=$withval],
-      [ac_cv_dbus_daemon=/bin/dbus-daemon]
-    )
-    DBUS_DAEMON_PATH=$ac_cv_dbus_daemon
-
-    AC_ARG_VAR([PKG_CONFIG_PATH], [Path to additional pkg-config packages])
-    PKG_CHECK_MODULES([TRACKER], [tracker-sparql-$ac_cv_tracker_pkg_version >= $ac_cv_tracker_pkg_version_min], [ac_cv_have_tracker_sparql=yes], [ac_cv_have_tracker_sparql=no])
-
-    if test x"$ac_cv_have_tracker_sparql" = x"no" ; then
-        if test x"$need_tracker_sparql" = x"yes" ; then
-            AC_MSG_ERROR([$ac_cv_tracker_pkg not found])
-        fi
-    else
-        ac_cv_have_tracker=yes
-        AC_DEFINE(HAVE_TRACKER, 1, [Define if Tracker is available])
-        AC_DEFINE_UNQUOTED(TRACKER_PREFIX, ["$ac_cv_tracker_install_prefix"], [Path to Tracker])
-        AC_DEFINE_UNQUOTED([DBUS_DAEMON_PATH], ["$ac_cv_dbus_daemon"], [Path to dbus-daemon])
-
-        ac_cv_tracker_pkg_version_MAJOR=`echo $ac_cv_tracker_pkg_version | cut -d. -f1`
-        if test $ac_cv_tracker_pkg_version_MAJOR -ge 3 ; then
-          AC_DEFINE(HAVE_TRACKER3, 1, [Define if Tracker3 is used])
-        fi
-    fi
-
-    dnl Tracker Managing Command
-    if test x"$ac_cv_have_tracker" = x"yes" ; then
-        AC_CHECK_PROGS(ac_cv_tracker_manage, tracker tracker3 tracker-control, , ["$ac_cv_tracker_prefix"/bin])
-        if test x"$ac_cv_tracker_manage" = x"tracker" ; then
-           TRACKER_MANAGING_COMMAND="tracker daemon"
-           AC_DEFINE(TRACKER_MANAGING_COMMAND, "tracker daemon", [tracker managing command])
-        elif test x"$ac_cv_tracker_manage" = x"tracker3" ; then
-           TRACKER_MANAGING_COMMAND="tracker3 daemon"
-           AC_DEFINE(TRACKER_MANAGING_COMMAND, "tracker3 daemon", [tracker managing command])
-        elif test x"$ac_cv_tracker_manage" = x"tracker-control" ; then
-           TRACKER_MANAGING_COMMAND="tracker-control"
-           AC_DEFINE(TRACKER_MANAGING_COMMAND, "tracker-control", [tracker managing command])
-        else
-           AC_MSG_ERROR([could find neither tracker command nor tracker-control command])
-        fi
-    fi
-
-    AC_SUBST(TRACKER_CFLAGS)
-    AC_SUBST(TRACKER_LIBS)
-    AC_SUBST(TRACKER_MINER_CFLAGS)
-    AC_SUBST(TRACKER_MINER_LIBS)
-    AC_SUBST(DBUS_DAEMON_PATH)
-    AM_CONDITIONAL(HAVE_TRACKER, [test x"$ac_cv_have_tracker" = x"yes"])
+    AC_MSG_RESULT([$enable_dev])
+    AM_CONDITIONAL(DEVELOPER, test x"$enable_dev" = x"yes")
 ])
 
-dnl Whether to disable bundled libevent
+dnl Check for libevent
 AC_DEFUN([AC_NETATALK_LIBEVENT], [
     PKG_CHECK_MODULES(LIBEVENT, libevent, , [AC_MSG_ERROR([couldn't find libevent with pkg-config])])
     AC_SUBST(LIBEVENT_CFLAGS)

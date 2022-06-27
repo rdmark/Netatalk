@@ -23,7 +23,6 @@
 #include <atalk/globals.h>
 #include <atalk/fce_api.h>
 #include <atalk/netatalk_conf.h>
-#include <atalk/spotlight.h>
 #include <atalk/dsi.h>
 
 #include "directory.h"
@@ -37,7 +36,7 @@
 
 /* the format for the finderinfo fields (from IM: Toolbox Essentials):
  * field         bytes        subfield    bytes
- * 
+ *
  * files:
  * ioFlFndrInfo  16      ->       type    4  type field
  *                             creator    4  creator field
@@ -45,9 +44,9 @@
  *					     alias, bundle, etc.
  *                            location    4  location in window
  *                              folder    2  window that contains file
- * 
+ *
  * ioFlXFndrInfo 16      ->     iconID    2  icon id
- *                              unused    6  reserved 
+ *                              unused    6  reserved
  *                              script    1  script system
  *                              xflags    1  reserved
  *                           commentID    2  comment id
@@ -65,9 +64,9 @@ static const u_char old_ufinderi[] = {
                               'T', 'E', 'X', 'T', 'U', 'N', 'I', 'X'
                           };
 
-/* ---------------------- 
+/* ----------------------
 */
-static int default_type(void *finder) 
+static int default_type(void *finder)
 {
     if (!memcmp(finder, ufinderi, 8) || !memcmp(finder, old_ufinderi, 8))
         return 1;
@@ -87,7 +86,7 @@ void *get_finderinfo(const struct vol *vol, const char *upath, struct adouble *a
     if (ad_finder) {
         memcpy(data, ad_finder, ADEDLEN_FINDERI);
         /* default type ? */
-        if (default_type(ad_finder)) 
+        if (default_type(ad_finder))
             chk_ext = 1;
     }
     else {
@@ -95,7 +94,7 @@ void *get_finderinfo(const struct vol *vol, const char *upath, struct adouble *a
         chk_ext = 1;
         if (vol_inv_dots(vol) && *upath == '.') { /* make it invisible */
             uint16_t ashort;
-            
+
             ashort = htons(FINDERINFO_INVISIBLE);
             memcpy((char *)data + FINDERINFO_FRFLAGOFF, &ashort, sizeof(ashort));
         }
@@ -106,8 +105,8 @@ void *get_finderinfo(const struct vol *vol, const char *upath, struct adouble *a
         memcpy(&linkflag, (char *)data + FINDERINFO_FRFLAGOFF, 2);
         linkflag |= htons(FINDERINFO_ISALIAS);
         memcpy((char *)data + FINDERINFO_FRFLAGOFF, &linkflag, 2);
-        memcpy((char *)data + FINDERINFO_FRTYPEOFF,"slnk",4); 
-        memcpy((char *)data + FINDERINFO_FRCREATOFF,"rhap",4); 
+        memcpy((char *)data + FINDERINFO_FRTYPEOFF,"slnk",4);
+        memcpy((char *)data + FINDERINFO_FRCREATOFF,"rhap",4);
     }
 
     /** Only enter if no appledouble information and no finder information found. */
@@ -121,7 +120,7 @@ void *get_finderinfo(const struct vol *vol, const char *upath, struct adouble *a
 
 /* ---------------------
 */
-char *set_name(const struct vol *vol, char *data, cnid_t pid, char *name, cnid_t id, uint32_t utf8) 
+char *set_name(const struct vol *vol, char *data, cnid_t pid, char *name, cnid_t id, uint32_t utf8)
 {
     uint32_t   aint;
     char        *tp = NULL;
@@ -133,7 +132,7 @@ char *set_name(const struct vol *vol, char *data, cnid_t pid, char *name, cnid_t
         if (utf8_encoding(vol->v_obj)) {
             /* but name is an utf8 mac name */
             char *u, *m;
-           
+
             /* global static variable... */
             tp = strdup(name);
             if (!(u = mtoupath(vol, name, pid, 1)) || !(m = utompath(vol, u, id, 0))) {
@@ -143,7 +142,7 @@ char *set_name(const struct vol *vol, char *data, cnid_t pid, char *name, cnid_t
                 aint = strlen(m);
                 src = m;
             }
-            
+
         }
         if (aint > MACFILELEN)
             aint = MACFILELEN;
@@ -158,7 +157,7 @@ char *set_name(const struct vol *vol, char *data, cnid_t pid, char *name, cnid_t
         utf8 = vol->v_kTextEncoding;
         memcpy(data, &utf8, sizeof(utf8));
         data += sizeof(utf8);
-        
+
         temp = htons(aint);
         memcpy(data, &temp, sizeof(temp));
         data += sizeof(temp);
@@ -203,11 +202,11 @@ char *set_name(const struct vol *vol, char *data, cnid_t pid, char *name, cnid_t
  * @param len    (r) strlen of upath
  */
 uint32_t get_id(struct vol *vol,
-                struct adouble *adp, 
+                struct adouble *adp,
                 const struct stat *st,
                 const cnid_t did,
                 const char *upath,
-                const int len) 
+                const int len)
 {
     static int first = 1;       /* mark if this func is called the first time */
     uint32_t adcnid;
@@ -284,12 +283,12 @@ exit:
     first = 0;
     return dbcnid;
 }
-             
+
 /* -------------------------- */
 int getmetadata(const AFPObj *obj,
                 struct vol *vol,
                 uint16_t bitmap,
-                struct path *path, struct dir *dir, 
+                struct path *path, struct dir *dir,
                 char *buf, size_t *buflen, struct adouble *adp)
 {
     char		*data, *l_nameoff = NULL, *upath;
@@ -332,7 +331,7 @@ int getmetadata(const AFPObj *obj,
                         return AFPERR_MISC;
                     }
                 }
-                
+
                 /* Build fullpath */
                 if (((fullpath = bstrcpy(dir->d_fullpath)) == NULL)
                     || (bconchar(fullpath, '/') != BSTR_OK)
@@ -569,7 +568,7 @@ int getmetadata(const AFPObj *obj,
             data += sizeof( aint );
 
 	    /* FIXME: ugly hack
-               type == slnk indicates an OSX style symlink, 
+               type == slnk indicates an OSX style symlink,
                we have to add S_IFLNK to the mode, otherwise
                10.3 clients freak out. */
 
@@ -590,7 +589,7 @@ int getmetadata(const AFPObj *obj,
             *data++ = ma.ma_group;
             *data++ = ma.ma_owner;
             break;
-            
+
         default :
             return( AFPERR_BITMAP );
         }
@@ -610,14 +609,14 @@ int getmetadata(const AFPObj *obj,
     *buflen = data - buf;
     return (AFP_OK);
 }
-                
+
 /* ----------------------- */
 int getfilparams(const AFPObj *obj, struct vol *vol, uint16_t bitmap, struct path *path,
                  struct dir *dir, char *buf, size_t *buflen, int in_enumerate)
 {
     struct adouble	ad, *adp;
     int                 opened = 0;
-    int rc;    
+    int rc;
     int flags; /* uninitialized ok */
 
     LOG(log_debug, logtype_afpd, "getfilparams(\"%s\")", path->u_name);
@@ -672,7 +671,7 @@ int afp_createfile(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, 
     int			creatf, did, openf, retvalue = AFP_OK;
     uint16_t		vid;
     struct path		*s_path;
-    
+
     *rbuflen = 0;
     ibuf++;
     creatf = (unsigned char) *ibuf++;
@@ -699,7 +698,7 @@ int afp_createfile(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, 
 
     upath = s_path->u_name;
     ad_init(&ad, vol);
-    
+
     /* if upath is deleted we already in trouble anyway */
     if ((of = of_findname(vol, s_path))) {
         if (creatf)
@@ -825,8 +824,8 @@ int afp_setfilparams(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_
 }
 
 /*
- * cf AFP3.0.pdf page 252 for change_mdate and change_parent_mdate logic  
- * 
+ * cf AFP3.0.pdf page 252 for change_mdate and change_parent_mdate logic
+ *
 */
 extern struct path Cur_Path;
 
@@ -984,7 +983,7 @@ int setfilparams(const AFPObj *obj, struct vol *vol,
         bit++;
     }
 
-    /* second try with adouble open 
+    /* second try with adouble open
     */
     if (ad_open(adp, upath, ADFLAGS_HF | ADFLAGS_RDWR | ADFLAGS_CREATE, 0666) < 0) {
         LOG(log_debug, logtype_afpd, "setfilparams: ad_open_metadata error");
@@ -1008,7 +1007,7 @@ int setfilparams(const AFPObj *obj, struct vol *vol,
         }
         (void)ad_setid(adp, path->st.st_dev, path->st.st_ino, id, curdir->d_did, vol->v_stamp);
     }
-    
+
     bit = 0;
     bitmap = f_bitmap;
     while ( bitmap != 0 ) {
@@ -1045,7 +1044,7 @@ int setfilparams(const AFPObj *obj, struct vol *vol,
                 break;
             }
             if (default_type( ad_entry( adp, ADEID_FINDERI ))
-                    && ( 
+                    && (
                      ((em = getextmap( path->m_name )) &&
                       !memcmp(finder_buf, em->em_type, sizeof( em->em_type )) &&
                       !memcmp(finder_buf + 4, em->em_creator,sizeof( em->em_creator)))
@@ -1113,7 +1112,7 @@ setfilparam_done:
  *
  * sdir_fd     source dir fd to which src path is relative (for openat et al semantics)
  *             passing -1 means this is not used, src path is a full path
- * src         the source path 
+ * src         the source path
  * dst         the dest filename in current dir
  * newname     the dest mac name
  * adp         adouble struct of src file, if open, or & zeroed one
@@ -1136,7 +1135,7 @@ int renamefile(struct vol *vol, struct dir *ddir, int sdir_fd, char *src, char *
         case EROFS:
             return AFPERR_VLOCK;
         case EXDEV :			/* Cross device move -- try copy */
-           /* NOTE: with open file it's an error because after the copy we will 
+           /* NOTE: with open file it's an error because after the copy we will
             * get two files, it's fixable for our process (eg reopen the new file, get the
             * locks, and so on. But it doesn't solve the case with a second process
             */
@@ -1156,13 +1155,13 @@ int renamefile(struct vol *vol, struct dir *ddir, int sdir_fd, char *src, char *
 
     if (vol->vfs->vfs_renamefile(vol, sdir_fd, src, dst) < 0 ) {
         int err;
-        
-        err = errno;        
+
+        err = errno;
 	/* try to undo the data fork rename,
-	 * we know we are on the same device 
+	 * we know we are on the same device
 	*/
 	if (err) {
-        unix_rename(-1, dst, sdir_fd, src ); 
+        unix_rename(-1, dst, sdir_fd, src );
     	    /* return the first error */
     	    switch ( err) {
             case ENOENT :
@@ -1188,7 +1187,7 @@ int renamefile(struct vol *vol, struct dir *ddir, int sdir_fd, char *src, char *
     return( AFP_OK );
 }
 
-/* ---------------- 
+/* ----------------
    convert a Mac long name to an utf8 name,
 */
 size_t mtoUTF8(const struct vol *vol, const char *src, size_t srclen, char *dest, size_t destlen)
@@ -1217,7 +1216,7 @@ uint32_t   hint;
     case 2:
         if (( plen = (unsigned char)*ibuf++ ) != 0 ) {
             if (vol->v_obj->afp_version >= 30) {
-                /* convert it to UTF8 
+                /* convert it to UTF8
                 */
                 if ((plen = mtoUTF8(vol, ibuf, plen, newname, AFPOBJ_TMPSIZ)) == (size_t)-1)
                    return -1;
@@ -1228,7 +1227,7 @@ uint32_t   hint;
             }
             if (strlen(newname) != plen) {
                 /* there's \0 in newname, e.g. it's a pathname not
-                 * only a filename. 
+                 * only a filename.
                 */
             	return -1;
             }
@@ -1237,11 +1236,11 @@ uint32_t   hint;
     case 3:
         memcpy(&hint, ibuf, sizeof(hint));
         ibuf += sizeof(hint);
-           
+
         memcpy(&len16, ibuf, sizeof(len16));
         ibuf += sizeof(len16);
         plen = ntohs(len16);
-        
+
         if (plen) {
             if (plen > AFPOBJ_TMPSIZ) {
             	return -1;
@@ -1271,7 +1270,7 @@ int afp_copyfile(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, si
 
     struct adouble ad, *adp;
     int denyreadset;
-    
+
     *rbuflen = 0;
     ibuf += 2;
 
@@ -1323,7 +1322,7 @@ int afp_copyfile(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, si
         goto copy_exit;
     }
 #endif
-    denyreadset = (ad_testlock(adp, ADEID_DFORK, AD_FILELOCK_DENY_RD) != 0 || 
+    denyreadset = (ad_testlock(adp, ADEID_DFORK, AD_FILELOCK_DENY_RD) != 0 ||
                   ad_testlock(adp, ADEID_RFORK, AD_FILELOCK_DENY_RD) != 0 );
 
     if (denyreadset) {
@@ -1359,7 +1358,7 @@ int afp_copyfile(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, si
         retvalue = get_afp_errno(AFPERR_NOOBJ);
         goto copy_exit;
     }
-    
+
     if ( *s_path->m_name != '\0' ) {
 	retvalue =path_error(s_path, AFPERR_NOOBJ);
         goto copy_exit;
@@ -1394,11 +1393,11 @@ copy_exit:
 /* ----------------------------------
  * if newname is NULL (from directory.c) we don't want to copy the resource fork.
  * because we are doing it elsewhere.
- * currently if newname is NULL then adp is NULL. 
+ * currently if newname is NULL then adp is NULL.
  */
 int copyfile(struct vol *s_vol,
-             struct vol *d_vol, 
-             struct dir *d_dir, 
+             struct vol *d_vol,
+             struct dir *d_dir,
              int sfd,
              char *src,
              char *dst,
@@ -1410,7 +1409,7 @@ int copyfile(struct vol *s_vol,
     int                 adflags;
     int                 stat_result;
     struct stat         st;
-    
+
     LOG(log_debug, logtype_afpd, "copyfile(sfd:%d,s:'%s',d:'%s',n:'%s')",
         sfd, src, dst, newname);
 
@@ -1436,7 +1435,7 @@ int copyfile(struct vol *s_vol,
 
     stat_result = fstat(ad_data_fileno(adp), &st); /* saving stat exit code, thus saving us on one more stat later on */
 
-    if (stat_result < 0) {           
+    if (stat_result < 0) {
       /* unlikely but if fstat fails, the default file mode will be 0666. */
       st.st_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
     }
@@ -1485,7 +1484,7 @@ error:
 
     if (ad_close( &add, adflags ) <0) {
        err = errno;
-    } 
+    }
 
     if (err) {
         deletefile(d_vol, -1, dst, 0);
@@ -1527,7 +1526,7 @@ done:
 
    when deletefile is called we don't have lock on it, file is closed (for us)
    untrue if called by renamefile
-   
+
    ad_open always try to open file RDWR first and ad_lock takes care of
    WRITE lock on read only file.
 */
@@ -1548,7 +1547,7 @@ uint16_t   bshort = 0;
 	}
 	return 0;
 }
-/* 
+/*
  * dirfd can be used for unlinkat semantics
  */
 int deletefile(const struct vol *vol, int dirfd, char *file, int checkAttrib)
@@ -1563,8 +1562,8 @@ int deletefile(const struct vol *vol, int dirfd, char *file, int checkAttrib)
     ad_init(&ad, vol);
     if (checkAttrib) {
         /* was EACCESS error try to get only metadata */
-        /* we never want to create a resource fork here, we are going to delete it 
-         * moreover sometimes deletefile is called with a no existent file and 
+        /* we never want to create a resource fork here, we are going to delete it
+         * moreover sometimes deletefile is called with a no existent file and
          * ad_open would create a 0 byte resource fork
         */
         if ( ad_metadataat(dirfd, file, ADFLAGS_CHECK_OF, &ad) == 0 ) {
@@ -1575,7 +1574,7 @@ int deletefile(const struct vol *vol, int dirfd, char *file, int checkAttrib)
             meta = 1;
         }
     }
- 
+
     /* try to open both forks at once */
     adflags = ADFLAGS_DF;
     if (ad_openat(&ad, dirfd, file, adflags | ADFLAGS_RF | ADFLAGS_NORF | ADFLAGS_RDONLY) < 0 ) {
@@ -1599,11 +1598,11 @@ int deletefile(const struct vol *vol, int dirfd, char *file, int checkAttrib)
 
     if ( adp && AD_RSRC_OPEN(adp) ) { /* there's a resource fork */
         adflags |= ADFLAGS_RF;
-        /* FIXME we have a pb here because we want to know if a file is open 
+        /* FIXME we have a pb here because we want to know if a file is open
          * there's a 'priority inversion' if you can't open the ressource fork RW
          * you can delete it if it's open because you can't get a write lock.
-         * 
-         * ADLOCK_FILELOCK means the whole ressource fork, not only after the 
+         *
+         * ADLOCK_FILELOCK means the whole ressource fork, not only after the
          * metadatas
          *
          * FIXME it doesn't work for RFORK open read only and fork open without deny mode
@@ -1728,13 +1727,13 @@ static int reenumerate_loop(struct dirent *de, char *mname _U_, void *data)
 {
     struct path   path;
     struct reenum *param = data;
-    struct vol    *vol = param->vol;  
+    struct vol    *vol = param->vol;
     cnid_t        did  = param->did;
     cnid_t	  aint;
-    
+
     if (ostat(de->d_name, &path.st, vol_syml_opt(vol)) < 0)
         return 0;
-    
+
     /* update or add to cnid */
     AFP_CNID_START("cnid_add");
     aint = cnid_add(vol->v_cdb, &path.st, did, de->d_name, strlen(de->d_name), 0); /* ignore errors */
@@ -1753,11 +1752,11 @@ reenumerate_id(struct vol *vol, char *name, struct dir *dir)
     int             ret;
     struct reenum   data;
     struct stat     st;
-    
+
     if (vol->v_cdb == NULL) {
 	return -1;
     }
-    
+
     /* FIXME use of_statdir ? */
     if (ostat(name, &st, vol_syml_opt(vol))) {
 	return -1;
@@ -1767,7 +1766,7 @@ reenumerate_id(struct vol *vol, char *name, struct dir *dir)
         /* we already did it once and the dir haven't been modified */
     	return dir->d_offcnt;
     }
-    
+
     data.vol = vol;
     data.did = dir->d_did;
     if ((ret = for_each_dirent(vol, name, reenumerate_loop, (void *)&data)) >= 0) {
@@ -1811,7 +1810,7 @@ int afp_resolveid(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_
     memcpy(&id, ibuf, sizeof( id ));
     ibuf += sizeof(id);
     cnid = id;
-    
+
     if (!id) {
         /* some MacOS versions after a catsearch do a *lot* of afp_resolveid with 0 */
         return AFPERR_NOID;
@@ -1847,7 +1846,7 @@ retry:
 	if (errno == ESTALE) {
 	    errno = ENOENT;
 	}
-#endif	
+#endif
 	if ( errno == ENOENT && !retry) {
 	    /* cnid db is out of sync, reenumerate the directory and update ids */
 	    reenumerate_id(vol, ".", dir);
@@ -1878,7 +1877,7 @@ retry:
         return AFPERR_NOID;
     }
     path.id = cnid;
-    if (AFP_OK != (err = getfilparams(obj, vol, bitmap, &path , curdir, 
+    if (AFP_OK != (err = getfilparams(obj, vol, bitmap, &path , curdir,
                                       rbuf + sizeof(bitmap), &buflen, 0))) {
         return err;
     }
@@ -1946,7 +1945,7 @@ int afp_deleteid(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_
             return AFPERR_ACCESS;
 #ifdef ESTALE
 	case ESTALE:
-#endif	
+#endif
         case ENOENT:
             /* still try to delete the id */
             err = AFPERR_NOOBJ;
@@ -2003,7 +2002,7 @@ static struct adouble *find_adouble(const AFPObj *obj, struct vol *vol, struct p
         afp_errno = AFPERR_ACCESS;
         return NULL;
     }
-    
+
     if ((*of = of_findname(vol, path))) {
         /* reuse struct adouble so it won't break locks */
         adp = (*of)->of_ad;
@@ -2041,7 +2040,7 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
     struct ofork	*s_of = NULL;
     struct ofork	*d_of = NULL;
     int                 crossdev;
-    
+
     int                 slen, dlen;
     uint32_t		sid, did;
     uint16_t		vid;
@@ -2071,7 +2070,7 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
     }
 
     if (NULL == ( path = cname( vol, dir, &ibuf )) ) {
-        return get_afp_errno(AFPERR_NOOBJ); 
+        return get_afp_errno(AFPERR_NOOBJ);
     }
 
     if ( path_isadir(path) ) {
@@ -2090,14 +2089,14 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
         /* pathname too long */
         return AFPERR_PARAM ;
     }
-    
+
     ad_init(&ads, vol);
     if (!(adsp = find_adouble(obj, vol, path, &s_of, &ads))) {
         return afp_errno;
     }
 
     /* ***** from here we may have resource fork open **** */
-    
+
     /* look for the source cnid. if it doesn't exist, don't worry about
      * it. */
     AFP_CNID_START("cnid_lookup");
@@ -2110,7 +2109,7 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
     }
 
     if (NULL == ( path = cname( vol, dir, &ibuf )) ) {
-        err = get_afp_errno(AFPERR_NOOBJ); 
+        err = get_afp_errno(AFPERR_NOOBJ);
         goto err_exchangefile;
     }
 
@@ -2135,7 +2134,7 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
 
     /* they are not on the same device and at least one is open
      * FIXME broken for for crossdev and adouble v2
-     * return an error 
+     * return an error
     */
     crossdev = (srcst.st_dev != destst.st_dev);
     if (/* (d_of || s_of)  && */ crossdev) {
@@ -2181,12 +2180,12 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
         goto err_dest_to_src;
     of_rename(vol, s_of, curdir, temp, curdir, path->m_name);
 
-    /* 
-     * id's need switching. src -> dest and dest -> src. 
+    /*
+     * id's need switching. src -> dest and dest -> src.
      * we need to re-stat() if it was a cross device copy.
      */
     if (sid) {
-        AFP_CNID_START("cnid_delete");        
+        AFP_CNID_START("cnid_delete");
         cnid_delete(vol->v_cdb, sid);
         AFP_CNID_DONE();
     }
@@ -2196,7 +2195,7 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
         AFP_CNID_DONE();
     }
 
-    if ((did && ( (crossdev && ostat(upath, &srcst, vol_syml_opt(vol)) < 0) || 
+    if ((did && ( (crossdev && ostat(upath, &srcst, vol_syml_opt(vol)) < 0) ||
                 cnid_update(vol->v_cdb, did, &srcst, curdir->d_did,upath, dlen) < 0))
        ||
         (sid && ( (crossdev && ostat(p, &destst, vol_syml_opt(vol)) < 0) ||
@@ -2248,14 +2247,14 @@ int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U
     }
 
     /* FIXME: we should switch ressource fork too */
-    
+
     /* here we need to reopen if crossdev */
-    if (sid && ad_setid(addp, destst.st_dev, destst.st_ino,  sid, sdir->d_did, vol->v_stamp)) 
+    if (sid && ad_setid(addp, destst.st_dev, destst.st_ino,  sid, sdir->d_did, vol->v_stamp))
     {
        ad_flush( addp );
     }
-        
-    if (did && ad_setid(adsp, srcst.st_dev, srcst.st_ino,  did, curdir->d_did, vol->v_stamp)) 
+
+    if (did && ad_setid(adsp, srcst.st_dev, srcst.st_ino,  did, curdir->d_did, vol->v_stamp))
     {
        ad_flush( adsp );
     }

@@ -35,7 +35,6 @@ afpd_SOURCES = \
 	nfsquota.c \
 	ofork.c \
 	quota.c \
-	spotlight_marshalling.c \
 	status.c \
 	switch.c \
 	uam.c \
@@ -57,12 +56,6 @@ afpd_CFLAGS = \
 	-D_PATH_AFPDUAMPATH=\"$(UAMS_PATH)/\" \
 	-D_PATH_CONFDIR=\"$(pkgconfdir)/\" \
 	-D_PATH_STATEDIR='"$(localstatedir)/netatalk/"'
-
-if HAVE_TRACKER
-afpd_SOURCES += spotlight.c
-afpd_LDADD += $(top_builddir)/etc/spotlight/libspotlight.la @TALLOC_LIBS@
-afpd_CFLAGS += @TRACKER_CFLAGS@ @TALLOC_CFLAGS@
-endif
 
 if HAVE_DBUS_GLIB
 BUILT_SOURCES += afpstats_service_glue.h

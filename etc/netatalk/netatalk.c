@@ -1,11 +1,11 @@
-/* 
+/*
    Copyright (c) 2012 Frank Lahm <franklahm@gmail.com>
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -79,45 +79,6 @@ static bool service_running(pid_t pid)
     return false;
 }
 
-/* Set Tracker Miners to index all our volumes */
-static int set_sl_volumes(void)
-{
-    EC_INIT;
-    const struct vol *volumes, *vol;
-    struct bstrList *vollist = bstrListCreate();
-    bstring sep = bfromcstr(", ");
-    bstring volnamelist = NULL, cmd = NULL;
-
-    EC_NULL_LOG( volumes = getvolumes() );
-
-    for (vol = volumes; vol; vol = vol->v_next) {
-        if (vol->v_flags & AFPVOL_SPOTLIGHT) {
-            bstring volnamequot = bformat("'%s'", vol->v_path);
-            bstrListPush(vollist, volnamequot);
-        }
-    }
-
-    volnamelist = bjoin(vollist, sep);
-    cmd = bformat("gsettings set org.freedesktop.Tracker.Miner.Files index-recursive-directories \"[%s]\"",
-                  bdata(volnamelist) ? bdata(volnamelist) : "");
-    LOG(log_debug, logtype_sl, "set_sl_volumes: %s", bdata(cmd));
-    system(bdata(cmd));
-
-    /* Disable default root user home indexing */
-    system("gsettings set org.freedesktop.Tracker.Miner.Files index-single-directories \"[]\"");
-
-EC_CLEANUP:
-    if (cmd)
-        bdestroy(cmd);
-    if (sep)
-        bdestroy(sep);
-    if (vollist)
-        bstrListDestroy(vollist);
-    if (volnamelist)
-        bdestroy(volnamelist);
-    EC_EXIT;
-}
-
 /******************************************************************
  * libevent helper functions
  ******************************************************************/
@@ -174,9 +135,6 @@ static void sigterm_cb(evutil_socket_t fd, short what, void *arg)
     event_del(sighup_ev);
     event_del(timer_ev);
 
-#ifdef HAVE_TRACKER
-    system(TRACKER_MANAGING_COMMAND " -t");
-#endif
     kill_childs(SIGTERM, &afpd_pid, &cnid_metad_pid, &dbus_pid, NULL);
 }
 
@@ -184,9 +142,6 @@ static void sigterm_cb(evutil_socket_t fd, short what, void *arg)
 static void sigquit_cb(evutil_socket_t fd, short what, void *arg)
 {
     LOG(log_note, logtype_afpd, "Exiting on SIGQUIT");
-#ifdef HAVE_TRACKER
-    system(TRACKER_MANAGING_COMMAND " -t");
-#endif
     kill_childs(SIGQUIT, &afpd_pid, &cnid_metad_pid, &dbus_pid, NULL);
 }
 
@@ -264,16 +219,6 @@ static void timer_cb(evutil_socket_t fd, short what, void *arg)
             LOG(log_error, logtype_default, "Error starting 'cnid_metad'");
         }
     }
-
-#ifdef HAVE_TRACKER
-    if (dbus_pid == NETATALK_SRV_NEEDED) {
-        dbus_restarts++;
-        LOG(log_note, logtype_afpd, "Restarting 'dbus' (restarts: %u)", dbus_restarts);
-        if ((dbus_pid = run_process(dbus_path, "--config-file=" _PATH_CONFDIR "dbus-session.conf", NULL)) == -1) {
-            LOG(log_error, logtype_default, "Error starting '%s'", dbus_path);
-        }
-    }
-#endif
 }
 
 /******************************************************************
@@ -357,13 +302,6 @@ static void show_netatalk_version( void )
 	puts( "No" );
 #endif
 
-	printf( "     Spotlight support:\t" );
-#ifdef HAVE_TRACKER
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
 }
 
 static void show_netatalk_paths( void )
@@ -371,21 +309,9 @@ static void show_netatalk_paths( void )
 	printf( "                  afpd:\t%s\n", _PATH_AFPD);
 	printf( "            cnid_metad:\t%s\n", _PATH_CNID_METAD);
 
-#ifdef HAVE_TRACKER
-	printf( "       tracker manager:\t%s\n", TRACKER_PREFIX "/bin/" TRACKER_MANAGING_COMMAND);
-	printf( "           dbus-daemon:\t%s\n", DBUS_DAEMON_PATH);
-#endif
-
 	printf( "              afp.conf:\t%s\n", _PATH_CONFDIR "afp.conf");
 
-#ifdef HAVE_TRACKER
-	printf( "     dbus-session.conf:\t%s\n", _PATH_CONFDIR "dbus-session.conf");
-#endif
-
-#ifndef SOLARIS
 	printf( "    netatalk lock file:\t%s\n", PATH_NETATALK_LOCK);
-#endif
-
 }
 
 static void usage(void)
@@ -434,7 +360,7 @@ int main(int argc, char **argv)
 
     sigfillset(&blocksigs);
     sigprocmask(SIG_SETMASK, &blocksigs, NULL);
-    
+
     if (afp_config_parse(&obj, "netatalk") != 0)
         netatalk_exit(EXITERR_CONF);
 
@@ -481,34 +407,6 @@ int main(int argc, char **argv)
     sigdelset(&blocksigs, SIGCHLD);
     sigdelset(&blocksigs, SIGHUP);
     sigprocmask(SIG_SETMASK, &blocksigs, NULL);
-
-#ifdef HAVE_TRACKER
-    if (obj.options.flags & OPTION_SPOTLIGHT) {
-        setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=" _PATH_STATEDIR "spotlight.ipc", 1);
-        setenv("XDG_DATA_HOME", _PATH_STATEDIR, 0);
-        setenv("XDG_CACHE_HOME", _PATH_STATEDIR, 0);
-        setenv("TRACKER_USE_LOG_FILES", "1", 0);
-
-        if (atalk_iniparser_getboolean(obj.iniconfig, INISEC_GLOBAL, "start dbus", 1)) {
-            dbus_path = atalk_iniparser_getstring(obj.iniconfig, INISEC_GLOBAL, "dbus daemon", DBUS_DAEMON_PATH);
-            LOG(log_note, logtype_default, "Starting dbus: %s", dbus_path);
-            if ((dbus_pid = run_process(dbus_path, "--config-file=" _PATH_CONFDIR "dbus-session.conf", NULL)) == NETATALK_SRV_ERROR) {
-                LOG(log_error, logtype_default, "Error starting '%s'", dbus_path);
-                netatalk_exit(EXITERR_CONF);
-            }
-
-            /* Allow dbus some time to start up */
-            sleep(1);
-        }
-
-        set_sl_volumes();
-
-        if (atalk_iniparser_getboolean(obj.iniconfig, INISEC_GLOBAL, "start tracker", 1)) {
-            LOG(log_note, logtype_default, "Starting Tracker: " TRACKER_PREFIX "/bin/" TRACKER_MANAGING_COMMAND " -s");
-            system(TRACKER_PREFIX "/bin/" TRACKER_MANAGING_COMMAND " -s");
-        }
-    }
-#endif
 
     /* Now register with zeroconf, we also need the volumes for that */
     if (! (obj.options.flags & OPTION_NOZEROCONF)) {

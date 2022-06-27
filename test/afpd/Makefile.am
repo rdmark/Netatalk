@@ -58,9 +58,3 @@ test_LDADD = \
 	@LIBGCRYPT_LIBS@ @GSSAPI_LIBS@ @KRB5_LIBS@ @MYSQL_LIBS@
 
 test_LDFLAGS = -export-dynamic
-
-if HAVE_TRACKER
-test_SOURCES += $(top_srcdir)/etc/afpd/spotlight.c
-test_LDADD += $(top_builddir)/etc/spotlight/libspotlight.la
-test_CFLAGS += @TRACKER_CFLAGS@
-endif
