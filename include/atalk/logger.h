@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <stdarg.h>
-#include <syslog.h>
 #include <time.h>
 
 #if defined(linux)		/* for program_invocation_short_name */
@@ -268,8 +267,8 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 #else
 	snprintf(logpath, 255, "/var/log/netatalk/%s.log", getprogname());
 #endif
+
 	if (log_level <= type_configs[type].level) {
-		syslog(LOG_WARNING, buffer);
 		now = time(NULL);
 		strftime(timestring, sizeof(timestring) - 1,
 			 "%Y-%m-%d %H:%M:%S", gmtime(&now));
