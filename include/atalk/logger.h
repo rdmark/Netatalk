@@ -253,6 +253,15 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 	vsnprintf(buffer, 255, fmt, args);
 	va_end(args);
 
+#if 0
+#ifdef NO_DEBUG
+	if (log_level <= LOG_MAX)
+#endif
+		if (log_level <= type_configs[type].level) {
+			make_log_entry((log_level), (type), __FILE__,
+				       __LINE__, buffer);
+		}
+#else
 #if defined(linux)
 	snprintf(logpath, 255, "/var/log/netatalk/%s.log",
 		 program_invocation_short_name);
@@ -263,7 +272,7 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 		syslog(LOG_WARNING, buffer);
 		now = time(NULL);
 		strftime(timestring, sizeof(timestring) - 1,
-			 "%Y-%m-%d %H:%M:%S", localtime(&now));
+			 "%Y-%m-%d %H:%M:%S", gmtime(&now));
 		logfile = fopen(logpath, "a");
 		if (logfile != NULL) {
 			fprintf(logfile, "%s %s: (%s) %s\n", timestring,
@@ -272,6 +281,7 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 			fclose(logfile);
 		}
 	}
+#endif
 }
 
 #endif				/* _ATALK_LOGGER_H */
