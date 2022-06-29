@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <stdarg.h>
-#include <time.h>
 
 #if defined(linux) /* for program_invocation_short_name */
 #include <errno.h>
@@ -229,8 +228,7 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 		"uams",
 		"end-of-list"
 	};
-	time_t now;
-	char timestring[256];
+
 
 	va_start(args, fmt);
 	vsnprintf(buffer, 255, fmt, args);
@@ -250,11 +248,9 @@ static inline void LOG(int log_level, int type, char *fmt, ...)
 #else
 	snprintf(logpath, 255, "/var/log/netatalk/%s.log", getprogname());
 #endif
-	now = time(NULL);
-	strftime (timestring, sizeof(timestring)-1, "%Y-%m-%d %H:%M:%S", gmtime(&now));
 	logfile = fopen(logpath, "a");
 	if (logfile != NULL) {
-		fprintf(logfile, "%s %s: %s\n", timestring, lognames[type], buffer);
+		fprintf(logfile, "%s: %s\n", lognames[type], buffer);
 		fclose(logfile);
 	}
 #endif
