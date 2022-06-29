@@ -3,6 +3,7 @@
 # # Startup daemon for netatalk on macOS
 
 # Prepare the environment
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 PREFIX=/usr/local/sbin
 . /etc/rc.common
 
