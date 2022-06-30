@@ -21,19 +21,19 @@ $ apt install libssl-dev libdb-dev autotools-dev automake libtool pkg-config
 Classic Mac OS AppleTalk service discovery support only, with CUPS to enable printer sharing, running as systemd services that are enabled and started during installation.
 ```
 $ apt install libcups2-dev cups
-$ ./configure --enable-systemd --enable-systemd-start
+$ ./configure --enable-systemd
 ```
 
 Supporting Mac OS X 10.2 through macOS Mavericks: libgrypt to build the DHX2 UAM, as well as libavahi for Zeroconf (Bonjour) service discovery.
 ```
 $ apt install libgcrypt20-dev libavahi-client-dev
-$ ./configure --enable-systemd --enable-systemd-start --enable-zeroconf
+$ ./configure --enable-systemd --enable-zeroconf
 ```
 
 Same as the above, but with SLP support instead of Zeroconf, for Mac OS X 10.0 and 10.1 service discovery.
 ```
 $ apt install libslp-dev
-$ ./configure --enable-systemd --enable-systemd-start --enable-srvloc --disable-zeroconf
+$ ./configure --enable-systemd --enable-srvloc --disable-zeroconf
 ```
 
 # Documentation
