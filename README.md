@@ -12,25 +12,37 @@ Hence, the need among the vintage Apple community to keep maintaining the Netata
 # Installation
 Follow the installation steps in the [official Netatalk 2.2 documentation](http://netatalk.sourceforge.net/2.2/htmldocs/installation.html) to configure and install Netatalk.
 
-As supplementary information when installing on Debian derivate Linux distros, you need at least these apt packages:
+As supplementary information when installing on a Debian based Linux distros (which is the primary environment the author of this fork is using), you need at least these apt packages:
 ```
 $ apt install libssl-dev libdb-dev autotools-dev automake libtool pkg-config
 ```
 
-## Configuration Examples
-Classic Mac OS AppleTalk service discovery support only, with CUPS to enable printer sharing, running as systemd services that are enabled and started during installation.
+For *papd* printer server support, install CUPS packages.
 ```
 $ apt install libcups2-dev cups
+```
+
+For Zeroconf (Bonjour) service discovery in Mac OS X 10.2 or later, install Avahi packages.
+```
+$ apt install libavahi-client-dev
+```
+
+For DHX2 authentication support, required for Mac OS X 10.2 or later, install libgcrypt.
+```
+$ apt install libgcrypt20-dev
+```
+
+## Configuration Examples
+First of all, it is worth noting that unlike upstream Netatalk 2, DDP (AppleTalk), papd, timelord, and a2boot are all configured and compiled by default. 
+
+For most setups, the only parameter you need is for picking the init script option for your OS. Here as an example is the *systemd* option, which will install systemd services that you can start once installation is complete. Use ```./configure --help``` to see the other init script options available.
+```
 $ ./configure --enable-systemd
 ```
 
-Supporting Mac OS X 10.2 through macOS Mavericks: libgrypt to build the DHX2 UAM, as well as libavahi for Zeroconf (Bonjour) service discovery.
-```
-$ apt install libgcrypt20-dev libavahi-client-dev
-$ ./configure --enable-systemd --enable-zeroconf
-```
+If you want to use Netatalk with Mac OS X 10.2 or later, make sure you have installed *libavahi* and *libgcrypt* as per the instructions in the section above before configuring and compiling.
 
-Same as the above, but with SLP support instead of Zeroconf, for Mac OS X 10.0 and 10.1 service discovery.
+Mac OS X 10.0 and 10.1 uses SLP rather than Zeroconf for service discovery. Netatalk does not support SLP and Zeroconf being enabled at the same time. [See bug #7.](https://github.com/rdmark/Netatalk-2.x/issues/7)
 ```
 $ apt install libslp-dev
 $ ./configure --enable-systemd --enable-srvloc --disable-zeroconf
