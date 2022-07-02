@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Netatalk install script for Debian Linux. May work on other flavors too.
-# This script should be run from within the contrib/misc directory.
+# This script should be run from within the contrib/shell_utils directory.
 # Example usage, compiling with four cores:
 #   $ ./debian_install.sh -j=4
 #
@@ -25,7 +25,6 @@ function initialChecks() {
         exit 1
     fi
     echo "Netatalk install script for Debian Linux. May work on other flavors too."
-    echo "This script should be run from within the contrib/misc directory."
     echo "It attempts to set up a universally compatible AFP server:"
     echo " - Classic AppleTalk (DDP) support enabled"
     echo " - TCP/IP (DSI) support and service discovery with Zeroconf / Bonjour enabled"
