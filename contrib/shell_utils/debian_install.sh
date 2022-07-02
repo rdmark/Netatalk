@@ -78,7 +78,8 @@ function installNetatalk() {
 
     echo ""
     echo "Installing dependencies..."
-    ( sudo apt-get update && sudo apt-get install libssl-dev libdb-dev libcups2-dev cups libavahi-client-dev autotools-dev automake libtool libgcrypt20-dev pkg-config --assume-yes ) </dev/null
+    sudo apt-get update || true
+    sudo apt-get install libssl-dev libdb-dev libcups2-dev cups libavahi-client-dev autotools-dev automake libtool libgcrypt20-dev pkg-config --assume-yes </dev/null
 
     echo ""
     echo "Bootstrapping and configuring Netatalk..."
@@ -113,15 +114,14 @@ function installNetatalk() {
     fi
 
     echo ""
-    echo "Starting systemd services..."
+    echo "Starting systemd services... (this may take a while)"
     sudo systemctl start afpd atalkd papd timelord a2boot cups
-    systemctl status afpd atalkd papd timelord a2boot
 
     echo ""
-    echo "Netatalk daemons are now installed and enabled as systemd services."
-    echo "From your Mac, connect to the file server using the current username ("$USER") and password."
+    echo "Netatalk daemons are now installed and running, and should be discoverable by your Macs."
+    echo "To authenticate with the file server, use the current username ("$USER") and password."
     echo ""
-    echo "IMPORTANT: "$USER" needs to have a password of 8 chars or less."
+    echo "IMPORTANT: "$USER" needs to have a password of 8 chars or less due to Classic Mac OS limitations."
     echo "Do you want to change your password now? [y/N]"
     read -r REPLY
     if [ "$REPLY" == "y" ] || [ "$REPLY" == "Y" ]; then
