@@ -96,7 +96,5 @@ In most scenarios, atalkd will successfully autodetect the AppleTalk network set
 
 If AppleTalk does not work out of the box, please refer to the [manual entry on AppleTalk](https://netatalk.sourceforge.io/2.2/htmldocs/configuration.html#id1207348).
 
-The following example uses the default pi user, a single shared directory, and a single routerless AppleTalk network without Zones. 
-
-# Documentation
+# See Also
 Comprehensive [documentation for Netatalk 2.2](http://netatalk.sourceforge.net/2.2/htmldocs/) can be found on SourceForge.net
