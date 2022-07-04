@@ -103,13 +103,17 @@ function installNetatalk() {
 
     echo ""
     echo "Modifying service configurations..."
+    echo "AppleVolumes.default:"
     sudo sed -i /^~/d "$SYSCONFDIR/netatalk/AppleVolumes.default"
     echo "$AFP_SHARE_PATH \"Netatalk File Server\"" | sudo tee -a "$SYSCONFDIR/netatalk/AppleVolumes.default"
+    echo "afpd.conf:"
     echo "- -transall -uamlist uams_guest.so,uams_clrtxt.so,uams_dhx2.so -nosavepassword -noicon" | sudo tee -a "$SYSCONFDIR/netatalk/afpd.conf"
+    echo "papd.conf:"
     echo "cupsautoadd:op=root:" | sudo tee -a "$SYSCONFDIR/netatalk/papd.conf"
     sudo usermod -a -G lpadmin $USER
     sudo cupsctl --remote-admin WebInterface=yes
-    if [[ `sudo grep "PreserveJobHistory No" /etc/cups/cupsd.conf` -eq 0 ]]; then
+    if [[ `sudo grep "PreserveJobHistory" /etc/cups/cupsd.conf` -eq 0 ]]; then
+        echo "cupsd.conf:"
         sudo sed -i "/MaxLogSize/a PreserveJobHistory No" /etc/cups/cupsd.conf
     fi
 
