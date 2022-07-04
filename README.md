@@ -210,5 +210,6 @@ In Basilisk II, make sure you configure the emulator with the slirp network inte
 
 # See Also
 * [Netatalk 2.2 Manual](http://netatalk.sourceforge.net/2.2/htmldocs/)
+* [Classic Mac Networking](http://www.applefool.com/se30/) guide by Mk.558
 * [Netatalk-Classic](https://github.com/christopherkobayashi/netatalk-classic), an AppleTalk-only fork of Netatalk
 * [Netatalk integration with RaSCSI](https://github.com/akuker/RASCSI/wiki/AFP-File-Sharing)
