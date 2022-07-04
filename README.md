@@ -1,12 +1,12 @@
 # Netatalk 2.x
-Netatalk 2.x is a fork of the Netatalk 2.2 codebase, which aims to be clean and easy to set up on modern systems. It has taken in all community patches that emerged since upstream Netatalk 2.2 stopped being actively developed, for ultimate performance, compatibility and usability. It has also aggressively deprecated broken or deprecated features, as well as backported a select few security patches from upstream.
+Netatalk 2.x is a fork of the Netatalk 2.2 codebase, which aims to be clean and easy to set up on modern systems. It has taken in all community patches that emerged since upstream Netatalk 2.2 stopped being actively developed, for ultimate performance, compatibility and usability. It has also aggressively deprecated broken or long outdated features, as well as backported a select few security patches from upstream.
 
 Actively supported platforms are Linux, NetBSD and Solaris.
 
 # Background
 Netatalk is an open source implementation of AFP, Apple's legacy file sharing protocol, originally standing for AppleTalk Filing Protocol. This is what classic Mac OS as well as earlier versions of Mac OS X (until 10.8) uses for file sharing, when Apple deprecated AFP in favor of Samba.
 
-As of Netatalk 3.0, support for Apple's legacy AppleTalk (DDP) protocol was dropped. AppleTalk is required for Macs running System 6.0 through Mac OS 7.6, as well as Apple IIe and IIgs computers, to be able to connect to an AppleShare server out of the box. Additionally, AppleTalk support brings the convenience of a printer server (papd) which can act as a two-way bridge for using modern printers on old Macs, and vice versa, as well as a time server (timelord,) plus an Apple II netboot server (a2boot.)
+As of Netatalk 3.0, support for Apple's legacy AppleTalk (DDP) protocol was dropped. AppleTalk is required for Macs running System 6.0 through Mac OS 7.6, as well as Apple IIe and IIgs computers, to be able to connect to an AppleShare server out of the box. Additionally, AppleTalk support brings the convenience of a printer server (**papd**) which can act as a two-way bridge for using modern printers on old Macs, and vice versa, as well as a time server (**timelord**) plus an Apple II netboot server (**a2boot**.)
 
 One major motivation for keeping Netatalk 2.2 alive, is the ability to understand both AppleTalk (DDP) and TCP/IP (DSI) which allows it to serve as a bridge between very old Apple II and Mac systems, and modern macOS and other systems that understand AFP.
 
@@ -39,11 +39,6 @@ $ apt install libgcrypt20-dev
 
 ## Feature Configuration Examples
 First of all, it is worth noting that unlike upstream Netatalk 2, DDP (AppleTalk), papd, timelord, and a2boot are all configured and compiled by default.
-
-To see all configure options, run it with the --help parameter.
-```
-$ ./configure --help
-```
 
 For most setups, the only parameter you need is for picking the init script option for your OS. Here as an example is the *systemd* option, which will install systemd services that you can start once installation is complete. Use ```./configure --help``` to see the other init script options available.
 ```
@@ -177,7 +172,7 @@ If you see your printer here, the only thing left is to configure the printer on
 ### Troubleshooting
 If the LaserWriter driver fails to properly spool the print job to the printer, you may want to try to configure is differently through CUPS. Here it is helpful to have the web interface ready. Go to the Administration page, Add Printer, then pick the printer you want to share from the list of detected ones. Note that one printer may expose several interfaces, so choose the one that seems the most likely to work with LaserWriter spool queues. Afterwards, check with the nbplkup command which printers are available over AppleTalk, and have a look in the Chooser if a different printer has been detected now.
 
-You may also try different PPD files in the Chooser and see it that makes a difference. 
+You may also experiment with different PPD files in the Chooser and see it that makes a difference. 
 
 ## Time Server
 Netatalk also comes bundled with a [Timelord](https://web.archive.org/web/20010303220117/http://www.cs.mu.oz.au/appletalk/readmes/TMLD.README.html) compatible daemon that can be used to continuously synchronize vintage Macs' system clocks, enabling you to operate them without a PRAM battery, for instance.
@@ -211,7 +206,8 @@ Note that the AppleShare Client 3.7.4 installer will refuse to install on a 7.1 
 ## Mac Emulators
 The AFP server can be accessed also from within a Mac emulator with a network bridge, such as Basilisk II.
 
-In Basilisk II, make sure you configure the emulator with the slirp network interface, and install the AppleShare Client / Open Transport software on the emulated system as instructed above. In the TCP/IP control panel, configure DHCP and make sure you can ping the host with OTTool or similar utility. At this point, you should be able to reach the shared drive through TCP, if not AppleTalk.
+In Basilisk II, make sure you configure the emulator with the slirp network interface, and install the AppleShare Client / Open Transport software on the emulated system as instructed above. In the TCP/IP control panel, configure DHCP and make sure you can ping the host with OTTool or similar utility. At this point, you should be able to reach the shared drive through TCP, or even AppleTalk if your emulator's network bridge supports it.
 
 # See Also
-Comprehensive [documentation for Netatalk 2.2](http://netatalk.sourceforge.net/2.2/htmldocs/) can be found on SourceForge.net
+* [Netatalk 2.2 Manual](http://netatalk.sourceforge.net/2.2/htmldocs/)
+* [Netatalk-Classic](https://github.com/christopherkobayashi/netatalk-classic), an AppleTalk-only fork of Netatalk
