@@ -191,13 +191,13 @@ At the time of writing, Linux, NetBSD and Solaris are known to have maintained A
 
 ## Linux
 
-To check if your kernel has AppleTalk support, first start the atalkd daemon, then issue this command and inspect the output:
+To check if your kernel has AppleTalk support, first start the ```atalkd``` daemon, then issue this command and inspect the output:
 
 ```
 $ lsmod | grep appletalk
 ```
 
-This section describes the modular approach, but it should also be possible to compile the AppleTalk module directly into the kernel for a slight performance boost.
+If no ```appletalk``` module is detected, you may have to compile support into the kernel. This section describes the modular approach, but it should also be possible to compile the AppleTalk module directly into the kernel for a slight performance boost.
 
 This section will not describe the entire process, but rather follow the steps in the [Raspberry Pi documentation](https://www.raspberrypi.com/documentation/computers/linux_kernel.html). Do the steps in the documentation in this order:
 
