@@ -184,6 +184,37 @@ Netatalk comes with the a2boot daemon for netbooting Apple //e and //gs computer
 
 The [A2SERVER](http://ivanx.com/a2server/) project has comprehensive information on a2boot. 
 
+# AppleTalk Kernel Module
+Netatalk relies on AppleTalk support in the kernel to make use of the DDP layer. The ```atalkd``` daemon will attempt to dynamically load the kernel module if not detected, and error out if all attempts fail. You can still use the DSI layer without an AppleTalk kernel module.
+
+At the time of writing, Linux, NetBSD and Solaris are known to have maintained AppleTalk kernel modules. At one point in history, Netatalk had an embedded kernel module in its codebase, but this was deprecated long ago.
+
+## Linux
+
+To check if your kernel has AppleTalk support, first start the atalkd daemon, then issue this command and inspect the output:
+
+```
+$ lsmod | grep appletalk
+```
+
+This section describes the modular approach, but it should also be possible to compile the AppleTalk module directly into the kernel for a slight performance boost.
+
+This section will not describe the entire process, but rather follow the steps in the [https://www.raspberrypi.com/documentation/computers/linux_kernel.html Raspberry Pi documentation]. Do the steps in the documentation in this order:
+
+* [Building the Kernel Locally](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#building-the-kernel-locally)
+* [Apply the Default Configuration](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#default_configuration)
+* [Preparing to Configure](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#preparing-to-configure)
+* [Using menuconfig](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#using-menuconfig)
+* Networking support ---> Networking options ---> Appletalk protocol support
+    * Press M to select this
+    * Select ''Appletalk interfaces support'' and press M again
+    * Save and exit menuconfig
+* [Building the Kernel](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#building-the-kernel)
+* Reboot the system once the process is completed (compilation may take an hour or longer on slower systems)
+* Check that the ''appletalk'' kernel module has been loaded, as per the above
+* If the module isn't automatically loaded, add a line to /etc/modules
+** appletalk
+
 # Connect to AppleShare from a Mac client
 This section provides some pointers to how to connect to the AppleShare server provided by Netatalk.
 
