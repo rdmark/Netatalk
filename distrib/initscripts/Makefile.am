@@ -161,7 +161,7 @@ timelord: rc.timelord.netbsd
 	chmod a+x $@
 	
 a2boot: rc.a2boot.netbsd
-	cp -f $< $@
+	cp -f $? $@
 	chmod a+x $@
 
 install-data-hook:
