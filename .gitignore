@@ -21,6 +21,7 @@ autom4te.cache
 autoscan.log
 test-driver
 patches
+**/.AppleDouble/**
 *.rpm
 *.deb
 *.dsc
@@ -29,7 +30,6 @@ patches
 *.diff.gz
 *~
 *.o
-<<<<<<< HEAD
 *.orig
 *.rej
 *.diff
