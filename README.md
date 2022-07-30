@@ -180,7 +180,7 @@ Netatalk also comes bundled with a [Timelord](https://web.archive.org/web/200103
 Once the timelord daemon is running, you'd want to install the [Tardis Chooser extension](https://macintoshgarden.org/apps/tardis-and-timelord) on your Mac and reboot. Now you should have a 'tardis' option in the Chooser, from where you can choose available time servers to sync with. The extension will automatically sync the system clock on bootup against the chosen server.
 
 ## Apple II Netboot
-Netatalk comes with the a2boot daemon for netbooting Apple //e and //gs computers.
+Netatalk comes with the a2boot daemon for netbooting Apple IIe and IIGS computers. It provides shared ProDOS volumes where you can install system files for booting an Apple II over a LocalTalk network.
 
 The [A2SERVER](http://ivanx.com/a2server/) project has comprehensive information on a2boot. 
 
