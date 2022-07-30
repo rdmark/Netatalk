@@ -1,12 +1,23 @@
+Changes in 2.x v220702
+======================
+* NEW: debian_install.sh: The script now takes -n (share name) and
+       -p (share path) parameters.
+* FIX: debian_install.sh: Modifying cupsd.conf should work properly now.
+* FIX: debian_install.sh: Make sure the script can create the share dir anywhere.
+       Reported by foo8ar.
+* UPD: Further fleshed out README.md with info on the Linux
+       appletalk module, etc.
+
 Changes in 2.x v220701
 ======================
-* FIX: Fixed regression bug that caused "dsi_stream_read: len:-1, No such file or directory"
+* FIX: Fixed regression bug that caused
+       "dsi_stream_read: len:-1, No such file or directory"
        errors when making DSI connections.
        https://github.com/rdmark/Netatalk-2.x/issues/9
 * FIX: Fixes for building on Alpine Linux, and other modern distros.
        https://github.com/rdmark/Netatalk-2.x/pull/10
-* REM: Removed the -Wall -Werror C flags to avoid unnecessarily erroring out with
-       very recent (gcc 12) or very old (gcc 6) compilers.
+* REM: Removed the -Wall -Werror C flags to avoid unnecessarily erroring
+       out with very recent (gcc 12) or very old (gcc 6) compilers.
        https://github.com/rdmark/Netatalk-2.x/issues/11
 * NEW: Added an automated install script for Debian Linux:
        ./contrib/shell_utils/debian_install.sh
