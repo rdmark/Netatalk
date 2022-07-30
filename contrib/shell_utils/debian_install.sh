@@ -15,6 +15,7 @@ set -e
 
 USER=$(whoami)
 BASE=$(dirname "$(readlink -f "${0}")")
+AFP_SHARE_NAME="Netatalk File Server"
 AFP_SHARE_PATH="$HOME/afpshare"
 SYSCONFDIR="/etc"
 
@@ -30,7 +31,7 @@ function initialChecks() {
     echo " - TCP/IP (DSI) support and service discovery with Zeroconf / Bonjour enabled"
     echo " - Cleartxt UAM to authenticate Classic Mac OS clients"
     echo " - DHX2 UAM to authenticate Mac OS X / macOS clients"
-    echo " - A single shared directory owned by the current user"
+    echo " - Sharing $AFP_SHARE_PATH as $AFP_SHARE_NAME"
     echo ""
     echo "The following changes will be made to your system:"
     echo " - Modify user groups and permissions"
@@ -106,7 +107,7 @@ function installNetatalk() {
     echo "Modifying service configurations..."
     echo "AppleVolumes.default:"
     sudo sed -i /^~/d "$SYSCONFDIR/netatalk/AppleVolumes.default"
-    echo "$AFP_SHARE_PATH \"Netatalk File Server\"" | sudo tee -a "$SYSCONFDIR/netatalk/AppleVolumes.default"
+    echo "$AFP_SHARE_PATH \"$AFP_SHARE_NAME\"" | sudo tee -a "$SYSCONFDIR/netatalk/AppleVolumes.default"
     echo "afpd.conf:"
     echo "- -transall -uamlist uams_guest.so,uams_clrtxt.so,uams_dhx2.so -nosavepassword -noicon" | sudo tee -a "$SYSCONFDIR/netatalk/afpd.conf"
     echo "papd.conf:"
@@ -115,7 +116,7 @@ function installNetatalk() {
     sudo cupsctl --remote-admin WebInterface=yes
     if [[ `sudo grep "PreserveJobHistory" /etc/cups/cupsd.conf` -eq 0 ]]; then
         echo "cupsd.conf:"
-        sudo sed -i "/MaxLogSize/a PreserveJobHistory No" /etc/cups/cupsd.conf
+        sudo sed -i "/MaxLogSize/a PreserveJobHistory\ No" /etc/cups/cupsd.conf
     fi
 
     echo ""
@@ -145,6 +146,12 @@ while [ "$1" != "" ]; do
     case $PARAM in
         -j | --cores)
             CORES=$VALUE
+            ;;
+        -n | --share-name)
+            AFP_SHARE_NAME=$VALUE
+            ;;
+        -p | --share-path)
+            AFP_SHARE_PATH=$VALUE
             ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""
