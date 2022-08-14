@@ -28,4 +28,6 @@ all developers past and present.
 5. cd to the repo then double-click install.command
 
 
-6. Set up your afp.conf file and specify AFP shares as needed. Note: for afpstats to work *afpstats = yes* must be in the global section of afp.conf.
+6. Set up your afp.conf file and specify AFP shares as needed.
+
+Notes: For afpstats to work *afpstats = yes* must be in the global section of afp.conf. The icon folder contains a Mac OS 9 colour icon for the AFP share. The extension folder contains a System Folder extension for enabling Bonjour in Mac OS 9.
