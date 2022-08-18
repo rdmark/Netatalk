@@ -407,6 +407,8 @@ int afp_options_parseline(char *buf, struct afp_options *options)
 		options->uampath = opt;
 	if ((c = getoption(buf, "-uamlist")) && (opt = strdup(c)))
 		options->uamlist = opt;
+	if ((c = getoption(buf, "-ipaddr")) && (opt = strdup(c)))
+		options->ipaddr = opt;
 
 	/* FIXME CNID Cnid_srv is a server attribute */
 	if ((c = getoption(buf, "-cnidserver"))) {
