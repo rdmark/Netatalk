@@ -1,9 +1,17 @@
 dnl configure.in for netatalk
 
-AC_INIT([netatalk],[m4_esyscmd([echo -n `cat VERSION`])])
+# For legacy Automake versions, use this syntax instead.
+# AC_INIT(etc/afpd/main.c)
+# AC_CANONICAL_TARGET
+# NETATALK_VERSION=`cat $srcdir/VERSION`
+# AM_INIT_AUTOMAKE(netatalk, ${NETATALK_VERSION})
 
+# Current syntax as per Automake 1.16.5 documentation.
+# https://www.gnu.org/software/automake/manual/html_node/Public-Macros.html
+AC_INIT([netatalk],[m4_esyscmd([echo -n `cat VERSION`])])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([subdir-objects])
+
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIRS([macros])
 AM_MAINTAINER_MODE([enable])
