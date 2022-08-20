@@ -1,3 +1,13 @@
+Changes in 2.x v220801
+======================
+* FIX: afpd: Restore -ipaddr option in afpd.conf, by saybur.
+* FIX: afpd: Restore fix for error when moving file with shortened file name.
+* FIX: debian_install.sh: Correct check for cupsd.conf to avoid spurious error.
+* UPD: Bring back examples of legacy Automake syntax to configure.ac,
+       commented out near the top of the file. Uncomment to build on f.e.
+       Ubuntu 18.04. Requested by snhirsch.
+       https://github.com/rdmark/Netatalk-2.x/issues/13
+
 Changes in 2.x v220702
 ======================
 * NEW: debian_install.sh: The script now takes -n (share name) and
