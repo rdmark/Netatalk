@@ -726,8 +726,6 @@ int afp_moveandrename(AFPObj * obj, char *ibuf, size_t ibuflen _U_,
 			rc = AFPERR_PARAM;
 			goto exit;
 		}
-		curdir->d_offcnt++;
-		sdir->d_offcnt--;
 		/* if unix priv don't try to match perm with dest folder */
 		if (!isdir && !vol_unix_priv(vol)) {
 			int admode = ad_mode("", 0777) | vol->v_fperm;
