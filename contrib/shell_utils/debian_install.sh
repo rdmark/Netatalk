@@ -115,7 +115,7 @@ function installNetatalk() {
     echo "cupsautoadd:op=root:" | sudo tee -a "$SYSCONFDIR/netatalk/papd.conf"
     sudo usermod -a -G lpadmin $USER
     sudo cupsctl --remote-admin WebInterface=yes
-    if [[ `sudo grep "PreserveJobHistory" /etc/cups/cupsd.conf` -eq 0 ]]; then
+    if [[ `sudo grep -c "PreserveJobHistory" /etc/cups/cupsd.conf` -eq 0 ]]; then
         echo "cupsd.conf:"
         sudo sed -i "/MaxLogSize/a PreserveJobHistory\ No" /etc/cups/cupsd.conf
     fi
