@@ -2,111 +2,57 @@
 <chapter id="upgrade">
   <chapterinfo>
     <date>9.6.2013</date>
-
     <author>
       <firstname>Frank</firstname>
-
       <surname>Lahm</surname>
     </author>
-
     <pubdate>6 Sep, 2013</pubdate>
   </chapterinfo>
-
   <title>Upgrading from Netatalk 2</title>
-
   <sect1>
     <title>Overview</title>
-
-    <para>There are two major changes in Netatalk:<orderedlist>
-        <listitem>
-          <para>New configuration file <filename><link
-          linkend="afp.conf.5">afp.conf</link></filename>, obsoleting all
-          previous configuration files</para>
-        </listitem>
-
-        <listitem>
-          <para>New AppleDouble backend "<option>appledouble = ea</option>"
+    <para>There are two major changes in Netatalk:<orderedlist><listitem><para>New configuration file <filename><link linkend="afp.conf.5">afp.conf</link></filename>, obsoleting all
+          previous configuration files</para></listitem><listitem><para>New AppleDouble backend "<option>appledouble = ea</option>"
           which stores Mac metadata and resource forks in extended attributes
-          of the filesystem</para>
-        </listitem>
-      </orderedlist></para>
-
+          of the filesystem</para></listitem></orderedlist></para>
     <sect2>
       <title>New configuration</title>
-
-      <para><itemizedlist>
+      <para>
+        <itemizedlist>
           <listitem>
             <para>ini style syntax (like Samba’s smb.conf)</para>
           </listitem>
-
           <listitem>
             <para>one to rule them all: configure AFP settings and volumes in
             one file</para>
           </listitem>
-
           <listitem>
             <para>obsoletes <filename>afpd.conf</filename>,
             <filename>netatalk.conf</filename>,
             <filename>AppleVolumes.default</filename> and
             <filename>afp_ldap.conf</filename></para>
           </listitem>
-        </itemizedlist><warning>
-          <para>most option names have changed, read the full manpage <link
-          linkend="afp.conf.5">afp.conf</link> for details</para>
-        </warning></para>
+        </itemizedlist>
+        <warning>
+          <para>most option names have changed, read the full manpage <link linkend="afp.conf.5">afp.conf</link> for details</para>
+        </warning>
+      </para>
     </sect2>
-
     <sect2>
       <title>New AppleDouble backend</title>
-
       <para>New AppleDouble backend "<option>appledouble = ea</option>" which
       stores Mac metadata and resource forks in extended attributes of the
-      filesystem.<itemizedlist>
-          <listitem>
-            <para>default backend (!)</para>
-          </listitem>
-
-          <listitem>
-            <para>requires a filesystem with Extended Attributes, fallback is
-            "<option>appledouble = v2</option>"</para>
-          </listitem>
-
-          <listitem>
-            <para>converts filesystems from "<option>appledouble = v2</option>"
+      filesystem.<itemizedlist><listitem><para>default backend (!)</para></listitem><listitem><para>requires a filesystem with Extended Attributes, fallback is
+            "<option>appledouble = v2</option>"</para></listitem><listitem><para>converts filesystems from "<option>appledouble = v2</option>"
             to "<option>appledouble = ea</option>" on the fly when accessed
-            (can be disabled)</para>
-          </listitem>
-
-          <listitem>
-            <para><command><link linkend="dbd.1">dbd</link></command> can be
-            used to do conversion in one shot</para>
-          </listitem>
-        </itemizedlist></para>
-
-      <para>Implementation details:<itemizedlist>
-          <listitem>
-            <para>stores Mac Metadata (eg FinderInfo, AFP Flags, Comment,
+            (can be disabled)</para></listitem><listitem><para><command><link linkend="dbd.1">dbd</link></command> can be
+            used to do conversion in one shot</para></listitem></itemizedlist></para>
+      <para>Implementation details:<itemizedlist><listitem><para>stores Mac Metadata (eg FinderInfo, AFP Flags, Comment,
             CNID) in an Extended Attributed named
-            “<filename>org.netatalk.Metadata</filename>”</para>
-          </listitem>
-
-          <listitem>
-            <para>stores Mac ResourceFork either in<itemizedlist>
-                <listitem>
-                  <para>an Extended Attribute named
+            “<filename>org.netatalk.Metadata</filename>”</para></listitem><listitem><para>stores Mac ResourceFork either in<itemizedlist><listitem><para>an Extended Attribute named
                   “<filename>org.netatalk.ResourceFork</filename>”
-                  on Solaris w. ZFS, or in</para>
-                </listitem>
-
-                <listitem>
-                  <para>an extra AppleDouble file named “<filename>._file</filename>” for a file
-                  named “<filename>file</filename>”</para>
-                </listitem>
-              </itemizedlist></para>
-          </listitem>
-
-          <listitem>
-            <para>the format of the ._ file is exactly as the Mac’s CIFS
+                  on Solaris w. ZFS, or in</para></listitem><listitem><para>an extra AppleDouble file named “<filename>._file</filename>” for a file
+                  named “<filename>file</filename>”</para></listitem></itemizedlist></para></listitem><listitem><para>the format of the ._ file is exactly as the Mac’s CIFS
             client expects it when accessing the same filesystem via a CIFS
             server (Samba), thus you can have parallel access from Macs to the
             same dataset via AFP and CIFS without the risk of loosing data
@@ -114,77 +60,67 @@
             from Windows clients will still break the coupling of
             “<filename>file</filename>” and “<filename>._file</filename>”
             on non ZFS filesystems (see above), so for this we still
-            need an enhanced Samba VFS module (in the works).</para>
-          </listitem>
-        </itemizedlist></para>
-
+            need an enhanced Samba VFS module (in the works).</para></listitem></itemizedlist></para>
       <para>As these days the only applications making use of Resource Forks
       are Adobe Photoshop (image preview) and Postscript Type 1 fonts, even on
       e.g. Linux you’ll get rid of 99% of any extra Netatalk AppleDouble files
       (and folders).</para>
     </sect2>
-
     <sect2>
       <title>Other major changes</title>
-
-      <para><itemizedlist>
+      <para>
+        <itemizedlist>
           <listitem>
             <para>The CNID databases are now stored under
               <filename>/var/netatalk/CNID/</filename>
               by default. You can use configure --localstatedir=PATH at
               compile time to change the location.</para>
           </listitem>
-
           <listitem>
             <para>Netatalk 2.x volume options “usedots” and “upriv” now
             enabled by default</para>
           </listitem>
-
           <listitem>
             <para>Removed SLP and AFP proxy support</para>
           </listitem>
-
           <listitem>
             <para>Removed type/creator extension mapping
             support</para>
           </listitem>
-        </itemizedlist></para>
+        </itemizedlist>
+      </para>
     </sect2>
   </sect1>
-
   <sect1>
     <title>Upgrading</title>
-
-    <para><orderedlist>
+    <para>
+      <orderedlist>
         <listitem>
           <para>Stop Netatalk 2.x</para>
         </listitem>
-
         <listitem>
           <para>Install Netatalk 3</para>
         </listitem>
-
         <listitem>
           <para>Manually recreate configuration in
           <option>afp.conf</option> and <option>extmap.conf</option></para>
         </listitem>
-
         <listitem>
           <para>Move <filename>afp_voluuid.conf</filename> and
           <filename>afp_signature.conf</filename> to the localstate directory (default
           <filename>/var/netatalk/</filename>), you can use <command>afpd -v</command>
           in order to find the correct path</para>
         </listitem>
-
         <listitem>
           <para>Start Netatalk 3</para>
         </listitem>
-      </orderedlist></para>
+      </orderedlist>
+    </para>
   </sect1>
-
   <sect1>
     <title>Table with old and new configuration file names</title>
-    <para><table frame="all">
+    <para>
+      <table frame="all">
         <title>old and new configuration file names</title>
         <tgroup cols="3">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -200,22 +136,34 @@
           <tbody>
             <row>
               <entry>-</entry>
-              <entry><filename>etc/afp.conf</filename></entry>
+              <entry>
+                <filename>etc/afp.conf</filename>
+              </entry>
               <entry>new ini-style format</entry>
             </row>
             <row>
               <entry>-</entry>
-              <entry><filename>etc/extmap.conf</filename></entry>
+              <entry>
+                <filename>etc/extmap.conf</filename>
+              </entry>
               <entry>starting with netatalk 3.0.2</entry>
             </row>
             <row>
-              <entry><filename>etc/netatalk/afp_signature.conf</filename></entry>
-              <entry><filename>var/netatalk/afp_signature.conf</filename></entry>
+              <entry>
+                <filename>etc/netatalk/afp_signature.conf</filename>
+              </entry>
+              <entry>
+                <filename>var/netatalk/afp_signature.conf</filename>
+              </entry>
               <entry>moved to $localstatedir</entry>
             </row>
             <row>
-              <entry><filename>etc/netatalk/afp_voluuid.conf</filename></entry>
-              <entry><filename>var/netatalk/afp_voluuid.conf</filename></entry>
+              <entry>
+                <filename>etc/netatalk/afp_voluuid.conf</filename>
+              </entry>
+              <entry>
+                <filename>var/netatalk/afp_voluuid.conf</filename>
+              </entry>
               <entry>moved to $localstatedir</entry>
             </row>
             <row>
@@ -225,38 +173,49 @@
               <entry>obsolete</entry>
             </row>
             <row>
-              <entry><filename>etc/netatalk/afpd.conf</filename></entry>
+              <entry>
+                <filename>etc/netatalk/afpd.conf</filename>
+              </entry>
               <entry>-</entry>
               <entry>obsolete</entry>
             </row>
             <row>
-              <entry><filename>etc/netatalk/afp_ldap.conf</filename></entry>
+              <entry>
+                <filename>etc/netatalk/afp_ldap.conf</filename>
+              </entry>
               <entry>-</entry>
               <entry>obsolete</entry>
             </row>
             <row>
-              <entry><filename>etc/netatalk/AppleVolumes.default</filename></entry>
+              <entry>
+                <filename>etc/netatalk/AppleVolumes.default</filename>
+              </entry>
               <entry>-</entry>
               <entry>obsolete</entry>
             </row>
             <row>
-              <entry><filename>etc/netatalk/AppleVolumes.system</filename></entry>
+              <entry>
+                <filename>etc/netatalk/AppleVolumes.system</filename>
+              </entry>
               <entry>-</entry>
               <entry>obsolete</entry>
             </row>
             <row>
-              <entry><filename>~/.AppleVolumes</filename></entry>
+              <entry>
+                <filename>~/.AppleVolumes</filename>
+              </entry>
               <entry>-</entry>
               <entry>obsolete</entry>
             </row>
           </tbody>
         </tgroup>
-      </table></para>
+      </table>
+    </para>
   </sect1>
-
   <sect1>
     <title>Table with old and new option names</title>
-    <para><table frame="all">
+    <para>
+      <table frame="all">
         <title>from netatalk.conf (/etc/default/netatalk) to afp.conf</title>
         <tgroup cols="6">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -287,8 +246,12 @@
             <row>
               <entry>ATALK_UNIX_CHARSET</entry>
               <entry>unix charset</entry>
-              <entry><emphasis role="bold">LOCALE</emphasis></entry>
-              <entry><emphasis role="bold">UTF8</emphasis></entry>
+              <entry>
+                <emphasis role="bold">LOCALE</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">UTF8</emphasis>
+              </entry>
               <entry>(G)</entry>
               <entry>-</entry>
             </row>
@@ -319,8 +282,12 @@
             <row>
               <entry>AFPD_MAX_CLIENTS</entry>
               <entry>max connections</entry>
-              <entry><emphasis role="bold">20</emphasis></entry>
-              <entry><emphasis role="bold">200</emphasis></entry>
+              <entry>
+                <emphasis role="bold">20</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">200</emphasis>
+              </entry>
               <entry>(G)</entry>
               <entry>-</entry>
             </row>
@@ -406,7 +373,8 @@
             </row>
           </tbody>
         </tgroup>
-      </table><table frame="all">
+      </table>
+      <table frame="all">
         <title>from afpd.conf to afp.conf</title>
         <tgroup cols="6">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -557,8 +525,12 @@
             <row>
               <entry>-server_quantum</entry>
               <entry>server quantum</entry>
-              <entry><emphasis role="bold">303840</emphasis></entry>
-              <entry><emphasis role="bold">1048576</emphasis></entry>
+              <entry>
+                <emphasis role="bold">303840</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">1048576</emphasis>
+              </entry>
               <entry>(G)</entry>
               <entry>-</entry>
             </row>
@@ -621,8 +593,12 @@
             <row>
               <entry>-uampath</entry>
               <entry>uam path</entry>
-              <entry><emphasis role="bold">etc/netatalk/uams/</emphasis></entry>
-              <entry><emphasis role="bold">lib/netatalk/</emphasis></entry>
+              <entry>
+                <emphasis role="bold">etc/netatalk/uams/</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">lib/netatalk/</emphasis>
+              </entry>
               <entry>(G)</entry>
               <entry>moved to $libdir</entry>
             </row>
@@ -669,8 +645,12 @@
             <row>
               <entry>-unixcodepage</entry>
               <entry>unix charset</entry>
-              <entry><emphasis role="bold">LOCALE</emphasis></entry>
-              <entry><emphasis role="bold">UTF8</emphasis></entry>
+              <entry>
+                <emphasis role="bold">LOCALE</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">UTF8</emphasis>
+              </entry>
               <entry>(G)</entry>
               <entry>-</entry>
             </row>
@@ -902,7 +882,7 @@
               <entry>-[no]icon</entry>
               <entry>-</entry>
               <entry>-noicon</entry>
-              <entry></entry>
+              <entry/>
               <entry>-</entry>
               <entry>obsolete</entry>
             </row>
@@ -916,7 +896,8 @@
             </row>
           </tbody>
         </tgroup>
-      </table><table frame="all">
+      </table>
+      <table frame="all">
         <title>from afp_ldap.conf to afp.conf</title>
         <tgroup cols="6">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -1034,7 +1015,8 @@
             </row>
           </tbody>
         </tgroup>
-      </table><table frame="all">
+      </table>
+      <table frame="all">
         <title>from AppleVolumes.* to afp.conf</title>
         <tgroup cols="6">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -1129,8 +1111,12 @@
             <row>
               <entry>volcharset:</entry>
               <entry>vol charset</entry>
-              <entry><emphasis role="bold">UTF8</emphasis></entry>
-              <entry><emphasis role="bold">(same as unix charset)</emphasis></entry>
+              <entry>
+                <emphasis role="bold">UTF8</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">(same as unix charset)</emphasis>
+              </entry>
               <entry>(G)/(V)</entry>
               <entry>-</entry>
             </row>
@@ -1169,8 +1155,12 @@
             <row>
               <entry>adouble:</entry>
               <entry>appledouble</entry>
-              <entry><emphasis role="bold">v2</emphasis></entry>
-              <entry><emphasis role="bold">ea</emphasis></entry>
+              <entry>
+                <emphasis role="bold">v2</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">ea</emphasis>
+              </entry>
               <entry>(V)</entry>
               <entry>v1, osx and sfm are obsoleted</entry>
             </row>
@@ -1185,8 +1175,12 @@
             <row>
               <entry>dbpath:</entry>
               <entry>vol dbpath</entry>
-              <entry><emphasis role="bold">(volume directory)</emphasis></entry>
-              <entry><emphasis role="bold">var/netatalk/CNID/</emphasis></entry>
+              <entry>
+                <emphasis role="bold">(volume directory)</emphasis>
+              </entry>
+              <entry>
+                <emphasis role="bold">var/netatalk/CNID/</emphasis>
+              </entry>
               <entry>(G)</entry>
               <entry>moved to $localstatedir</entry>
             </row>
@@ -1354,7 +1348,9 @@
               <entry>options:upriv</entry>
               <entry>unix priv</entry>
               <entry>-</entry>
-              <entry><emphasis role="bold">yes</emphasis></entry>
+              <entry>
+                <emphasis role="bold">yes</emphasis>
+              </entry>
               <entry>(V)</entry>
               <entry>-</entry>
             </row>
@@ -1512,17 +1508,18 @@
             </row>
           </tbody>
         </tgroup>
-      </table></para>
+      </table>
+    </para>
   </sect1>
-
   <sect1>
     <title>To Do</title>
-
-    <para><itemizedlist>
+    <para>
+      <itemizedlist>
         <listitem>
           <para>test <command>ad</command> utils with <option>appledouble =
           ea</option></para>
         </listitem>
-      </itemizedlist></para>
+      </itemizedlist>
+    </para>
   </sect1>
 </chapter>

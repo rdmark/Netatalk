@@ -2,25 +2,19 @@
 <refentry id="asip-status.pl.1">
   <refmeta>
     <refentrytitle>asip-status.pl</refentrytitle>
-
     <manvolnum>1</manvolnum>
-
     <refmiscinfo class="date">06 May 2016</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP fileserver Manual</refmiscinfo>
     <refmiscinfo class="version">@NETATALK_VERSION@</refmiscinfo>
   </refmeta>
-
   <refnamediv>
     <refname>asip-status.pl</refname>
-
     <refpurpose>Queries AFP servers for their capabilities</refpurpose>
   </refnamediv>
-
   <refsynopsisdiv>
     <cmdsynopsis>
       <command>asip-status.pl</command>
-
       <group choice="opt">
         <arg choice="plain">-4</arg>
         <arg choice="plain">-6</arg>
@@ -28,14 +22,15 @@
       <arg choice="opt">-d</arg>
       <arg choice="opt">-i</arg>
       <arg choice="opt">-x</arg>
-
-      <arg choice="plain"><replaceable>HOSTNAME</replaceable></arg>
-      <arg choice="opt"><replaceable>PORT</replaceable></arg>
+      <arg choice="plain">
+        <replaceable>HOSTNAME</replaceable>
+      </arg>
+      <arg choice="opt">
+        <replaceable>PORT</replaceable>
+      </arg>
     </cmdsynopsis>
-
     <cmdsynopsis>
       <command>asip-status.pl</command>
-
       <group choice="opt">
         <arg choice="plain">-4</arg>
         <arg choice="plain">-6</arg>
@@ -43,103 +38,92 @@
       <arg choice="opt">-d</arg>
       <arg choice="opt">-i</arg>
       <arg choice="opt">-x</arg>
-
       <arg choice="plain"><replaceable>HOSTNAME</replaceable>:<replaceable>PORT</replaceable></arg>
     </cmdsynopsis>
-
     <cmdsynopsis>
       <command>asip-status.pl</command>
-
       <group choice="plain">
         <arg choice="plain">-v</arg>
         <arg choice="plain">-version</arg>
         <arg choice="plain">--version</arg>
       </group>
     </cmdsynopsis>
-
   </refsynopsisdiv>
-
   <refsect1>
     <title>DESCRIPTION</title>
-
     <para><command>asip-status.pl</command> is a perl script that
     sends a FPGetSrvrInfo request to an AFP server at
     <replaceable>HOSTNAME</replaceable>:<replaceable>PORT</replaceable> and
     displays the results, namely "Machine type", the server's name, supported
     AFP versions, UAMs and AFP flags, the "server signature" and the network
     addresses, the server provides AFP services on.</para>
-
     <para>When you don't supply <replaceable>PORT</replaceable>, then the
     default AFP port, 548, will be used.</para>
-
     <para>Starting with Netatalk 3.1.9, <command>asip-status.pl</command>
     supports both IPv4 and IPv6. It's decided by your system which IP version
     to use. You can use -4 or -6 option to specify IP version.</para>
-
-    <note><para><command>asip-status.pl</command> requires IO::Socket::IP
-    module.</para></note>
-
+    <note>
+      <para><command>asip-status.pl</command> requires IO::Socket::IP
+    module.</para>
+    </note>
   </refsect1>
-
   <refsect1>
     <title>OPTIONS</title>
-
     <variablelist remap="TP">
       <varlistentry>
-        <term><option>-4</option></term>
-
+        <term>
+          <option>-4</option>
+        </term>
         <listitem>
           <para>Use IPv4 only.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
-        <term><option>-6</option></term>
-
+        <term>
+          <option>-6</option>
+        </term>
         <listitem>
           <para>Use IPv6 only.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
-        <term><option>-d</option></term>
-
+        <term>
+          <option>-d</option>
+        </term>
         <listitem>
           <para>Enable debug output.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
-        <term><option>-i</option></term>
-
+        <term>
+          <option>-i</option>
+        </term>
         <listitem>
           <para>Show icon if it exists.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
-        <term><option>-x</option></term>
-
+        <term>
+          <option>-x</option>
+        </term>
         <listitem>
           <para>Enable hex dump output.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
-        <term><option>-v, -version, --version</option></term>
-
+        <term>
+          <option>-v, -version, --version</option>
+        </term>
         <listitem>
           <para>Show version.</para>
         </listitem>
-
       </varlistentry>
     </variablelist>
   </refsect1>
-
   <refsect1>
     <title>EXAMPLES</title>
-
-    <para><programlisting>$ <emphasis remap="B">asip-status.pl</emphasis> 192.168.1.15
+    <para>
+      <programlisting>$ <emphasis remap="B">asip-status.pl</emphasis> 192.168.1.15
 AFP reply from 192.168.1.15:548 via IPv4
 Flags: 1  Cmd: 3  ID: 57005
 Reply: DSIGetStatus
@@ -161,9 +145,10 @@ Signature:
                                                   
 Network address: 192.168.1.15:548 (IPv4 address and port)
 Network address: 65280.128 (ddp address)
-</programlisting></para>
-
-    <para><programlisting>$ <emphasis remap="B">asip-status.pl</emphasis> myserver:10548
+</programlisting>
+    </para>
+    <para>
+      <programlisting>$ <emphasis remap="B">asip-status.pl</emphasis> myserver:10548
 AFP reply from myserver:10548 via IPv6
 Flags: 1  Cmd: 3  ID: 57005
 Reply: DSIGetStatus
@@ -189,19 +174,16 @@ ea 56 61 0d bf 29 36 31 fa 6a 8a 24 a8 f0 cc 1d  .Va..)61.j.$....
                                                   
 Network address: [fd00:0000:0000:0000:0000:0000:0001:0160]:10548 (IPv6 address + port)
 UTF8 Servername: myserver
-</programlisting></para>
+</programlisting>
+    </para>
   </refsect1>
-
   <refsect1>
     <title>REPORTING BUGS</title>
-
     <para>Report bugs to the Netatalk-devel list
     &lt;netatalk-devel@lists.sourceforge.net&gt;.</para>
   </refsect1>
-  
   <refsect1>
-      <title>AUTHOR</title>
-      
-      <para>See <ulink url='https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS'>https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS</ulink></para>
+    <title>AUTHOR</title>
+    <para>See <ulink url="https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS">https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS</ulink></para>
   </refsect1>
 </refentry>

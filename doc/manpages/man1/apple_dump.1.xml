@@ -2,100 +2,87 @@
 <refentry id="apple_dump.1">
   <refmeta>
     <refentrytitle>apple_dump</refentrytitle>
-
     <manvolnum>1</manvolnum>
-
     <refmiscinfo class="date">12 Nov 2015</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP fileserver Manual</refmiscinfo>
     <refmiscinfo class="version">@NETATALK_VERSION@</refmiscinfo>
   </refmeta>
-
   <refnamediv>
     <refname>apple_dump</refname>
-
     <refpurpose>Dump AppleSingle/AppleDouble format data</refpurpose>
   </refnamediv>
-
   <refsynopsisdiv>
     <cmdsynopsis>
       <command>apple_dump</command>
-
-      <arg choice="opt"><arg choice="plain">-a</arg></arg>
-
+      <arg choice="opt">
+        <arg choice="plain">-a</arg>
+      </arg>
       <group choice="opt">
-        <arg choice="plain"><replaceable>FILE</replaceable></arg>
-        <arg choice="plain"><replaceable>DIR</replaceable></arg>
+        <arg choice="plain">
+          <replaceable>FILE</replaceable>
+        </arg>
+        <arg choice="plain">
+          <replaceable>DIR</replaceable>
+        </arg>
       </group>
     </cmdsynopsis>
-
     <cmdsynopsis>
       <command>apple_dump</command>
-
       <arg choice="plain">-e</arg>
-
       <group choice="plain">
-        <arg choice="plain"><replaceable>FILE</replaceable></arg>
-        <arg choice="plain"><replaceable>DIR</replaceable></arg>
+        <arg choice="plain">
+          <replaceable>FILE</replaceable>
+        </arg>
+        <arg choice="plain">
+          <replaceable>DIR</replaceable>
+        </arg>
       </group>
     </cmdsynopsis>
-
     <cmdsynopsis>
       <command>apple_dump</command>
-
       <arg choice="plain">-f</arg>
-
-      <arg choice="opt"><replaceable>FILE</replaceable></arg>
+      <arg choice="opt">
+        <replaceable>FILE</replaceable>
+      </arg>
     </cmdsynopsis>
-
     <cmdsynopsis>
       <command>apple_dump</command>
-
       <arg choice="plain">-d</arg>
-
-      <arg choice="opt"><replaceable>FILE</replaceable></arg>
+      <arg choice="opt">
+        <replaceable>FILE</replaceable>
+      </arg>
     </cmdsynopsis>
-
     <cmdsynopsis>
       <command>apple_dump</command>
-
       <group choice="plain">
         <arg choice="plain">-h</arg>
         <arg choice="plain">-help</arg>
         <arg choice="plain">--help</arg>
       </group>
     </cmdsynopsis>
-
     <cmdsynopsis>
       <command>apple_dump</command>
-
       <group choice="plain">
         <arg choice="plain">-v</arg>
         <arg choice="plain">-version</arg>
         <arg choice="plain">--version</arg>
       </group>
-
     </cmdsynopsis>
   </refsynopsisdiv>
-
   <refsect1>
     <title>DESCRIPTION</title>
-
     <para><command>apple_dump</command> is a perl script to dump
     AppleSingle/AppleDouble format data. </para>
     <para>This script can dump various AppleSingle/AppleDouble data created
     by mailer, archiver, Mac OS X, Netatalk and so on.</para>
     <para>With no <replaceable>FILE</replaceable>|<replaceable>DIR</replaceable>, or when <replaceable>FILE</replaceable>|<replaceable>DIR</replaceable> is '-', read standard input.</para>
-
   </refsect1>
-
   <refsect1>
     <title>OPTIONS</title>
-
     <variablelist remap="TP">
       <varlistentry>
         <term><option>-a</option> [<replaceable>FILE</replaceable>|<replaceable>DIR</replaceable>]</term>
-
         <listitem>
           <para>This is default.
           Dump a AppleSingle/AppleDouble data for
@@ -111,68 +98,52 @@
           <replaceable>._DIR</replaceable>.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
-        <term><option>-e</option> <replaceable>FILE</replaceable>|<replaceable>DIR</replaceable></term>
-
+        <term><option>-e</option><replaceable>FILE</replaceable>|<replaceable>DIR</replaceable></term>
         <listitem>
           <para>Dump extended attribute of <replaceable>FILE</replaceable> or <replaceable>DIR</replaceable>.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
         <term><option>-f</option> [<replaceable>FILE</replaceable>]</term>
-
         <listitem>
           <para>Dump <replaceable>FILE</replaceable>. Assume FinderInfo to be FileInfo.</para>
         </listitem>
       </varlistentry>
-
       <varlistentry>
         <term><option>-d</option> [<replaceable>FILE</replaceable>]</term>
-
         <listitem>
           <para>Dump <replaceable>FILE</replaceable>. Assume FinderInfo to be DirInfo.</para>
         </listitem>
-
       </varlistentry>
-
       <varlistentry>
-        <term><option>-h, -help, --help</option></term>
-
+        <term>
+          <option>-h, -help, --help</option>
+        </term>
         <listitem>
           <para>Display the help and exit</para>
         </listitem>
-
       </varlistentry>
-
       <varlistentry>
-        <term><option>-v, -version, --version</option></term>
-
+        <term>
+          <option>-v, -version, --version</option>
+        </term>
         <listitem>
           <para>Show version and exit</para>
         </listitem>
-
       </varlistentry>
-
     </variablelist>
   </refsect1>
-
   <refsect1>
     <title>NOTE</title>
-
     <para>There is no way to detect whether FinderInfo is FileInfo or DirInfo.
     By default, apple_dump examines whether file or directory, a parent directory
     is .AppleDouble, filename is ._*, filename is .Parent, and so on.</para>
-
     <para>If setting option -e, -f or -d,  assume FinderInfo and doesn't look
     for another data.</para>
-
   </refsect1>
-
   <refsect1>
     <title>SEE ALSO</title>
-
     <para><citerefentry><refentrytitle>ad</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>getfattr</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>attr</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
@@ -180,10 +151,8 @@
     <citerefentry><refentrytitle>getextattr</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>lsextattr</refentrytitle><manvolnum>8</manvolnum></citerefentry></para>
   </refsect1>
-  
   <refsect1>
-      <title>AUTHOR</title>
-      
-      <para>See <ulink url='https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS'>https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS</ulink></para>
+    <title>AUTHOR</title>
+    <para>See <ulink url="https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS">https://sourceforge.net/p/netatalk/code/ci/master/tree/AUTHORS</ulink></para>
   </refsect1>
 </refentry>
