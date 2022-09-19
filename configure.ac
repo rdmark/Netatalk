@@ -88,9 +88,6 @@ AX_PTHREAD(, [AC_MSG_ERROR([missing pthread_sigmask])])
 
 AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 
-dnl 64bit platform check
-AC_NETATALK_64BIT_LIBS
-
 dnl OS specific checks
 AC_NETATALK_OS_SPECIFIC
 

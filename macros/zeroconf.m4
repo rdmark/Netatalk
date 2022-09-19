@@ -12,9 +12,6 @@ AC_DEFUN([AC_NETATALK_ZEROCONF], [
 		[zeroconf=try]
 	)
 
-    dnl make sure atalk_libname is defined beforehand
-    [[ -n "$atalk_libname" ]] || AC_MSG_ERROR([internal error, atalk_libname undefined])
-
 	if test "x$zeroconf" != "xno"; then
 		savedcppflags="$CPPFLAGS"
 		savedldflags="$LDFLAGS"

@@ -23,15 +23,12 @@ AC_DEFUN([AC_NETATALK_PATH_BDB], [
 	saved_CFLAGS=$CFLAGS
 	neta_cv_have_bdb=no
 
-dnl Make sure atalk_libname is defined beforehand
-	[[ -n "$atalk_libname" ]] || AC_MSG_ERROR([internal error, atalk_libname undefined])
-
 	if test "$trybdb" = "yes"; then
 		AC_MSG_CHECKING([for BDB])
 		for bdbdir in "" $trybdbdir $(brew --prefix berkeley-db) ; do
 			if test -f "$bdbdir/include/db.h" ; then
 				BDB_CFLAGS="$BDB_CFLAGS -I$bdbdir/include"
-				BDB_LIBS="$BDB_LIBS -L$bdbdir/$atalk_libname -L$bdbdir -ldb"
+				BDB_LIBS="$BDB_LIBS -L$bdbdir/lib -L$bdbdir -ldb"
 					if test "x$enable_dtags" = "xyes"; then
 						BDB_LIBS="$BDB_LIBS -Wl,--enable-new-dtags"
 					fi

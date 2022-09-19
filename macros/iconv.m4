@@ -18,11 +18,11 @@ dnl	# check for libiconv support
 	    ;;
 	  *)
 	    ICONV_CFLAGS="-I$withval/include"
-	    ICONV_LIBS="-L$withval/$atalk_libname"
+	    ICONV_LIBS="-L$withval/lib"
 	    ;;
 	  esac ],
 	  withval="no"
-	)	
+	)
 
 	CFLAGS="$ICONV_CFLAGS $CFLAGS"
         LDFLAGS="$LDFLAGS $ICONV_LIBS -liconv"
@@ -116,5 +116,5 @@ int main() {
         CFLAGS="$savedcflags"
         LDFLAGS="$savedldflags"
 	CPPFLAGS="$saved_CPPFLAGS"
-	
+
 ])

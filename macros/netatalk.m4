@@ -156,41 +156,6 @@ AC_DEFUN([AC_NETATALK_LOCKFILE], [
     AC_MSG_RESULT([$ac_cv_netatalk_lock])
 ])
 
-dnl 64bit platform check
-AC_DEFUN([AC_NETATALK_64BIT_LIBS], [
-AC_MSG_CHECKING([whether to check for 64bit libraries])
-# Test if the compiler is in 64bit mode
-echo 'int i;' > conftest.$ac_ext
-atalk_cv_cc_64bit_output=no
-if AC_TRY_EVAL(ac_compile); then
-    case `/usr/bin/file conftest.$ac_objext` in
-    *"ELF 64"*)
-      atalk_cv_cc_64bit_output=yes
-      ;;
-    esac
-fi
-rm -rf conftest*
-
-case $host_cpu:$atalk_cv_cc_64bit_output in
-powerpc64:yes | s390x:yes | sparc*:yes | x86_64:yes | i386:yes)
-    case $target_os in
-    *bsd* | dragonfly*)
-        AC_MSG_RESULT([no])
-        atalk_libname="lib"
-        ;;
-    *)
-        AC_MSG_RESULT([yes])
-        atalk_libname="lib64"
-        ;;
-    esac
-    ;;
-*:*)
-    AC_MSG_RESULT([no])
-    atalk_libname="lib"
-    ;;
-esac
-])
-
 dnl Check whether to enable debug code
 AC_DEFUN([AC_NETATALK_DEBUG], [
 AC_MSG_CHECKING([whether to enable verbose debug code])
