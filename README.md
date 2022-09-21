@@ -38,6 +38,8 @@ $ apt install libgcrypt20-dev
 ```
 
 ## Feature Configuration Examples
+**Note: For systems running legacy versions of autotools, you may need to replace the first few lines of ```configure.a```c with the commented out legacy syntax before running the ```bootstrap``` script. Has been confirmed on f.e. Ubuntu 18.04 and earlier, and Illumos (Tribblix 0m28).**
+
 First of all, it is worth noting that unlike upstream Netatalk 2, DDP (AppleTalk), papd, timelord, and a2boot are all configured and compiled by default.
 
 For most setups, the only parameter you need is for picking the init script option for your OS. Here as an example is the *systemd* option, which will install systemd services that you can start once installation is complete. Use ```./configure --help``` to see the other init script options available.
