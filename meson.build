@@ -1,5 +1,5 @@
 project('netatalk', 'c',
-  version : '3.1.3',
+  version : '3.1.13',
   license : 'GPLv2',
   default_options : ['warning_level=3', 'c_std=c2x', 'prefix=/usr/local'],
   meson_version : '>=0.61.0'
