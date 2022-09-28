@@ -10,4 +10,4 @@ fi
 
 # Configure
 autoreconf -fi
-./configure RANLIB="ranlib -no_warning_for_no_symbols"
+./configure

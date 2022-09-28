@@ -4,7 +4,7 @@ SUBDIRS = acl adouble bstring compat cnid dsi iniparser talloc util unicode vfs
 
 lib_LTLIBRARIES = libatalk.la
 
-libatalk_la_SOURCES = dummy.c
+libatalk_la_SOURCES =
 
 libatalk_la_CFLAGS = \
 	@PTHREAD_CFLAGS@
