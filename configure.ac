@@ -1,4 +1,4 @@
-dnl configure.ac for netatalk
+# configure.ac for netatalk
 
 AC_INIT([netatalk],m4_normalize(m4_include([VERSION])))
 AC_CONFIG_SRCDIR([etc/afpd/main.c])
@@ -15,20 +15,15 @@ AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE([subdir-objects])
 AM_MAINTAINER_MODE([enable])
 
-dnl Checks for programs.
-AC_PROG_AWK
+# Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
-AC_PROG_MAKE_SET
 LT_INIT([dlopen])
 AM_PROG_CC_C_O
-AC_C_BIGENDIAN
-AC_C_INLINE
-AC_PROG_LEX([yywrap])
-AC_PROG_YACC
 
-dnl Check if we can use attribute unused (gcc only) from ethereal
+
+# Check if we can use attribute unused (gcc only) from ethereal
 AC_MSG_CHECKING(to see if we can add '__attribute__((unused))' to CFLAGS)
 if test x$GCC != x ; then
   CFLAGS="-D_U_=\"__attribute__((unused))\" $CFLAGS"
@@ -38,26 +33,15 @@ else
   AC_MSG_RESULT(no)
 fi
 
-dnl Checks for header files, some checks are obsolete, unfortunately the code
-dnl uses the resulting macros, so the code has to cleaned up too before
-dnl we can remove the checks here.
-AC_CHECK_HEADERS(mntent.h unistd.h termios.h ufs/quota.h)
-AC_CHECK_HEADERS(netdb.h sgtty.h statfs.h dlfcn.h langinfo.h locale.h)
-AC_CHECK_HEADERS(sys/param.h sys/fcntl.h sys/termios.h)
-AC_CHECK_HEADERS(sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h)
-dnl Checks for header files, confirmed to be required as of 2011
-AC_CHECK_HEADERS([sys/mount.h], , ,
-[#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-])
+# Checks for header files
+AC_CHECK_HEADERS(unistd.h termios.h netdb.h sgtty.h statfs.h dlfcn.h langinfo.h locale.h)
+AC_CHECK_HEADERS(sys/param.h sys/fcntl.h sys/termios.h sys/statvfs.h sys/stat.h sys/mount.h)
+
 AC_CHECK_TYPES([fshare_t], [], [], [[#include <fcntl.h>]])
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 
-dnl --------------------------------------------------------------------------
-dnl check if dlsym needs to add an underscore, uses libtool macros
-dnl --------------------------------------------------------------------------
+# Check if dlsym needs to add an underscore, uses libtool macros
 LT_LIB_DLLOAD
 AC_CHECK_FUNCS(dlopen dlsym dlclose)
 LT_FUNC_DLSYM_USCORE
@@ -65,7 +49,7 @@ if test x"$libltdl_cv_need_uscore" = xyes; then
     AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
 fi
 
-dnl Special checks
+# Special checks
 ac_neta_haveatfuncs=yes
 AC_CHECK_FUNCS(openat renameat fstatat unlinkat, , ac_neta_haveatfuncs=no)
 if test x"$ac_neta_haveatfuncs" = x"yes" ; then
@@ -74,100 +58,99 @@ if test x"$ac_neta_haveatfuncs" = x"yes" ; then
 fi
 AC_CHECK_MEMBERS(struct tm.tm_gmtoff,,, [#include <time.h>])
 
-dnl these tests have been comfirmed to be needed in 2011
 AC_CHECK_FUNCS(backtrace_symbols dirfd getusershell pread pwrite pselect)
-AC_CHECK_FUNCS(setlinebuf strlcat strlcpy strnlen mempcpy vasprintf asprintf)
-AC_CHECK_FUNCS(mmap utime getpagesize) dnl needed by tbd
+AC_CHECK_FUNCS(setlinebuf strlcat strlcpy strnlen vasprintf asprintf)
 
-dnl search for necessary libraries
+# Search for necessary libraries
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(connect, socket)
-AC_CHECK_FUNCS(getifaddrs) dnl comes after gethostbyname and connect so it picks up the libs
-
-AX_PTHREAD(, [AC_MSG_ERROR([missing pthread_sigmask])])
+AC_CHECK_FUNCS(getifaddrs) # comes after gethostbyname and connect so it picks up the libs
 
 AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 
-dnl OS specific checks
+# Pthread support
+AX_PTHREAD(, [AC_MSG_ERROR([missing pthread_sigmask])])
+
+# OS specific checks
 AC_NETATALK_OS_SPECIFIC
 
-dnl Whether to set rpath
+# Whether to set rpath
 AC_NETATALK_SET_RPATH
 
-dnl --with-pkgconfdir check to change configuration directory location
+# --with-pkgconfdir check to change configuration directory location
 AC_NETATALK_CONFIG_DIRS
 
-dnl Check whether to enable debug code
+# Check whether to enable debug code
 AC_NETATALK_DEBUG
 
-dnl Check whether to disable tickle SIGALARM stuff, which eases debugging
+# Check whether to disable tickle SIGALARM stuff, which eases debugging
 AC_NETATALK_DEBUGGING
 
-dnl	Check for libiconv support
+#	Check for libiconv support
 AC_NETATALK_CHECK_ICONV
 
-dnl Check for CNID database backends
+# Check for CNID database backends
 AC_NETATALK_CNID([bdb_required=yes],[bdb_required=no])
 
-dnl Check for optional Zeroconf support
+# Check for optional Zeroconf support
 AC_NETATALK_ZEROCONF
 
-dnl Check for PAM libs
+# Check for PAM libs
 AC_NETATALK_PATH_PAM
 
-dnl Check for optional initscript install
+# Check for optional initscript install
 AC_NETATALK_INIT_STYLE
 
-dnl Path where UAM modules shall be installed
+# Path where UAM modules shall be installed
 AC_ARG_WITH(uams-path, [  --with-uams-path=PATH   path to UAMs [[$libdir/netatalk]]], [uams_path="$withval"], [uams_path="$libdir/netatalk"])
 
-dnl Check for libgcrypt, if found enables DHX2 UAM
+# Check for libgcrypt, if found enables DHX2 UAM
 AC_NETATALK_PATH_LIBGCRYPT([1:1.2.3])
 
-dnl Check for openssl, if found enables DHX UAM and Randnum UAM
+# Check for openssl, if found enables DHX UAM and Randnum UAM
 AC_NETATALK_PATH_SSL
 
-dnl Check for Berkeley DB library
+# Check for Berkeley DB library
 AC_NETATALK_PATH_BDB
 
-dnl Check for building Kerberos V UAM module
+# Check for building Kerberos V UAM module
 AC_NETATALK_KRB5_UAM
 
-dnl Check for Kerberos 5 support
+# Check for Kerberos 5 support
 AC_NETATALK_KERBEROS
 
-dnl Check for overwrite the config files or not
+# Check for overwrite the config files or not
 AC_NETATALK_OVERWRITE_CONFIG
 
-dnl Check for LDAP support, for client-side ACL visibility
+# Check for LDAP support, for client-side ACL visibility
 AC_NETATALK_LDAP
 
-dnl Check for Extended Attributes support
+# Check for Extended Attributes support
 AC_NETATALK_EXTENDED_ATTRIBUTES
 
-dnl Check if realpath() takes NULL
+# Check if realpath() takes NULL
 AC_NETATALK_REALPATH
 
-dnl Check for sendfile()
+# Check for sendfile()
 AC_NETATALK_SENDFILE
 AC_NETATALK_RECVFILE
 
-dnl Check for libevent
+# Check for libevent
 AC_NETATALK_LIBEVENT
 
-dnl Check whether bundled tdb shall be used
+# Check whether bundled tdb shall be used
 AC_NETATALK_TDB
 
-dnl libatalk API checks
+# libatalk API checks
 AC_DEVELOPER
 
-dnl Check for dbus-glib, for AFP stats on dbus
+# Check for dbus-glib, for AFP stats on dbus
 AC_NETATALK_DBUS_GLIB
 
-dnl netatalk lockfile path, must come after AC_NETATALK_FHS
+# netatalk lockfile path, must come after AC_NETATALK_FHS
 AC_NETATALK_LOCKFILE
 
-dnl Check for Docbook and build documentation if found
+# Check for Docbook and build documentation if found
 AX_CHECK_DOCBOOK
 
 CPPFLAGS="-I\$(top_srcdir)/include -I\$(top_builddir)/include -I\$(top_srcdir) $CPPFLAGS"
@@ -189,10 +172,10 @@ AM_CONDITIONAL(DEFAULT_HOOK, test x$neta_cv_have_libgcrypt != xyes && test x$net
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
 AM_CONDITIONAL(HAVE_ATFUNCS, test x"$ac_neta_haveatfuncs" = x"yes")
 
-dnl Enable silent Automake rules if present
+# Enable silent Automake rules if present
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
-dnl --------------------- generate files
+# Generate files
 AC_CONFIG_FILES([
   Makefile
   bin/Makefile
