@@ -1,4 +1,6 @@
-dnl Autoconf macro to check for Kerberos V
+# NETATALK_GSSAPI_CHECK
+# ---------------------
+# Autoconf macro to check for Kerberos V.
 
 AC_DEFUN([NETATALK_GSSAPI_CHECK],
 [

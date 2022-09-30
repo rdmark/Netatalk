@@ -1,19 +1,14 @@
-dnl Kitchen sink for configuration macros
+# Kitchen sink for configuration macros.
 
-dnl Check for docbook
+# AX_CHECK_DOCBOOK
+# ----------------
+# Check for docbook.
+
 AC_DEFUN([AX_CHECK_DOCBOOK], [
   # It's just rude to go over the net to build
   XSLTPROC_FLAGS=--nonet
-  DOCBOOK_ROOT=$(BREW --prefix docbook-xsl)/docbook-xsl
+  DOCBOOK_ROOT=$(brew --prefix docbook-xsl)/docbook-xsl
   XSLTPROC_WORKS=no
-
-  AC_ARG_WITH(docbook,
-    AS_HELP_STRING(
-      [--with-docbook],
-      [Path to Docbook XSL directory]
-    ),
-    [DOCBOOK_ROOT=$withval]
-  )
 
   if test -n "$DOCBOOK_ROOT" ; then
     AC_CHECK_PROG(XSLTPROC,xsltproc,xsltproc,)
@@ -42,42 +37,32 @@ END
   AC_SUBST(XSLTPROC)
 ])
 
-dnl Check for dbus-glib, for AFP stats
+# AC_NETATALK_DBUS_GLIB
+# ---------------------
+# Check for dbus-glib, for AFP stats.
+
 AC_DEFUN([AC_NETATALK_DBUS_GLIB], [
   atalk_cv_with_dbus=no
 
-  AC_ARG_WITH(afpstats,
-    AS_HELP_STRING(
-      [--with-afpstats],
-      [Enable AFP statistics via dbus (default: enabled if dbus found)]
-    ),,[withval=auto]
-  )
-
-  if test x"$withval" != x"no" ; then
-    PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.1, have_dbus=yes, have_dbus=no)
-    PKG_CHECK_MODULES(DBUS_GLIB, dbus-glib-1, have_dbus_glib=yes, have_dbus_glib=no)
-    PKG_CHECK_MODULES(DBUS_GTHREAD, gthread-2.0, have_dbus_gthread=yes, have_dbus_gthread=no)
-    if test x$have_dbus_glib = xyes -a x$have_dbus = xyes -a x$have_dbus_gthread = xyes ; then
-        saved_CFLAGS=$CFLAGS
-        saved_LIBS=$LIBS
-        CFLAGS="$CFLAGS $DBUS_GLIB_CFLAGS"
-        LIBS="$LIBS $DBUS_GLIB_LIBS"
-        AC_CHECK_FUNC([dbus_g_bus_get_private], [atalk_cv_with_dbus=yes], [atalk_cv_with_dbus=no])
-        CFLAGS="$saved_CFLAGS"
-        LIBS="$saved_LIBS"
-    fi
+  PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.1, have_dbus=yes, have_dbus=no)
+  PKG_CHECK_MODULES(DBUS_GLIB, dbus-glib-1, have_dbus_glib=yes, have_dbus_glib=no)
+  PKG_CHECK_MODULES(DBUS_GTHREAD, gthread-2.0, have_dbus_gthread=yes, have_dbus_gthread=no)
+  if test x$have_dbus_glib = xyes -a x$have_dbus = xyes -a x$have_dbus_gthread = xyes ; then
+    saved_CFLAGS=$CFLAGS
+    saved_LIBS=$LIBS
+    CFLAGS="$CFLAGS $DBUS_GLIB_CFLAGS"
+    LIBS="$LIBS $DBUS_GLIB_LIBS"
+    AC_CHECK_FUNC([dbus_g_bus_get_private], [atalk_cv_with_dbus=yes], [atalk_cv_with_dbus=no])
+    CFLAGS="$saved_CFLAGS"
+    LIBS="$saved_LIBS"
   fi
 
   if test x"$withval" = x"yes" -a x"$atalk_cv_with_dbus" = x"no"; then
     AC_MSG_ERROR([afpstats requested but dbus-glib not found])
   fi
 
-  AC_ARG_WITH(
-      dbus-sysconf-dir,
-      [AS_HELP_STRING([--with-dbus-sysconf-dir=PATH],[Path to dbus system bus security configuration directory (default: ${sysconfdir}/dbus-1/system.d/)])],
-      ac_cv_dbus_sysdir=$withval,
-      ac_cv_dbus_sysdir=$(brew --prefix)/etc/dbus-1/system.d
-  )
+  ac_cv_dbus_sysdir=$(brew --prefix)/etc/dbus-1/system.d
+
   DBUS_SYS_DIR=""
   if test x$atalk_cv_with_dbus = xyes ; then
       AC_DEFINE(HAVE_DBUS_GLIB, 1, [Define if support for dbus-glib was found])
@@ -94,7 +79,10 @@ AC_DEFUN([AC_NETATALK_DBUS_GLIB], [
   AM_CONDITIONAL(HAVE_DBUS_GLIB, test x$atalk_cv_with_dbus = xyes)
 ])
 
-dnl Whether to enable developer build
+# AC_DEVELOPER
+# ------------
+# Whether to enable developer build.
+
 AC_DEFUN([AC_DEVELOPER], [
     AC_MSG_CHECKING([whether to enable developer build])
     AC_ARG_ENABLE(
@@ -107,14 +95,20 @@ AC_DEFUN([AC_DEVELOPER], [
     AM_CONDITIONAL(DEVELOPER, test x"$enable_dev" = x"yes")
 ])
 
-dnl Check for libevent
+# AC_NETATALK_LIBEVENT
+# --------------------
+# Check for libevent.
+
 AC_DEFUN([AC_NETATALK_LIBEVENT], [
     PKG_CHECK_MODULES(LIBEVENT, libevent, , [AC_MSG_ERROR([couldn't find libevent with pkg-config])])
     AC_SUBST(LIBEVENT_CFLAGS)
     AC_SUBST(LIBEVENT_LDFLAGS)
 ])
 
-dnl Whether to disable bundled tdb
+# AC_NETATALK_TDB
+# --------------------
+# Whether to disable bundled tdb.
+
 AC_DEFUN([AC_NETATALK_TDB], [
     AC_ARG_WITH(
         tdb,
@@ -139,7 +133,10 @@ AC_DEFUN([AC_NETATALK_TDB], [
     AM_CONDITIONAL(USE_BUILTIN_TDB, test x"$use_bundled_tdb" = x"yes")
 ])
 
-dnl netatalk lockfile path
+# AC_NETATALK_LOCKFILE
+# --------------------
+# Netatalk lockfile path.
+
 AC_DEFUN([AC_NETATALK_LOCKFILE], [
     AC_MSG_CHECKING([netatalk lockfile path])
     AC_ARG_WITH(
@@ -156,7 +153,10 @@ AC_DEFUN([AC_NETATALK_LOCKFILE], [
     AC_MSG_RESULT([$ac_cv_netatalk_lock])
 ])
 
-dnl Check whether to enable debug code
+# AC_NETATALK_DEBUG
+# -----------------
+# Check whether to enable debug code.
+
 AC_DEFUN([AC_NETATALK_DEBUG], [
 AC_MSG_CHECKING([whether to enable verbose debug code])
 AC_ARG_ENABLE(debug,
@@ -179,7 +179,10 @@ AC_ARG_ENABLE(debug,
 )
 ])
 
-dnl Check whethe to disable tickle SIGALARM stuff, which eases debugging
+# AC_NETATALK_DEBUGGING
+# ---------------------
+# Check whether to disable tickle SIGALARM stuff, which eases debugging.
+
 AC_DEFUN([AC_NETATALK_DEBUGGING], [
 AC_MSG_CHECKING([whether to enable debugging with debuggers])
 AC_ARG_ENABLE(debugging,
@@ -201,12 +204,12 @@ AC_ARG_ENABLE(debugging,
 
 ])
 
-dnl Check for optional initscript install
+# AC_NETATALK_INIT_STYLE
+# ----------------------
+# Check for initscript install.
+
 AC_DEFUN([AC_NETATALK_INIT_STYLE], [
-    AC_ARG_WITH(init-style,
-                [  --with-init-style       use OS specific init config [[macos-launchd]]],
-                init_style="$withval", init_style=macos-launchd
-    )
+    init_style=macos-launchd
     case "$init_style" in
     "macos-launchd")
 	    AC_MSG_RESULT([enabling macOS-style launchd initscript support])
@@ -215,108 +218,26 @@ AC_DEFUN([AC_NETATALK_INIT_STYLE], [
     esac
     AM_CONDITIONAL(USE_MACOS_LAUNCHD, test x$init_style = xmacos-launchd)
     AM_CONDITIONAL(USE_UNDEF, test x$init_style = xnone)
-
-    AC_ARG_WITH(init-dir,
-                [  --with-init-dir=PATH    path to OS specific init directory],
-                ac_cv_init_dir="$withval", ac_cv_init_dir="$ac_cv_init_dir"
-    )
+    ac_cv_init_dir="$ac_cv_init_dir"
     INIT_DIR="$ac_cv_init_dir"
     AC_SUBST(INIT_DIR, ["$ac_cv_init_dir"])
 ])
 
-dnl OS specific configuration
+# AC_NETATALK_OS_SPECIFIC
+# -----------------------
+# OS specific configuration.
+
 AC_DEFUN([AC_NETATALK_OS_SPECIFIC], [
 case "$host_os" in
-	*aix*)				this_os=aix ;;
-	*freebsd*) 			this_os=freebsd ;;
-	*kfreebsd*)			this_os=kfreebsd ;;
-	*hpux11*)			this_os=hpux11 ;;
-	*irix*)				this_os=irix ;;
-	*linux*)   			this_os=linux ;;
-	*osx*)				this_os=macosx ;;
 	*darwin*)			this_os=macosx ;;
-	*netbsd*) 			this_os=netbsd ;;
-	*openbsd*) 			this_os=openbsd ;;
-	*osf*) 				this_os=tru64 ;;
 esac
-
-case "$host_cpu" in
-	i386|i486|i586|i686|k7)		this_cpu=x86 ;;
-	alpha)						this_cpu=alpha ;;
-	mips)						this_cpu=mips ;;
-	powerpc|ppc)				this_cpu=ppc ;;
-esac
-
-dnl --------------------- GNU source
-case "$this_os" in
-	linux)	AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
-        ;;
-	kfreebsd) AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
-        ;;
-esac
-
-dnl --------------------- operating system specific flags (port from sys/*)
-
-dnl ----- FreeBSD specific -----
-if test x"$this_os" = "xfreebsd"; then
-	AC_MSG_RESULT([ * FreeBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EMLINK, errno returned by open with O_NOFOLLOW)
-fi
-
-dnl ----- GNU/kFreeBSD specific -----
-if test x"$this_os" = "xkfreebsd"; then
-	AC_MSG_RESULT([ * GNU/kFreeBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EMLINK, errno returned by open with O_NOFOLLOW)
-fi
-
-dnl ----- Linux specific -----
-if test x"$this_os" = "xlinux"; then
-	AC_MSG_RESULT([ * Linux specific configuration])
-    AC_DEFINE(LINUX, 1, [OS is Linux])
-	dnl ----- check if we need the quotactl wrapper
-    AC_CHECK_HEADERS(linux/dqblk_xfs.h,,
-		[AC_CHECK_HEADERS(linux/xqm.h linux/xfs_fs.h)
-        	AC_CHECK_HEADERS(xfs/libxfs.h xfs/xqm.h xfs/xfs_fs.h)]
-	)
-
-
-	dnl ----- as far as I can tell, dbtob always does the wrong thing
-	dnl ----- on every single version of linux I've ever played with.
-	dnl ----- see etc/afpd/quota.c
-	AC_DEFINE(HAVE_BROKEN_DBTOB, 1, [Define if dbtob is broken])
-fi
-
-dnl ----- NetBSD specific -----
-if test x"$this_os" = "xnetbsd"; then
-	AC_MSG_RESULT([ * NetBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(NETBSD, 1, [Define if OS is NetBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EFTYPE, errno returned by open with O_NOFOLLOW)
-
-	CFLAGS="-I\$(top_srcdir)/sys/netbsd $CFLAGS"
-
-	dnl ----- NetBSD does not have crypt.h, uses unistd.h -----
-	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
-fi
-
-dnl ----- OpenBSD specific -----
-if test x"$this_os" = "xopenbsd"; then
-	AC_MSG_RESULT([ * OpenBSD specific configuration])
-    AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	dnl ----- OpenBSD does not have crypt.h, uses unistd.h -----
-	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
-fi
 ])
 
-dnl Check whether to enable rpath
+# AC_NETATALK_SET_RPATH
+# ---------------------
+# Check whether to enable rpath.
+
 AC_DEFUN([AC_NETATALK_SET_RPATH], [
-	AS_CASE("$this_os", [linux|kfreebsd],
-		[enable_dtags=yes],
-		[enable_dtags=no])
 	AC_ARG_ENABLE(rpath,
 		AS_HELP_STRING([--enable-rpath],
 			[enable RPATH/RUNPATH (default: $default_rpath)]),
@@ -328,7 +249,10 @@ AC_DEFUN([AC_NETATALK_SET_RPATH], [
 	AC_MSG_RESULT([$enable_rpath])
 ])
 
-dnl Check for building Kerberos V UAM module
+# AC_NETATALK_KRB5_UAM
+# --------------------
+# Check for building Kerberos V UAM module
+
 AC_DEFUN([AC_NETATALK_KRB5_UAM], [
 netatalk_cv_build_krb5_uam=no
 AC_ARG_ENABLE(krbV-uam,
@@ -345,7 +269,7 @@ AC_ARG_ENABLE(krbV-uam,
 
 )
 
-AC_MSG_CHECKING([whether Kerberos V UAM should be build])
+AC_MSG_CHECKING([whether Kerberos V UAM should be built])
 if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then
 	AC_MSG_RESULT([yes])
 else
@@ -354,9 +278,12 @@ fi
 AM_CONDITIONAL(USE_GSSAPI, test x"$netatalk_cv_build_krb5_uam" = x"yes")
 ])
 
-dnl Check if we can directly use Kerberos 5 API, used for reading keytabs
-dnl and automatically construction DirectoryService names from that, instead
-dnl of requiring special configuration in afp.conf
+# AC_NETATALK_KERBEROS
+# --------------------
+# Check if we can directly use Kerberos 5 API, used for reading keytabs
+# and automatically construction DirectoryService names from that, instead
+# of requiring special configuration in afp.conf
+
 AC_DEFUN([AC_NETATALK_KERBEROS], [
 AC_MSG_CHECKING([for Kerberos 5 (necessary for GetSrvrInfo:DirectoryNames support)])
 AC_ARG_WITH([kerberos],
@@ -393,7 +320,7 @@ if test x"$with_kerberos" = x"yes"; then
    AC_DEFINE([HAVE_KERBEROS], [1], [Define if Kerberos 5 is available])
 fi
 
-dnl Check for krb5_free_unparsed_name and krb5_free_error_message
+# Check for krb5_free_unparsed_name and krb5_free_error_message
 save_CFLAGS="$CFLAGS"
 save_LIBS="$LIBS"
 CFLAGS="$KRB5_CFLAGS"
@@ -403,7 +330,10 @@ CFLAGS="$save_CFLAGS"
 LIBS="$save_LIBS"
 ])
 
-dnl Check for overwrite the config files or not
+# AC_NETATALK_OVERWRITE_CONFIG
+# ----------------------------
+# Check whether to overwrite the config files or not.
+
 AC_DEFUN([AC_NETATALK_OVERWRITE_CONFIG], [
 AC_MSG_CHECKING([whether configuration files should be overwritten])
 AC_ARG_ENABLE(overwrite,
@@ -415,7 +345,10 @@ AC_MSG_RESULT([$OVERWRITE_CONFIG])
 AC_SUBST(OVERWRITE_CONFIG)
 ])
 
-dnl Check for LDAP support, for client-side ACL visibility
+# AC_NETATALK_LDAP
+# ----------------
+# Check for LDAP support, for client-side ACL visibility.
+
 AC_DEFUN([AC_NETATALK_LDAP], [
 AC_MSG_CHECKING(for LDAP (necessary for client-side ACL visibility))
 AC_ARG_WITH(ldap,
@@ -470,7 +403,10 @@ LDFLAGS="$save_LDFLAGS"
 LIBS="$save_LIBS"
 ])
 
-dnl Check for Extended Attributes support
+# AC_NETATALK_EXTENDED_ATTRIBUTES
+# -------------------------------
+# Check for Extended Attributes support.
+
 AC_DEFUN([AC_NETATALK_EXTENDED_ATTRIBUTES], [
 neta_cv_eas="ad"
 neta_cv_eas_sys_found=no
@@ -478,22 +414,15 @@ neta_cv_eas_sys_not_found=no
 
 AC_CHECK_HEADERS(sys/xattr.h sys/uio.h)
 
-case "$this_os" in
-
-  *)
-	AC_SEARCH_LIBS(getxattr, [attr])
-
-    if test "x$neta_cv_eas_sys_found" != "xyes" ; then
-       AC_CHECK_FUNCS([getxattr fgetxattr listxattr],
-                      [neta_cv_eas_sys_found=yes],
-                      [neta_cv_eas_sys_not_found=yes])
-	   AC_CHECK_FUNCS([flistxattr removexattr fremovexattr],,
-                      [neta_cv_eas_sys_not_found=yes])
-	   AC_CHECK_FUNCS([setxattr fsetxattr],,
-                      [neta_cv_eas_sys_not_found=yes])
-    fi
-  ;;
-esac
+if test "x$neta_cv_eas_sys_found" != "xyes" ; then
+  AC_CHECK_FUNCS([getxattr fgetxattr listxattr],
+                 [neta_cv_eas_sys_found=yes],
+                 [neta_cv_eas_sys_not_found=yes])
+  AC_CHECK_FUNCS([flistxattr removexattr fremovexattr],,
+                 [neta_cv_eas_sys_not_found=yes])
+  AC_CHECK_FUNCS([setxattr fsetxattr],,
+                 [neta_cv_eas_sys_not_found=yes])
+fi
 
 # Do xattr functions take additional options like on Darwin?
 if test x"$ac_cv_func_getxattr" = x"yes" ; then
@@ -520,60 +449,10 @@ fi
 AC_DEFINE_UNQUOTED(EA_MODULES,["$neta_cv_eas"],[Available Extended Attributes modules])
 ])
 
-dnl Check for libsmbsharemodes from Samba for Samba/Netatalk access/deny/share modes interop
-dnl Defines "neta_cv_have_smbshmd" to "yes" or "no"
-dnl AC_SUBST's "SMB_SHAREMODES_CFLAGS" and "SMB_SHAREMODES_LDFLAGS"
-dnl AM_CONDITIONAL's "USE_SMB_SHAREMODES"
-AC_DEFUN([AC_NETATALK_SMB_SHAREMODES], [
-    neta_cv_have_smbshmd=no
-    AC_ARG_WITH(smbsharemodes-lib,
-                [  --with-smbsharemodes-lib=PATH        PATH to libsmbsharemodes lib from Samba],
-                [SMB_SHAREMODES_LDFLAGS="-L$withval -lsmbsharemodes"]
-    )
-    AC_ARG_WITH(smbsharemodes-include,
-                [  --with-smbsharemodes-include=PATH    PATH to libsmbsharemodes header from Samba],
-                [SMB_SHAREMODES_CFLAGS="-I$withval"]
-    )
-    AC_ARG_WITH(smbsharemodes,
-                [AS_HELP_STRING([--with-smbsharemodes],[Samba interop (default is yes)])],
-                [use_smbsharemodes=$withval],
-                [use_smbsharemodes=yes]
-    )
+# AC_NETATALK_SENDFILE
+# --------------------
+# Check for sendfile().
 
-    if test x"$use_smbsharemodes" = x"yes" ; then
-        AC_MSG_CHECKING([whether to enable Samba/Netatalk access/deny/share-modes interop])
-
-        saved_CFLAGS="$CFLAGS"
-        saved_LDFLAGS="$LDFLAGS"
-        CFLAGS="$SMB_SHAREMODES_CFLAGS $CFLAGS"
-        LDFLAGS="$SMB_SHAREMODES_LDFLAGS $LDFLAGS"
-
-        AC_LINK_IFELSE(
-            [#include <unistd.h>
-             #include <stdio.h>
-             #include <sys/time.h>
-             #include <time.h>
-             #include <stdint.h>
-             /* From messages.h */
-             struct server_id {
-                 pid_t pid;
-             };
-             #include "smb_share_modes.h"
-             int main(void) { (void)smb_share_mode_db_open(""); return 0;}],
-            [neta_cv_have_smbshmd=yes]
-        )
-
-        AC_MSG_RESULT($neta_cv_have_smbshmd)
-        AC_SUBST(SMB_SHAREMODES_CFLAGS, [$SMB_SHAREMODES_CFLAGS])
-        AC_SUBST(SMB_SHAREMODES_LDFLAGS, [$SMB_SHAREMODES_LDFLAGS])
-        CFLAGS="$saved_CFLAGS"
-        LDFLAGS="$saved_LDFLAGS"
-    fi
-
-    AM_CONDITIONAL(USE_SMB_SHAREMODES, test x"$neta_cv_have_smbshmd" = x"yes")
-])
-
-dnl ------ Check for sendfile() --------
 AC_DEFUN([AC_NETATALK_SENDFILE], [
 netatalk_cv_search_sendfile=yes
 AC_ARG_ENABLE(sendfile,
@@ -613,7 +492,10 @@ if test x"$netatalk_cv_search_sendfile" = x"yes"; then
 fi
 ])
 
-dnl ------ Check for recvfile() --------
+# AC_NETATALK_RECVFILE
+# --------------------
+# Check for recvfile().
+
 AC_DEFUN([AC_NETATALK_RECVFILE], [
 case "$host_os" in
 *linux*)
@@ -630,7 +512,10 @@ if test x"$atalk_cv_use_recvfile" = x"yes"; then
 fi
 ])
 
-dnl --------------------- Check if realpath() takes NULL
+# AC_NETATALK_REALPATH
+# --------------------
+# Check if realpath() takes NULL.
+
 AC_DEFUN([AC_NETATALK_REALPATH], [
 AC_CACHE_CHECK([if the realpath function allows a NULL argument],
     neta_cv_REALPATH_TAKES_NULL, [

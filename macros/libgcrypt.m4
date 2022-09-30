@@ -1,18 +1,7 @@
-dnl AM_PATH_LIBGCRYPT([MINIMUM-VERSION,
-dnl                   [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
-dnl Test for libgcrypt and define LIBGCRYPT_CFLAGS and LIBGCRYPT_LIBS.
-dnl MINIMUM-VERSION is a string with the version number optionally prefixed
-dnl with the API version to also check the API compatibility. Example:
-dnl a MINIMUM-VERSION of 1:1.2.5 won't pass the test unless the installed
-dnl version of libgcrypt is at least 1.2.5 *and* the API number is 1.  Using
-dnl this feature allows to prevent build against newer versions of libgcrypt
-dnl with a changed API.
-dnl
-dnl If a prefix option is not used, the config script is first
-dnl searched in $SYSROOT/bin and then along $PATH.  If the used
-dnl config script does not match the host specification the script
-dnl is added to the gpg_config_script_warn variable.
-dnl
+# AC_NETATALK_PATH_LIBGCRYPT
+# --------------------------
+# Autoconf macro to check for libgcrypt.
+
 AC_DEFUN([AC_NETATALK_PATH_LIBGCRYPT],
 [ AC_REQUIRE([AC_CANONICAL_HOST])
   AC_ARG_WITH(libgcrypt-dir,

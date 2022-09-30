@@ -1,4 +1,6 @@
-dnl Autoconf macro to check for SSL or OpenSSL
+# AC_NETATALK_PATH_SSL
+# --------------------
+# Autoconf macro to check for OpenSSL.
 
 AC_DEFUN([AC_NETATALK_PATH_SSL], [
 	AC_ARG_WITH(ssl-dir, [  --with-ssl-dir=PATH     specify path to OpenSSL installation (must contain

@@ -1,4 +1,6 @@
-dnl Check for optional Zeroconf support
+# AC_NETATALK_ZEROCONF
+# -------------------------
+# Check for Zeroconf support.
 
 AC_DEFUN([AC_NETATALK_ZEROCONF], [
 	ZEROCONF_LIBS=""

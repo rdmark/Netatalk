@@ -1,4 +1,6 @@
-dnl Autoconf macro to check for Berkeley DB library
+# AC_NETATALK_PATH_BDB
+# --------------------
+# Autoconf macro to check for Berkeley DB library.
 
 AC_DEFUN([AC_NETATALK_PATH_BDB], [
 	AC_ARG_WITH(bdb-dir, [  --with-bdb-dir=PATH     specify path to Berkeley DB installation (must contain

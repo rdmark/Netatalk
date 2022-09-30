@@ -1,4 +1,6 @@
-dnl Autoconf macros, display configure summary
+# AC_NETATALK_CONFIG_SUMMARY
+# --------------------------
+# Autoconf macro to display configure summary.
 
 AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 
@@ -62,10 +64,11 @@ dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         Docbook:                 $XSLTPROC_WORKS])
 ])
 
+# AC_NETATALK_LIBS_SUMMARY
+# ------------------------
+# Display summary of libraries detected.
 
 AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
-	dnl #################################################
-	dnl # Display summary of libraries detected
 
 	AC_MSG_RESULT([Compilation summary:])
 	AC_MSG_RESULT([    CPPFLAGS    =  $CPPFLAGS])

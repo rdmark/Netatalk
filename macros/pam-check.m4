@@ -1,4 +1,6 @@
-dnl PAM finding macro
+# AC_NETATALK_PATH_PAM
+# --------------------
+# PAM finding macro.
 
 AC_DEFUN([AC_NETATALK_PATH_PAM], [
     netatalk_cv_use_pam=no
