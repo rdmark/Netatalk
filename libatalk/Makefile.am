@@ -12,24 +12,24 @@ libatalk_la_CFLAGS = \
 libatalk_la_LIBADD  = \
 	@PTHREAD_LIBS@ @MYSQL_LIBS@ \
 	acl/libacl.la \
-	adouble/libadouble.la	\
+	adouble/libadouble.la \
 	bstring/libbstring.la \
 	cnid/libcnid.la \
-	dsi/libdsi.la		\
+	dsi/libdsi.la \
 	iniparser/libiniparser.la \
 	unicode/libunicode.la \
-	util/libutil.la		\
+	util/libutil.la \
 	vfs/libvfs.la
 
 libatalk_la_DEPENDENCIES = \
 	acl/libacl.la \
-	adouble/libadouble.la	\
+	adouble/libadouble.la \
 	bstring/libbstring.la \
 	cnid/libcnid.la \
-	dsi/libdsi.la		\
+	dsi/libdsi.la \
 	iniparser/libiniparser.la \
 	unicode/libunicode.la \
-	util/libutil.la		\
+	util/libutil.la \
 	vfs/libvfs.la
 
 if USE_BUILTIN_TDB
