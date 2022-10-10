@@ -33,7 +33,6 @@ test_SOURCES =  test.c subtests.c afpfunc_helpers.c \
 				$(top_srcdir)/etc/afpd/messages.c \
 				$(top_srcdir)/etc/afpd/ofork.c \
 				$(top_srcdir)/etc/afpd/status.c \
-				$(top_srcdir)/etc/afpd/spotlight_marshalling.c \
 				$(top_srcdir)/etc/afpd/switch.c \
 				$(top_srcdir)/etc/afpd/uam.c \
 				$(top_srcdir)/etc/afpd/unix.c \
@@ -46,7 +45,6 @@ test_CFLAGS = \
 	@GSSAPI_CFLAGS@ @KRB5_CFLAGS@\
 	-DAPPLCNAME \
 	-DSERVERTEXT=\"$(SERVERTEXT)/\" \
-	-D_PATH_AFPDPWFILE=\"$(pkgconfdir)/afppasswd\" \
 	-D_PATH_AFPDUAMPATH=\"$(UAMS_PATH)/\" \
 	-D_PATH_CONFDIR=\"$(pkgconfdir)/\" \
 	-D_PATH_STATEDIR='"$(localstatedir)/netatalk/"'
