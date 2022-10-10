@@ -16,8 +16,6 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifdef HAVE_LDAP
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -101,4 +99,3 @@ int acl_ldap_readconfig(dictionary *iniconfig)
         LOG(log_info, logtype_afpd,"LDAP: not used");
     return 0;
 }
-#endif /* HAVE_LDAP */

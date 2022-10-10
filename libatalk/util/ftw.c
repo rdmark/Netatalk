@@ -18,9 +18,7 @@
    Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA.  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #if __GNUC__
 # define alloca __builtin_alloca
@@ -38,10 +36,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
-
-#if HAVE_SYS_PARAM_H
-# include <sys/param.h>
-#endif
+#include <sys/param.h>
 
 #include <atalk/ftw.h>
 
@@ -825,4 +820,3 @@ int NFTW_NAME(const char *path,
 {
     return ftw_startup (path, 1, func, up, descriptors, flags);
 }
-

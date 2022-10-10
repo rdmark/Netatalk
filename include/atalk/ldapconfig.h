@@ -1,5 +1,3 @@
-#ifdef HAVE_LDAP
-
 #ifndef LDAPCONFIG_H
 #define LDAPCONFIG_H
 
@@ -53,5 +51,3 @@ extern struct pref_array prefs_array[];
 extern int ldap_config_valid;
 
 #endif /* LDAPCONFIG_H */
-
-#endif /* HAVE_LDAP */

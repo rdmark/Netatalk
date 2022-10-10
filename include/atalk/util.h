@@ -99,12 +99,6 @@ extern void fault_setup	  (void (*fn)(void *));
 extern void netatalk_panic(const char *why);
 #define server_unlock(x)  (unlink(x))
 
-#ifndef HAVE_DLFCN_H
-extern void *mod_open    (const char *);
-extern void *mod_symbol  (void *, const char *);
-extern void mod_close    (void *);
-#define mod_error()      ""
-#else /* ! HAVE_DLFCN_H */
 #include <dlfcn.h>
 
 #ifndef RTLD_NOW
@@ -129,7 +123,6 @@ extern void *mod_symbol  (void *, const char *);
 #endif /* ! DLSYM_PREPEND_UNDERSCORE */
 #define mod_error()      dlerror()
 #define mod_close(a)     dlclose(a)
-#endif /* ! HAVE_DLFCN_H */
 
 #ifndef strequal
 #define strequal(a,b) (strcmp((a),(b)) == 0)

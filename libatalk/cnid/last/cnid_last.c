@@ -8,7 +8,6 @@
 
 #include "config.h"
 
-#ifdef CNID_BACKEND_LAST
 #include <stdlib.h>
 #include "cnid_last.h"
 #include <atalk/util.h>
@@ -93,7 +92,7 @@ cnid_t cnid_last_get(struct _cnid_db *cdb _U_, cnid_t did _U_, const char *name 
 
 
 /* */
-cnid_t cnid_last_lookup(struct _cnid_db *cdb _U_, const struct stat *st _U_, cnid_t did _U_, 
+cnid_t cnid_last_lookup(struct _cnid_db *cdb _U_, const struct stat *st _U_, cnid_t did _U_,
                         const char *name _U_, size_t len _U_)
 {
     /* FIXME: this function doesn't work in [last] scheme ! */
@@ -166,6 +165,3 @@ int cnid_last_update(struct _cnid_db *cdb _U_, cnid_t id _U_, const struct stat 
 {
     return 0;
 }
-
-
-#endif /* CNID_BACKEND_LAST */

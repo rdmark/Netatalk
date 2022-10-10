@@ -19,10 +19,9 @@
 
 #include "config.h"
 
-#if HAVE_USABLE_ICONV
+#include <string.h>
 
 #include "generic_cjk.h"
-#include <string.h>
 
 static size_t cjk_iconv(void *cd, char **inbuf, char *end,
 			char **outbuf, size_t *outbytesleft)
@@ -210,4 +209,3 @@ ucs2_t cjk_compose_seq(const ucs2_t* in, size_t* len, const uint32_t* table, siz
   *len = n;
   return wc;
 }
-#endif

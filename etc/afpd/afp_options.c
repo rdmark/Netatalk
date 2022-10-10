@@ -20,9 +20,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#ifdef HAVE_NETDB_H
 #include <netdb.h>
-#endif /* HAVE_NETDB_H */
 
 #include <grp.h>
 #include <sys/types.h>
@@ -104,16 +102,10 @@ static void show_version_extended(void )
 	show_version( );
 
 	printf( "      Zeroconf support:\t" );
-#if defined (HAVE_MDNS)
 	puts( "mDNSResponder" );
-#elif defined (HAVE_AVAHI)
-	puts( "Avahi" );
-#else
-	puts( "No" );
-#endif
 
-    printf("   Admin group support:\t");
-    puts("Yes");
+  printf("   Admin group support:\t");
+  puts("Yes");
 
 	printf( "    Valid shell checks:\t" );
 #ifndef DISABLE_SHELLCHECK
@@ -129,21 +121,13 @@ static void show_version_extended(void )
 	puts( "Yes" );
 
 	printf( "          LDAP support:\t" );
-#ifdef HAVE_LDAP
 	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
 
 	printf( "         D-Bus support:\t" );
-#ifdef HAVE_DBUS_GLIB
 	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
 
-    printf( "     Spotlight support:\t" );
-    puts( "Yes" );
+  printf( "     Spotlight support:\t" );
+  puts( "Yes" );
 }
 
 /*

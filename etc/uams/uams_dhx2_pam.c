@@ -6,27 +6,16 @@
 
 #include "config.h"
 
-#if defined (USE_PAM) && defined (UAM_DHX2)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <atalk/logger.h>
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <errno.h>
-#ifdef HAVE_SECURITY_PAM_APPL_H
 #include <security/pam_appl.h>
-#endif
-#ifdef HAVE_PAM_PAM_APPL_H
-#include <pam/pam_appl.h>
-#endif
 
-
-#ifdef HAVE_LIBGCRYPT
 #include <gcrypt.h>
-#endif /* HAVE_LIBGCRYPT */
 
 #include <atalk/afp.h>
 #include <atalk/uam.h>
@@ -962,5 +951,3 @@ UAM_MODULE_EXPORT struct uam_export uams_dhx2_pam = {
     UAM_MODULE_VERSION,
     uam_setup, uam_cleanup
 };
-
-#endif /* USE_PAM && UAM_DHX2 */

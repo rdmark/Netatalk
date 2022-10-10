@@ -315,11 +315,9 @@ int main(int ac, char **av)
     sigaddset(&sigs, SIGCHLD);
 
     pthread_sigmask(SIG_BLOCK, &sigs, NULL);
-#ifdef HAVE_DBUS_GLIB
     /* Run dbus AFP statics thread */
     if (obj.options.flags & OPTION_DBUS_AFPSTATS)
         (void)afpstats_init(server_children);
-#endif
     if (configinit(&obj) != 0) {
         LOG(log_error, logtype_afpd, "main: no servers configured");
         afp_exit(EXITERR_CONF);

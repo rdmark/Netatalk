@@ -13,9 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#ifdef HAVE_NETDB_H
 #include <netdb.h>
-#endif /* HAVE_NETDB_H */
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>

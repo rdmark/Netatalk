@@ -84,7 +84,7 @@ int sys_get_easize(VFS_FUNC_ARGS_EA_GETSIZE)
         memset(rbuf, 0, 4);
         *rbuflen += 4;
         switch(errno) {
-        case OPEN_NOFOLLOW_ERRNO:
+        case ELOOP:
             /* its a symlink and client requested O_NOFOLLOW  */
             LOG(log_debug, logtype_afpd, "sys_getextattr_size(%s): symlink with kXAttrNoFollow", uname);
             return AFPERR_MISC;
@@ -197,7 +197,7 @@ int sys_get_eacontent(VFS_FUNC_ARGS_EA_GETCONTENT)
         memset(rbuf, 0, 4);
         *rbuflen += 4;
         switch(errno) {
-        case OPEN_NOFOLLOW_ERRNO:
+        case ELOOP:
             /* its a symlink and client requested O_NOFOLLOW  */
             LOG(log_debug, logtype_afpd, "sys_getextattr_content(%s): symlink with kXAttrNoFollow", uname);
             return AFPERR_MISC;
@@ -288,7 +288,7 @@ int sys_list_eas(VFS_FUNC_ARGS_EA_LIST)
     /* PBaranski fix */
 
     if (ret == -1) switch(errno) {
-        case OPEN_NOFOLLOW_ERRNO:
+        case ELOOP:
             /* its a symlink and client requested O_NOFOLLOW, we pretend 0 EAs */
             LOG(log_debug, logtype_afpd, "sys_list_extattr(%s): symlink with kXAttrNoFollow", uname);
             ret = AFP_OK;
@@ -395,7 +395,7 @@ int sys_set_ea(VFS_FUNC_ARGS_EA_SET)
 
     if (ret == -1) {
         switch(errno) {
-        case OPEN_NOFOLLOW_ERRNO:
+        case ELOOP:
             /* its a symlink and client requested O_NOFOLLOW  */
             LOG(log_debug, logtype_afpd, "sys_set_ea(\"%s\", ea:'%s'): symlink with kXAttrNoFollow",
                 uname, attruname);
@@ -462,7 +462,7 @@ int sys_remove_ea(VFS_FUNC_ARGS_EA_REMOVE)
 
     if (ret == -1) {
         switch(errno) {
-        case OPEN_NOFOLLOW_ERRNO:
+        case ELOOP:
             /* its a symlink and client requested O_NOFOLLOW  */
             LOG(log_debug, logtype_afpd, "sys_remove_ea(%s/%s): symlink with kXAttrNoFollow", uname);
             return AFP_OK;

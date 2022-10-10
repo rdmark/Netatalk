@@ -9,8 +9,6 @@
 #include <config.h>
 #endif
 
-#ifdef HAVE_MDNS
-
 #include <unistd.h>
 #include <time.h>
 #include <pthread.h>
@@ -350,5 +348,3 @@ int md_zeroconf_unregister(void)
     unregister_stuff();
     return 0;
 }
-
-#endif /* USE_MDNS */

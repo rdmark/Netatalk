@@ -19,28 +19,15 @@
 #include <atalk/errchk.h>
 
 /* XXX: locking has to be checked before each stream of consecutive
- *      ad_writes to prevent a lock in the middle from causing problems. 
+ *      ad_writes to prevent a lock in the middle from causing problems.
  */
 
 ssize_t adf_pwrite(struct ad_fd *ad_fd, const void *buf, size_t count, off_t offset)
 {
     ssize_t		cc;
 
-#ifndef  HAVE_PWRITE
-    if ( ad_fd->adf_off != offset ) {
-	if ( lseek( ad_fd->adf_fd, offset, SEEK_SET ) < 0 ) {
-	    return -1;
-	}
-	ad_fd->adf_off = offset;
-    }
-    cc = write( ad_fd->adf_fd, buf, count );
-    if ( cc < 0 ) {
-        return -1;
-    }
-    ad_fd->adf_off += cc;
-#else
-   cc = pwrite(ad_fd->adf_fd, buf, count, offset );
-#endif
+    cc = pwrite(ad_fd->adf_fd, buf, count, offset );
+
     return cc;
 }
 
@@ -59,7 +46,7 @@ ssize_t ad_write(struct adouble *ad, uint32_t eid, off_t off, int end, const cha
 
     LOG(log_debug, logtype_ad, "ad_write: off: %ju, size: %zu, eabuflen: %zu",
         (uintmax_t)off, buflen, ad->ad_rlen);
-    
+
     if ( eid == ADEID_DFORK ) {
         if ( end ) {
             if ( fstat( ad_data_fileno(ad), &st ) < 0 ) {
@@ -96,7 +83,7 @@ ssize_t ad_write(struct adouble *ad, uint32_t eid, off_t off, int end, const cha
     return( cc );
 }
 
-/* 
+/*
  * the caller set the locks
  * ftruncate is undefined when the file length is smaller than 'size'
  */
@@ -128,7 +115,7 @@ char            c = 0;
         errno = err;
         return -1;
     }
-    
+
     if (st.st_size > length) {
         errno = err;
         return -1;
@@ -151,7 +138,7 @@ char            c = 0;
     }
 #endif
 
-    return 0;    
+    return 0;
 }
 
 /* ------------------------ */
@@ -212,7 +199,7 @@ static int copy_all(const int dfd, const void *buf,
     return 0;
 }
 
-/* -------------------------- 
+/* --------------------------
  * copy only the fork data stream
 */
 int copy_fork(int eid, struct adouble *add, struct adouble *ads, char *buf, size_t buflen)
@@ -237,14 +224,14 @@ int copy_fork(int eid, struct adouble *add, struct adouble *ads, char *buf, size
     else {
         sfd = ad_reso_fileno(ads);
         dfd = ad_reso_fileno(add);
-    }        
+    }
 
     if ((off_t)-1 == lseek(sfd, ad_getentryoff(ads, eid), SEEK_SET))
     	return -1;
 
     if ((off_t)-1 == lseek(dfd, ad_getentryoff(add, eid), SEEK_SET))
     	return -1;
-    	
+
 #if 0 /* ifdef SENDFILE_FLAVOR_LINUX */
     /* doesn't work With 2.6 FIXME, only check for EBADFD ? */
     off_t   offset = 0;
@@ -253,7 +240,7 @@ int copy_fork(int eid, struct adouble *add, struct adouble *ads, char *buf, size
     #define BUF 128*1024*1024
 
     if (fstat(sfd, &st) == 0) {
-        
+
         while (1) {
             if ( offset >= st.st_size) {
                return 0;
@@ -272,7 +259,7 @@ int copy_fork(int eid, struct adouble *add, struct adouble *ads, char *buf, size
     }
     no_sendfile:
     lseek(sfd, offset, SEEK_SET);
-#endif 
+#endif
 
     while (1) {
         if ((cc = read(sfd, filebuf, buflen)) < 0) {

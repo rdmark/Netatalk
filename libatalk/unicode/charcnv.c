@@ -31,9 +31,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/param.h>
-#ifdef HAVE_USABLE_ICONV
 #include <iconv.h>
-#endif
 #include <arpa/inet.h>
 
 #include <atalk/logger.h>

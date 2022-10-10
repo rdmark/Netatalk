@@ -1,6 +1,0 @@
-Makefile
-Makefile.in
-asip-status.pl
-apple_dump
-.gitignore
-*.o

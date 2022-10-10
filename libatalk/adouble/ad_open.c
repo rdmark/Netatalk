@@ -1032,7 +1032,7 @@ static int ad_open_df(const char *path, int adflags, mode_t mode, struct adouble
                 break;
             }
             return -1;
-        case OPEN_NOFOLLOW_ERRNO:
+        case ELOOP:
             ad->ad_data_fork.adf_syml = malloc(MAXPATHLEN+1);
             if ((lsz = readlink(path, ad->ad_data_fork.adf_syml, MAXPATHLEN)) <= 0) {
                 free(ad->ad_data_fork.adf_syml);

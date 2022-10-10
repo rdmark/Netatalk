@@ -16,8 +16,6 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifdef HAVE_LDAP
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -335,7 +333,7 @@ EC_CLEANUP:
  * Interface
  ********************************************************/
 
-/*! 
+/*!
  * Search UUID for name in LDAP
  *
  * Caller must free uuid_string when done with it
@@ -399,7 +397,7 @@ int ldap_getuuidfromname( const char *name, uuidtype_t type, char **uuid_string)
  * LDAP search wrapper
  * returns allocated storage in name, caller must free it
  * returns 0 on success, -1 on error or not found
- * 
+ *
  * @param uuidstr  (r) uuid to search as ascii string
  * @param name     (w) return pointer to name as allocated string
  * @param type     (w) return type: USER or GROUP
@@ -453,4 +451,3 @@ int ldap_getnamefromuuid( const char *uuidstr, char **name, uuidtype_t *type) {
 EC_CLEANUP:
     EC_EXIT;
 }
-#endif  /* HAVE_LDAP */

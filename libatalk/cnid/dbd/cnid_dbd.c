@@ -6,8 +6,6 @@
 
 #include "config.h"
 
-#ifdef CNID_BACKEND_DBD
-
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
@@ -1036,6 +1034,3 @@ struct _cnid_module cnid_dbd_module = {
     cnid_dbd_open,
     0
 };
-
-#endif /* CNID_DBD */
-

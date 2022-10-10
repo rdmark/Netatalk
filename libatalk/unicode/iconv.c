@@ -1,23 +1,23 @@
-/* 
+/*
    Unix SMB/CIFS implementation.
    minimal iconv implementation
    Copyright (C) Andrew Tridgell 2001
    Copyright (C) Jelmer Vernooij 2002,2003
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-   
+
    From samba 3.0 beta and GNU libiconv-1.8
    It's bad but most of the time we can't use libc iconv service:
    - it doesn't round trip for most encoding
@@ -34,9 +34,7 @@
 #include <errno.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#ifdef HAVE_USABLE_ICONV
 #include <iconv.h>
-#endif
 #include <arpa/inet.h>
 
 #include <atalk/unicode.h>
@@ -68,19 +66,7 @@
  **/
 #define CHARSET_WIDECHAR    32
 
-#ifdef HAVE_USABLE_ICONV
-#ifdef HAVE_UCS2INTERNAL
 #define UCS2ICONV "UCS-2-INTERNAL"
-#else /* !HAVE_UCS2INTERNAL */
-#if BYTE_ORDER==LITTLE_ENDIAN
-#define UCS2ICONV "UCS-2LE"
-#else /* !LITTLE_ENDIAN */
-#define UCS2ICONV "UCS-2BE"
-#endif /* BYTE_ORDER */
-#endif /* HAVE_UCS2INTERNAL */
-#else /* !HAVE_USABLE_ICONV */
-#define UCS2ICONV "UCS-2"
-#endif /* HAVE_USABLE_ICONV */
 
 static size_t ascii_pull(void *,char **, size_t *, char **, size_t *);
 static size_t ascii_push(void *,char **, size_t *, char **, size_t *);
@@ -94,12 +80,10 @@ extern  struct charset_functions charset_mac_greek;
 extern  struct charset_functions charset_mac_turkish;
 extern  struct charset_functions charset_utf8;
 extern  struct charset_functions charset_utf8_mac;
-#ifdef HAVE_USABLE_ICONV
 extern  struct charset_functions charset_mac_japanese;
 extern  struct charset_functions charset_mac_chinese_trad;
 extern  struct charset_functions charset_mac_korean;
 extern  struct charset_functions charset_mac_chinese_simp;
-#endif
 
 
 static struct charset_functions builtin_functions[] = {
@@ -124,7 +108,7 @@ static struct charset_functions builtin_functions[] = {
 
 static struct charset_functions *charsets = NULL;
 
-struct charset_functions *find_charset_functions(const char *name) 
+struct charset_functions *find_charset_functions(const char *name)
 {
 	struct charset_functions *c = charsets;
 
@@ -138,7 +122,7 @@ struct charset_functions *find_charset_functions(const char *name)
 	return NULL;
 }
 
-int atalk_register_charset(struct charset_functions *funcs) 
+int atalk_register_charset(struct charset_functions *funcs)
 {
 	if (!funcs) {
 		return -1;
@@ -162,7 +146,7 @@ static void lazy_initialize_iconv(void)
 
 	if (!initialized) {
 		initialized = 1;
-		for(i = 0; builtin_functions[i].name; i++) 
+		for(i = 0; builtin_functions[i].name; i++)
 			atalk_register_charset(&builtin_functions[i]);
 
 		/* register additional charsets */
@@ -174,32 +158,25 @@ static void lazy_initialize_iconv(void)
 		atalk_register_charset(&charset_mac_turkish);
 		atalk_register_charset(&charset_mac_centraleurope);
 		atalk_register_charset(&charset_mac_cyrillic);
-#ifdef HAVE_USABLE_ICONV
 		atalk_register_charset(&charset_mac_japanese);
 		atalk_register_charset(&charset_mac_chinese_trad);
 		atalk_register_charset(&charset_mac_korean);
 		atalk_register_charset(&charset_mac_chinese_simp);
-#endif
 	}
 }
 
 /* if there was an error then reset the internal state,
    this ensures that we don't have a shift state remaining for
    character sets like SJIS */
-static size_t sys_iconv(void *cd, 
+static size_t sys_iconv(void *cd,
 			char **inbuf, size_t *inbytesleft,
 			char **outbuf, size_t *outbytesleft)
 {
-#ifdef HAVE_USABLE_ICONV
-	size_t ret = iconv((iconv_t)cd, 
-			   (ICONV_CONST char**)inbuf, inbytesleft, 
+	size_t ret = iconv((iconv_t)cd,
+			   (ICONV_CONST char**)inbuf, inbytesleft,
 			   outbuf, outbytesleft);
 	if (ret == (size_t)-1) iconv(cd, NULL, NULL, NULL, NULL);
 	return ret;
-#else
-	errno = EINVAL;
-	return -1;
-#endif
 }
 
 /**
@@ -208,7 +185,7 @@ static size_t sys_iconv(void *cd,
  * It only knows about a very small number of character sets - just
  * enough that netatalk works on systems that don't have iconv.
  **/
-size_t atalk_iconv(atalk_iconv_t cd, 
+size_t atalk_iconv(atalk_iconv_t cd,
 		 const char **inbuf, size_t *inbytesleft,
 		 char **outbuf, size_t *outbytesleft)
 {
@@ -218,7 +195,7 @@ size_t atalk_iconv(atalk_iconv_t cd,
 
 	/* in many cases we can go direct */
 	if (cd->direct) {
-		return cd->direct(cd->cd_direct, 
+		return cd->direct(cd->cd_direct,
 				  (char **)inbuf, inbytesleft, outbuf, outbytesleft);
 	}
 
@@ -227,7 +204,7 @@ size_t atalk_iconv(atalk_iconv_t cd,
 	while (*inbytesleft > 0) {
 		bufp = cvtbuf;
 		bufsize = sizeof(cvtbuf);
-		
+
 		if (cd->pull(cd->cd_pull, (char **)inbuf, inbytesleft, &bufp, &bufsize) == (size_t)-1
 		       && errno != E2BIG) {
 		    return -1;
@@ -277,12 +254,11 @@ atalk_iconv_t atalk_iconv_open(const char *tocode, const char *fromcode)
 	/* check if we have a builtin function for this conversion */
 	from = find_charset_functions(fromcode);
 	if (from) ret->pull = from->pull;
-	
+
 	to = find_charset_functions(tocode);
 	if (to) ret->push = to->push;
 
 	/* check if we can use iconv for this conversion */
-#ifdef HAVE_USABLE_ICONV
 	if (!from || (from->flags & CHARSET_ICONV)) {
 	  ret->cd_pull = iconv_open(UCS2ICONV, from && from->iname ? from->iname : fromcode);
 	  if (ret->cd_pull != (iconv_t)-1) {
@@ -298,8 +274,7 @@ atalk_iconv_t atalk_iconv_open(const char *tocode, const char *fromcode)
 	  }
 	  if (!ret->push && ret->cd_pull) iconv_close((iconv_t)ret->cd_pull);
 	}
-#endif
-	
+
 	if (!ret->push || !ret->pull) {
 		SAFE_FREE(ret->from_name);
 		SAFE_FREE(ret->to_name);
@@ -328,11 +303,9 @@ atalk_iconv_t atalk_iconv_open(const char *tocode, const char *fromcode)
 */
 int atalk_iconv_close (atalk_iconv_t cd)
 {
-#ifdef HAVE_USABLE_ICONV
 	if (cd->cd_direct) iconv_close((iconv_t)cd->cd_direct);
 	if (cd->cd_pull) iconv_close((iconv_t)cd->cd_pull);
 	if (cd->cd_push) iconv_close((iconv_t)cd->cd_push);
-#endif
 
 	SAFE_FREE(cd->from_name);
 	SAFE_FREE(cd->to_name);
@@ -371,7 +344,7 @@ static size_t ascii_pull(void *cd _U_, char **inbuf, size_t *inbytesleft,
 		errno = E2BIG;
 		return -1;
 	}
-	
+
 	return 0;
 }
 
@@ -389,7 +362,7 @@ static size_t ascii_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
 		else {
 			errno = EILSEQ;
 			return -1;
-		}	
+		}
 		(*inbytesleft)  -= 2;
 		(*outbytesleft) -= 1;
 		(*inbuf)  += 2;
@@ -405,7 +378,7 @@ static size_t ascii_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
 		errno = E2BIG;
 		return -1;
 	}
-	
+
 	return ir_count;
 }
 

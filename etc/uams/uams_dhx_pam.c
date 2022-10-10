@@ -7,38 +7,21 @@
 
 #include "config.h"
 
-#if defined(USE_PAM) && defined(UAM_DHX)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <atalk/logger.h>
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <errno.h>
-#ifdef HAVE_SECURITY_PAM_APPL_H
 #include <security/pam_appl.h>
-#endif
-#ifdef HAVE_PAM_PAM_APPL_H
-#include <pam/pam_appl.h>
-#endif
 #include <arpa/inet.h>
 
-#if defined(GNUTLS_DHX)
-#include <gnutls/openssl.h>
-#elif defined(OPENSSL_DHX)
 #include <openssl/bn.h>
 #include <openssl/dh.h>
 #include <openssl/cast.h>
 #include <openssl/err.h>
 #include "openssl_compat.h"
-#else /* OPENSSL_DHX */
-#include <bn.h>
-#include <dh.h>
-#include <cast.h>
-#include <err.h>
-#endif /* OPENSSL_DHX */
 
 #include <atalk/afp.h>
 #include <atalk/uam.h>
@@ -763,5 +746,3 @@ UAM_MODULE_EXPORT struct uam_export uams_dhx_pam = {
   UAM_MODULE_VERSION,
   uam_setup, uam_cleanup
 };
-
-#endif /* USE_PAM && UAM_DHX */

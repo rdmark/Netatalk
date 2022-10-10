@@ -20,20 +20,11 @@
 #include <atalk/util.h>
 #include <atalk/globals.h>
 
-/* Kerberos includes */
-#ifdef HAVE_GSSAPI_GSSAPI_H
 #include <gssapi/gssapi.h>
-#else
 #include <gssapi.h>
-#endif // HAVE_GSSAPI_GSSAPI_H
 
-#ifdef HAVE_KERBEROS
-#ifdef HAVE_KRB5_KRB5_H
 #include <krb5/krb5.h>
-#else
 #include <krb5.h>
-#endif /* HAVE_KRB5_KRB5_H */
-#endif /* HAVE_KERBEROS */
 
 #if defined(__has_warning)
 #  if __has_warning("-Wdeprecated-declarations")
@@ -520,7 +511,6 @@ static int set_principal(AFPObj *obj, char *principal)
 static int gss_create_principal(AFPObj *obj)
 {
     int rv = -1;
-#ifdef HAVE_KERBEROS
     krb5_context context;
     krb5_error_code ret;
     const char *error_msg;
@@ -557,11 +547,7 @@ static int gss_create_principal(AFPObj *obj)
                                      &entry)) == KRB5_KT_NOTFOUND) {
             krb5_unparse_name(context, service_principal, &principal);
             LOG(log_error, logtype_afpd, "gss_create_principal: specified service principal '%s' not found in keytab", principal);
-#ifdef HAVE_KRB5_FREE_UNPARSED_NAME
             krb5_free_unparsed_name(context, principal);
-#else
-            krb5_xfree(principal);
-#endif
             goto krb5_cleanup;
         }
         krb5_free_principal(context, service_principal);
@@ -578,11 +564,7 @@ static int gss_create_principal(AFPObj *obj)
     }
 
     krb5_unparse_name(context, entry.principal, &principal);
-#ifdef HAVE_KRB5_FREE_KEYTAB_ENTRY_CONTENTS
     krb5_free_keytab_entry_contents(context, &entry);
-#elif defined(HAVE_KRB5_KT_FREE_ENTRY)
-    krb5_kt_free_entry(context, &entry);
-#endif
     set_principal(obj, principal);
     free(principal);
     rv = 0;
@@ -593,27 +575,12 @@ krb5_error:
         error_msg = krb5_get_error_message(context, ret);
         LOG(log_note, logtype_afpd, "Can't get principal from default keytab: %s",
             (char *)error_msg);
-#ifdef HAVE_KRB5_FREE_ERROR_MESSAGE
         krb5_free_error_message(context, error_msg);
-#else
-        krb5_xfree(error_msg);
-#endif
     }
 
 krb5_cleanup:
     krb5_kt_close(context, keytab);
     krb5_free_context(context);
-
-#else /* ! HAVE_KERBEROS */
-    if (!obj->options.k5service || !obj->options.fqdn || !obj->options.k5realm)
-        goto exit;
-
-    char principal[255];
-    size_t len = snprintf(principal, sizeof(principal), "%s/%s@%s",
-                          obj->options.k5service, obj->options.fqdn, obj->options.k5realm);
-    (void)set_principal(obj, principal);
-    rv = 0;
-#endif /* HAVE_KERBEROS */
 
 exit:
     return rv;

@@ -16,9 +16,7 @@
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
-#endif /* HAVE_DLFCN_H */
 
 #include <netinet/in.h>
 #include <arpa/inet.h>

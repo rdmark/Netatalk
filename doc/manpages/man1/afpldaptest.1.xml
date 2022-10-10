@@ -5,8 +5,8 @@
     <manvolnum>1</manvolnum>
     <refmiscinfo class="date">22 Mar 2012</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
-    <refmiscinfo class="manual">Netatalk AFP fileserver Manual</refmiscinfo>
-    <refmiscinfo class="source">@NETATALK_VERSION@</refmiscinfo>
+    <refmiscinfo class="manual">Netatalk AFP Fileserver Manual</refmiscinfo>
+    <refmiscinfo class="source">3.1.13</refmiscinfo>
   </refmeta>
   <refnamediv id="name">
     <refname>afpldaptest</refname>

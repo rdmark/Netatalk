@@ -1,0 +1,29 @@
+/* Define if CNID Database Daemon backend should be compiled. */
+#mesondefine CNID_BACKEND_DBD
+
+/* Define if CNID LAST scheme backend should be compiled. */
+#mesondefine CNID_BACKEND_LAST
+
+/* whether the MySQL CNID module is available */
+#mesondefine CNID_BACKEND_MYSQL
+
+/* Define if CNID TDB scheme backend should be compiled. */
+#mesondefine CNID_BACKEND_TDB
+
+/* Use internal tbd */
+#mesondefine USE_BUILTIN_TDB
+
+/* Default CNID scheme to be used */
+#mesondefine DEFAULT_CNID_SCHEME
+
+/* Available Extended Attributes modules */
+#mesondefine EA_MODULES
+
+/* Define as const if the declaration of iconv() needs const. */
+#mesondefine ICONV_CONST
+
+/* netatalk lockfile path */
+#mesondefine PATH_NETATALK_LOCK
+
+/* Version number of package */
+#mesondefine VERSION

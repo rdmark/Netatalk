@@ -1,0 +1,5 @@
+option('BUILD_HTML_MANS', type : 'boolean', value : false,
+	description : 'Build html manual')
+
+option('SKIP_TESTS', type: 'boolean', value: true,
+  description: 'Skip tests during build')

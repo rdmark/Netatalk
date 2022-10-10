@@ -15,9 +15,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#ifdef HAVE_GETIFADDRS
 #include <ifaddrs.h>
-#endif
 
 #include <atalk/logger.h>
 #include <atalk/util.h>
@@ -29,9 +27,7 @@
 #include <atalk/netatalk_conf.h>
 #include <atalk/fce_api.h>
 
-#ifdef HAVE_LDAP
 #include <atalk/ldapconfig.h>
-#endif
 
 #include "afp_config.h"
 #include "uam_auth.h"
@@ -88,9 +84,7 @@ int configinit(AFPObj *obj)
 
     auth_load(obj, obj->options.uampath, obj->options.uamlist);
     set_signature(&obj->options);
-#ifdef HAVE_LDAP
     acl_ldap_freeconfig();
-#endif /* HAVE_LDAP */
 
     LOG(log_debug, logtype_afpd, "DSIConfigInit: hostname: %s, listen: %s, interfaces: %s, port: %s",
         obj->options.hostname,
@@ -131,9 +125,6 @@ int configinit(AFPObj *obj)
     * to be unable to return ipv4 addresses
     */
     if (obj->options.interfaces) {
-#ifndef HAVE_GETIFADDRS
-        LOG(log_error, logtype_afpd, "option \"afp interfaces\" not supported");
-#else
         if (getifaddrs(&ifaddr) == -1) {
             LOG(log_error, logtype_afpd, "getinterfaddr: getifaddrs() failed: %s", strerror(errno));
             EC_FAIL;
@@ -174,7 +165,6 @@ int configinit(AFPObj *obj)
             p = strtok_r(NULL, ", ", &savep);
         }
         freeifaddrs(ifaddr);
-#endif
     }
 
     /*
@@ -195,10 +185,8 @@ int configinit(AFPObj *obj)
             getip_port((struct sockaddr *)&dsi->server));
     }
 
-#ifdef HAVE_LDAP
     /* Parse afp.conf */
     acl_ldap_readconfig(obj->iniconfig);
-#endif /* HAVE_LDAP */
 
     if ((r = atalk_iniparser_getstring(obj->iniconfig, INISEC_GLOBAL, "fce listener", NULL))) {
 		LOG(log_note, logtype_afpd, "Adding FCE listener: %s", r);

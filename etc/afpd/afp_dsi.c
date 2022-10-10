@@ -13,14 +13,10 @@
 #include <signal.h>
 #include <string.h>
 #include <errno.h>
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 #include <sys/socket.h>
 #include <sys/time.h>
-#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
-#endif /* HAVE_SYS_STAT_H */
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
