@@ -255,19 +255,11 @@ AC_DEFUN([AC_NETATALK_SET_RPATH], [
 
 AC_DEFUN([AC_NETATALK_KRB5_UAM], [
 netatalk_cv_build_krb5_uam=no
-AC_ARG_ENABLE(krbV-uam,
-	[  --enable-krbV-uam       enable build of Kerberos V UAM module],
-	[
-		if test x"$enableval" = x"yes"; then
-			NETATALK_GSSAPI_CHECK([
-				netatalk_cv_build_krb5_uam=yes
-			],[
-				AC_MSG_ERROR([need GSSAPI to build Kerberos V UAM])
-			])
-		fi
-	]
-
-)
+NETATALK_GSSAPI_CHECK([
+  netatalk_cv_build_krb5_uam=yes
+  ],[
+  AC_MSG_ERROR([need GSSAPI to build Kerberos V UAM])
+])
 
 AC_MSG_CHECKING([whether Kerberos V UAM should be built])
 if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then

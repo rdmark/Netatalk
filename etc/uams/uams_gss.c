@@ -35,6 +35,12 @@
 #endif /* HAVE_KRB5_KRB5_H */
 #endif /* HAVE_KERBEROS */
 
+#if defined(__has_warning)
+#  if __has_warning("-Wdeprecated-declarations")
+#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#  endif
+#endif
+
 #define LOG_UAMS(log_level, ...) \
     LOG(log_level, logtype_uams, __VA_ARGS__)
 
