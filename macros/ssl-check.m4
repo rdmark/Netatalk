@@ -1,21 +1,5 @@
 dnl Autoconf macro to check for SSL or OpenSSL
 
-AC_DEFUN([AC_NETATALK_CRYPT], [
-
-	saveLIBS=$LIBS
-	LIBS=""
-	CRYPT_LIBS=""
-
-	AC_CHECK_HEADERS(crypt.h)
-	AC_CHECK_LIB(crypt, main)
-
-	CRYPT_LIBS=$LIBS
-	LIBS=$saveLIBS
-
-	AC_SUBST(CRYPT_LIBS)
-])
-
-
 AC_DEFUN([AC_NETATALK_PATH_SSL], [
 	AC_ARG_WITH(ssl-dir, [  --with-ssl-dir=PATH     specify path to OpenSSL installation (must contain
                           lib and include dirs)],
