@@ -1,6 +1,6 @@
 # Makefile.am for bin/
 
-SUBDIRS = cnid megatron misc
+SUBDIRS = cnid misc
 
 if HAVE_ATFUNCS
 SUBDIRS += ad

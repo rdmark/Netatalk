@@ -179,7 +179,6 @@ AC_CONFIG_FILES([
   bin/ad/Makefile
   bin/cnid/Makefile
   bin/cnid/cnid2_create
-  bin/megatron/Makefile
   bin/misc/Makefile
   config/Makefile
   contrib/Makefile
