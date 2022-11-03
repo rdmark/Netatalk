@@ -333,7 +333,7 @@
           <type>(G)</type></term>
           <listitem>
             <para>Sets the default path for UAMs for this server (default is
-            @libdir@/netatalk).</para>
+            /usr/local/lib/netatalk).</para>
           </listitem>
         </varlistentry>
       </variablelist>

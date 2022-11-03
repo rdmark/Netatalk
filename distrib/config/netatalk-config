@@ -3,8 +3,8 @@
 
 af_libs=
 af_cflags=
-prefix=@prefix@
-exec_prefix=@exec_prefix@
+prefix=/usr/local
+exec_prefix=/usr/local
 
 
 ##
@@ -20,10 +20,9 @@ Options:
   --libs-dirs   only print the -L/-R part of --libs
   --libs-names  only print the -l part of --libs
   --help        display this help and exit
-  --macros      print the path to m4 macros
 
-  --prefix[=DIR] 
-  --exec_prefix[=DIR] 
+  --prefix[=DIR]
+  --exec_prefix[=DIR]
   --version     output netatalk version information
 Libraries:
          netatalk
@@ -73,12 +72,6 @@ while test $# -gt 0; do
       ;;
     --libs-names)
       af_echo_libs_l=yes
-      ;;
-    --macros*)
-
-echo -I @prefix@/include/netatalk/macros
-exit
-
       ;;
     --prefix=*)
       prefix=$af_optarg
@@ -156,7 +149,7 @@ for i in $af_all_flags; do
             case " $af_lib_L_flags " in
             *\ $i\ *) ;;                              # already there
             *) af_lib_L_flags="$af_lib_L_flags $i" ;; # add it to output
-            esac 
+            esac
         fi;;
     *)
         case " $af_other_flags " in
@@ -215,12 +208,9 @@ fi
 #dummy because this should always be selected
 
 
-if test "@includedir@" != /usr/include ; then
-  includes="-I@includedir@"
-fi
-if test "@libdir@" != /usr/lib ; then
-  libs="-L@libdir@"
-fi
+includes="-I/usr/local/include"
+libs="-L/usr/local/lib"
+
 af_cflags="$af_cflags $includes"
 af_libs="$libs -latalk"
 
@@ -230,4 +220,3 @@ af_libs="$libs -latalk"
 print_result
 
 exit 0
-
