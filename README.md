@@ -23,7 +23,7 @@ all developers past and present.
 
 4. cd to the repo then run the following commands:
 
-   meson build
+   meson setup build
 
    sudo ninja -C build install
 
