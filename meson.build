@@ -25,15 +25,15 @@ supported_oses = 'darwin'
 supported_cpus = ['aarch64', 'x86_64']
 
 if 'aarch64'.contains(host_machine.cpu_family())
-  lib_crypto = cc.find_library('crypto', dirs : '/opt/homebrew/opt/openssl@1.1/lib', required: true)
-  inc_crypto = include_directories('/opt/homebrew/opt/openssl@1.1/include')
+  lib_crypto = cc.find_library('crypto', dirs : '/opt/homebrew/opt/libressl/lib', required: true)
+  inc_crypto = include_directories('/opt/homebrew/opt/libressl/include')
 
   lib_db = cc.find_library('db', dirs : '/opt/homebrew/opt/berkeley-db/lib', required : true)
   inc_db = include_directories('/opt/homebrew/opt/berkeley-db/include')
 
 elif 'x86_64'.contains(host_machine.cpu_family())
-  lib_crypto = cc.find_library('crypto', dirs : '/usr/local/opt/openssl@1.1/lib', required: true)
-  inc_crypto = include_directories('/usr/local/opt/openssl@1.1/include')
+  lib_crypto = cc.find_library('crypto', dirs : '/usr/local/opt/libressl/lib', required: true)
+  inc_crypto = include_directories('/usr/local/opt/libressl/include')
 
   lib_db = cc.find_library('db', dirs : '/usr/local/opt/berkeley-db/lib', required : true)
   inc_db = include_directories('/usr/local/opt/berkeley-db/include')

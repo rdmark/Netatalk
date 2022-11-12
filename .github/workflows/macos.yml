@@ -12,6 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: brew upgrade
-    - run: brew install dbus meson mysql dbus-glib
+    - run: brew install dbus meson mysql dbus-glib libressl
     - run: meson build
     - run: ninja -C build
