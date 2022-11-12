@@ -1,3 +1,9 @@
+Changes in 2.x v221101
+======================
+* FIX: debian_install.sh: Enable systemd services to make them persist between
+       system reboots.
+* UPD: Add documentation about when and how to use legacy Autotools syntax.
+
 Changes in 2.x v220801
 ======================
 * FIX: afpd: Restore -ipaddr option in afpd.conf, by saybur.
