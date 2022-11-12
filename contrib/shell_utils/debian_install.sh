@@ -122,6 +122,7 @@ function installNetatalk() {
 
     echo ""
     echo "Starting systemd services... (this may take a while)"
+    sudo systemctl enable afpd atalkd papd timelord a2boot cups
     sudo systemctl start afpd atalkd papd timelord a2boot cups
 
     echo ""
