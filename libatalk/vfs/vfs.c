@@ -724,7 +724,11 @@ static struct vfs_ops netatalk_adouble_v2 = {
     /* vfs_deletefile:    */ RF_deletefile_adouble,
     /* vfs_renamefile:    */ RF_renamefile_adouble,
     /* vfs_copyfile:      */ RF_copyfile_adouble,
-    NULL
+    /* vfs_ea_getsize:    */ NULL,
+    /* vfs_ea_getcontent: */ NULL,
+    /* vfs_ea_list:       */ NULL,
+    /* vfs_ea_set:        */ NULL,
+    /* vfs_ea_remove:     */ NULL
 };
 
 static struct vfs_ops netatalk_adouble_ea = {
@@ -739,7 +743,11 @@ static struct vfs_ops netatalk_adouble_ea = {
     /* vfs_deletefile:    */ RF_deletefile_ea,
     /* vfs_renamefile:    */ RF_renamefile_ea,
     /* vfs_copyfile:      */ RF_copyfile_ea,
-    NULL
+    /* vfs_ea_getsize:    */ NULL,
+    /* vfs_ea_getcontent: */ NULL,
+    /* vfs_ea_list:       */ NULL,
+    /* vfs_ea_set:        */ NULL,
+    /* vfs_ea_remove:     */ NULL
 };
 
 /*
