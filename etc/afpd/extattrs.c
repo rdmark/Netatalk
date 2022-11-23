@@ -75,7 +75,7 @@ int afp_listextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf,
     struct vol          *vol;
     struct dir          *dir;
     struct path         *s_path;
-    struct stat         *st;
+    struct stat         *st _U_;
     struct adouble      ad, *adp = NULL;
     struct ofork	*opened = NULL;
     char                *uname, *FinderInfo;
@@ -207,7 +207,6 @@ int afp_listextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf,
         }
     }
 
-exit:
     bitmap = htons(bitmap);
     memcpy( rbuf, &bitmap, sizeof(bitmap));
     rbuf += sizeof(bitmap);

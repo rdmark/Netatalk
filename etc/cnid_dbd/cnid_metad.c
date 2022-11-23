@@ -248,7 +248,6 @@ static struct server *test_usockfn(const char *path)
         return -1;
     }
     if (pid == 0) {
-        int ret;
         /*
          *  Child. Close descriptors and start the daemon. If it fails
          *  just log it. The client process will fail connecting
@@ -272,21 +271,21 @@ static struct server *test_usockfn(const char *path)
             LOG(log_warning, logtype_cnid,
                 "Multiple attempts to start CNID db daemon for \"%s\" failed, wiping the slate clean...",
                 up->v_path);
-            ret = execlp(dbdpn, dbdpn,
-                         "-F", obj->options.configfile,
-                         "-p", volpath,
-                         "-t", buf1,
-                         "-l", buf2,
-                         "-u", username,
-                         NULL);
+            execlp(dbdpn, dbdpn,
+                   "-F", obj->options.configfile,
+                   "-p", volpath,
+                   "-t", buf1,
+                   "-l", buf2,
+                   "-u", username,
+                   NULL);
         } else {
-            ret = execlp(dbdpn, dbdpn,
-                         "-F", obj->options.configfile,
-                         "-p", volpath,
-                         "-t", buf1,
-                         "-l", buf2,
-                         "-u", username,
-                         NULL);
+            execlp(dbdpn, dbdpn,
+                   "-F", obj->options.configfile,
+                   "-p", volpath,
+                   "-t", buf1,
+                   "-l", buf2,
+                   "-u", username,
+                   NULL);
         }
         /* Yikes! We're still here, so exec failed... */
         LOG(log_error, logtype_cnid, "Fatal error in exec: %s", strerror(errno));
@@ -459,7 +458,7 @@ int main(int argc, char *argv[])
     char  *dbdpn = _PATH_CNID_DBD;
     char  *host;
     char  *port;
-    int    i;
+    unsigned int    i;
     int    cc;
     uid_t  uid = 0;
     gid_t  gid = 0;

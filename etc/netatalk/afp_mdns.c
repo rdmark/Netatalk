@@ -93,7 +93,7 @@ static struct pollfd *fds;
 static void *polling_thread(void *arg) {
     // First we loop through getting the filehandles and adding them to our poll, we
     // need to allocate our pollfd's
-    DNSServiceErrorType error;
+    DNSServiceErrorType error _U_;
     fds = calloc(svc_ref_count, sizeof(struct pollfd));
     assert(fds);
 

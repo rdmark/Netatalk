@@ -41,9 +41,8 @@ afpd_sources = [
   afpstatsservice,
   'afpstats_obj.c',
   'afpstats_obj.h',
-  'afpstats.c',  
-  'main.c',
-  'uid.c']
+  'afpstats.c',
+  'main.c']
 
 executable('afpd',
             afpd_sources,

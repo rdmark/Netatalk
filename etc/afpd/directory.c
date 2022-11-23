@@ -558,7 +558,7 @@ struct dir *dirlookup(const struct vol *vol, cnid_t did)
     bstring      fullpath = NULL;
     char         *upath = NULL, *mpath;
     cnid_t       cnid, pdid;
-    size_t       maxpath;
+    size_t       maxpath _U_;
     int          buflen = 12 + MAXPATHLEN + 1;
     int          utf8;
     int          err = 0;
@@ -599,14 +599,14 @@ struct dir *dirlookup(const struct vol *vol, cnid_t did)
                 ret = NULL;
                 goto exit;
             default:
-                ret = ret;
+                (void)ret;
                 goto exit;
             }
             /* DEADC0DE */
             ret = NULL;
             goto exit;
         }
-        ret = ret;
+        (void)ret;
         goto exit;
     }
 

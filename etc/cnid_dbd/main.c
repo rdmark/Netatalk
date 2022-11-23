@@ -486,7 +486,7 @@ static uid_t uid_from_name(const char *name)
 int main(int argc, char *argv[])
 {
     EC_INIT;
-    int delete_bdb = 0;
+    int delete_bdb _U_ = 0;
     int ctrlfd = -1, clntfd = -1;
     AFPObj obj = { 0 };
     char *volpath = NULL;

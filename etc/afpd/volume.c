@@ -217,7 +217,7 @@ static int getvolspace(const AFPObj *obj, struct vol *vol,
                        uint32_t *bfree, uint32_t *btotal,
                        VolSpace *xbfree, VolSpace *xbtotal, uint32_t *bsize)
 {
-    int         spaceflag, rc;
+    int         spaceflag _U_, rc;
     uint32_t   maxsize;
 
     spaceflag = AFPVOL_GVSMASK & vol->v_flags;
@@ -230,7 +230,6 @@ static int getvolspace(const AFPObj *obj, struct vol *vol,
 
     vol->v_flags = ( ~AFPVOL_GVSMASK & vol->v_flags ) | AFPVOL_USTATFS;
 
-getvolspace_done:
     if (vol->v_limitsize) {
         if (get_tm_used(vol) != 0)
             return AFPERR_MISC;

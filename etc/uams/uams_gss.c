@@ -43,7 +43,7 @@ static void log_status(char *s,
                        OM_uint32 minor_status)
 {
     gss_buffer_desc msg = GSS_C_EMPTY_BUFFER;
-    OM_uint32 min_status, maj_status;
+    OM_uint32 min_status, maj_status _U_;
     OM_uint32 maj_ctx = 0, min_ctx = 0;
 
     while (1) {

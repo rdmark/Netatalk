@@ -851,7 +851,7 @@ static int catsearch_afp(AFPObj *obj _U_, char *ibuf, size_t ibuflen,
     uint32_t   pdid = 0;
     int ret, rsize;
     uint32_t nrecs = 0;
-    unsigned char *spec1, *spec2, *bspec1, *bspec2;
+    unsigned char *spec1, *spec2, *bspec1, *bspec2 _U_;
     size_t	len;
     uint16_t	namelen;
     uint16_t	flags;

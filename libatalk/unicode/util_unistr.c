@@ -231,7 +231,7 @@ wide strstr()
 ucs2_t *strstr_w(const ucs2_t *s, const ucs2_t *ins)
 {
 	ucs2_t *r;
-	size_t slen, inslen;
+	size_t slen _U_, inslen;
 
 	if (!s || !*s || !ins || !*ins) return NULL;
 	slen = strlen_w(s);
@@ -252,7 +252,7 @@ wide strcasestr()
 ucs2_t *strcasestr_w(const ucs2_t *s, const ucs2_t *ins)
 {
 	ucs2_t *r;
-	size_t slen, inslen;
+	size_t slen _U_, inslen;
 
 	if (!s || !*s || !ins || !*ins) return NULL;
 	slen = strlen_w(s);
@@ -431,7 +431,7 @@ ucs2_t *strcat_w(ucs2_t *dest, const ucs2_t *src)
 binary search for pre|decomposition
 ********************************************************************/
 
-static ucs2_t do_precomposition(unsigned int base, unsigned int comb) 
+static ucs2_t do_precomposition(unsigned int base, unsigned int comb)
 {
 	int min = 0;
 	int max = PRECOMP_COUNT - 1;
@@ -455,7 +455,7 @@ static ucs2_t do_precomposition(unsigned int base, unsigned int comb)
 }
 
 /* ------------------------ */
-static uint32_t do_precomposition_sp(unsigned int base_sp, unsigned int comb_sp) 
+static uint32_t do_precomposition_sp(unsigned int base_sp, unsigned int comb_sp)
 {
 	int min = 0;
 	int max = PRECOMP_SP_COUNT - 1;
@@ -479,7 +479,7 @@ static uint32_t do_precomposition_sp(unsigned int base_sp, unsigned int comb_sp)
 }
 
 /* -------------------------- */
-static uint32_t do_decomposition(ucs2_t base) 
+static uint32_t do_decomposition(ucs2_t base)
 {
 	int min = 0;
 	int max = DECOMP_COUNT - 1;
@@ -505,7 +505,7 @@ static uint32_t do_decomposition(ucs2_t base)
 }
 
 /* -------------------------- */
-static uint64_t do_decomposition_sp(unsigned int base_sp) 
+static uint64_t do_decomposition_sp(unsigned int base_sp)
 {
 	int min = 0;
 	int max = DECOMP_SP_COUNT - 1;
@@ -556,14 +556,14 @@ size_t precompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 	ucs2_t result;
 	uint32_t result_sp;
 	size_t o_len = *outlen;
-	
+
 	if (!inplen || (inplen & 1) || inplen > o_len)
 		return (size_t)-1;
-	
+
 	i = 0;
 	in  = name;
 	out = comp;
-	
+
 	base = *in;
 	while (*outlen > 2) {
 		i += 2;
@@ -580,7 +580,7 @@ size_t precompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 
 		/* Non-Combination Character */
 		if (comb < 0x300) ;
-		
+
 		/* Unicode Standard Annex #15 A10.3 Hangul Composition */
 		/* Step 1 <L,V> */
 		else if ((VBASE <= comb) && (comb <= VBASE + VCOUNT)) {
@@ -591,7 +591,7 @@ size_t precompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 				base = SBASE + (lindex * VCOUNT + vindex) * TCOUNT;
 			}
 		}
-		
+
 		/* Step 2 <LV,T> */
 		else if ((TBASE < comb) && (comb < TBASE + TCOUNT)) {
 			if ((SBASE <= base) && (base < SBASE + SCOUNT) && (((base - SBASE) % TCOUNT) == 0)) {
@@ -599,7 +599,7 @@ size_t precompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 				base += comb - TBASE;
 			}
 		}
-		
+
 		/* Binary Search for Surrogate Pair */
 		else if ((0xD800 <= base) && (base < 0xDC00)) {
 			if ((0xDC00 <= comb) && (comb < 0xE000) && (i + 6 <= inplen)) {
@@ -643,7 +643,7 @@ size_t precompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 		else if ((result = do_precomposition(base, comb))) {
 			base = result;
 		}
-		
+
 		if (!result) {
 			*out = base;
 			out++;
@@ -678,29 +678,29 @@ size_t decompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 	while (i < inplen) {
 		base = *in;
 		comblen = 0;
-		
+
 		/* check ASCII first. this is frequent. */
 		if (base <= 0x007f) ;
-		
+
 		/* Unicode Standard Annex #15 A10.2 Hangul Decomposition */
 		else if ((SBASE <= base) && (base < SBASE + SCOUNT)) {
 			sindex = base - SBASE;
 			base = LBASE + sindex / NCOUNT;
 			comb[COMBBUFLEN-2] = VBASE + (sindex % NCOUNT) / TCOUNT;
-			
+
 			/* <L,V> */
 			if ((tjamo = TBASE + sindex % TCOUNT) == TBASE) {
 				comb[COMBBUFLEN-1] = comb[COMBBUFLEN-2];
 				comblen = 1;
 			}
-			
+
 			/* <L,V,T> */
 			else {
 				comb[COMBBUFLEN-1] = tjamo;
 				comblen = 2;
 			}
 		}
-		
+
 		/* Binary Search for Surrogate Pair */
 		else if ((0xD800 <= base) && (base < 0xDC00)) {
 			if (i + 2 < inplen) {
@@ -721,14 +721,14 @@ size_t decompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 				*out = base_sp >> 16;   /* hi */
 				out++;
 				*outlen -= 2;
-				
+
 				base = base_sp & 0xFFFF; /* lo */
-				
+
 				i += 2;
 				in++;
 			}
 		}
-			
+
 		/* Binary Search for BMP */
 		else {
 			do {
@@ -738,27 +738,27 @@ size_t decompose_w (ucs2_t *name, size_t inplen, ucs2_t *comp, size_t *outlen)
 				comb[COMBBUFLEN-comblen] = result & 0xFFFF;
 			} while ((0x007f < base) && (comblen < MAXCOMBLEN));
 		}
-		
+
 		if (*outlen < (comblen + 1) << 1) {
 			errno = E2BIG;
 			return (size_t)-1;
 		}
-		
+
 		*out = base;
 		out++;
 		*outlen -= 2;
-		
+
 		while ( comblen > 0 ) {
 			*out = comb[COMBBUFLEN-comblen];
 			out++;
 			*outlen -= 2;
 			comblen--;
 		}
-		
+
 		i += 2;
 		in++;
 	}
-	
+
 	*out = 0;
 	return o_len-*outlen;
 }
@@ -772,7 +772,7 @@ size_t utf8_charlen ( char* utf8 )
 	unsigned char *p;
 
 	p = (unsigned char*) utf8;
-	
+
 	if ( *p < 0x80 )
 		return (1);
 	else if ( *p > 0xC1 && *p < 0xe0 && *(p+1) > 0x7f && *(p+1) < 0xC0)

@@ -882,7 +882,7 @@ exit:
  */
 int ea_close(struct ea * restrict ea)
 {
-    int ret = 0;
+    int ret _U_ = 0;
     unsigned int count = 0;
     char *eaname;
     struct stat st;

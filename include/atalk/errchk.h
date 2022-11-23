@@ -5,7 +5,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -15,7 +15,7 @@
 #ifndef ERRCHECK_H
 #define ERRCHECK_H
 
-#define EC_INIT int ret = 0
+#define EC_INIT int ret _U_ = 0
 #define EC_STATUS(a) ret = (a)
 #define EC_EXIT_STATUS(a) do { ret = (a); goto cleanup; } while (0)
 #define EC_FAIL do { ret = -1; goto cleanup; } while (0)
@@ -28,7 +28,7 @@
 #define EC_CLEANUP cleanup
 #define EC_EXIT return ret
 
-/* 
+/*
  * Check out doc/DEVELOPER for more infos.
  *
  * We have these macros:

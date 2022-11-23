@@ -860,7 +860,7 @@ static size_t pull_charset_flags (charset_t from_set, charset_t to_set, charset_
                     inbuf++;
                     i_len--;
                 } else if ((from_set == CH_UTF8_MAC || from_set == CH_MAC)
-                           && (to_set != CH_UTF8_MAC  || to_set != CH_MAC)) {
+                           && 1) {
                     /* convert to ':' */
                     ucs2_t ucs2 = 0x003a;
                     memcpy(outbuf, &ucs2, sizeof(ucs2_t));

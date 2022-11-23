@@ -1729,7 +1729,7 @@ static int reenumerate_loop(struct dirent *de, char *mname _U_, void *data)
     struct reenum *param = data;
     struct vol    *vol = param->vol;
     cnid_t        did  = param->did;
-    cnid_t	  aint;
+    cnid_t	  aint _U_;
 
     if (ostat(de->d_name, &path.st, vol_syml_opt(vol)) < 0)
         return 0;

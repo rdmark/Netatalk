@@ -355,7 +355,7 @@ static char *volxlate(const AFPObj *obj,
     const char *q;
     int len;
     char *ret;
-    int xlatevolname = 0;
+    int xlatevolname _U_ = 0;
 
     if (path && !volname)
         /* cf above */
@@ -1779,7 +1779,7 @@ struct vol *getvolbypath(AFPObj *obj, const char *path)
     char        abspath[MAXPATHLEN + 1];
     char        volpath[MAXPATHLEN + 1], *realvolpath = NULL;
     char        tmpbuf[MAXPATHLEN + 1];
-    const char *secname, *basedir, *p = NULL, *subpath = NULL, *subpathconfig;
+    const char *secname, *basedir, *p = NULL, *subpath _U_ = NULL, *subpathconfig;
     char *user = NULL, *prw;
     regmatch_t match[1];
     size_t abspath_len;

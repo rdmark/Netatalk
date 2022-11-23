@@ -107,7 +107,7 @@ void afpstats_unlock_childs(void)
 
 int afpstats_init(server_child_t *childs_in)
 {
-    GThread *thread;
+    GThread *thread _U_;
 
     childs = childs_in;
     dbus_g_thread_init();

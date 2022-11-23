@@ -628,7 +628,7 @@ static int ftw_copy_file(const struct FTW *entp,
     static size_t bufsize;
     ssize_t wcount;
     size_t wresid;
-    off_t wtotal;
+    off_t wtotal _U_;
     int ch, checkch, from_fd = 0, rcount, rval, to_fd = 0;
     char *bufp;
     char *p;
