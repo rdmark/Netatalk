@@ -25,13 +25,14 @@
 */
 
 #include "config.h"
-#include <stdlib.h> /* for size_t */
+
 #include <arpa/inet.h>
+#include <stdlib.h> /* for size_t */
 
 #include <atalk/unicode.h>
 
-#include "mac_cyrillic.h"
 #include "generic_mb.h"
+#include "mac_cyrillic.h"
 
 static size_t   mac_cyrillic_pull(void *,char **, size_t *, char **, size_t *);
 static size_t   mac_cyrillic_push(void *,char **, size_t *, char **, size_t *);

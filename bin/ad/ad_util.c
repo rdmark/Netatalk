@@ -30,31 +30,31 @@
 
 #include "config.h"
 
-#include <sys/types.h>
+#include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
+#include <sys/types.h>
 
 #include <errno.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <limits.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sysexits.h>
 #include <unistd.h>
-#include <stdarg.h>
-#include <string.h>
-#include <libgen.h>
 
-#include <atalk/util.h>
-#include <atalk/cnid.h>
-#include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
-#include <atalk/logger.h>
+#include <atalk/bstrlib.h>
+#include <atalk/cnid.h>
 #include <atalk/errchk.h>
-#include <atalk/unicode.h>
 #include <atalk/globals.h>
+#include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
+#include <atalk/unicode.h>
+#include <atalk/util.h>
 
 
 #include "ad.h"

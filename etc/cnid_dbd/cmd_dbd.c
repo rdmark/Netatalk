@@ -14,22 +14,22 @@
 
 #include "config.h"
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <signal.h>
-#include <string.h>
 #include <errno.h>
+#include <limits.h>
 #include <pwd.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include <atalk/logger.h>
+#include <atalk/errchk.h>
 #include <atalk/globals.h>
+#include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
 #include <atalk/util.h>
-#include <atalk/errchk.h>
 
 #include "cmd_dbd.h"
 

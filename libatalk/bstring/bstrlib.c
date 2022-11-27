@@ -11,20 +11,14 @@
  * This file is the core module for implementing the bstring functions.
  */
 
-#include <stdio.h>
-#include <stddef.h>
+#include <ctype.h>
 #include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include <atalk/bstrlib.h>
-
-/* Optionally include a mechanism for debugging memory */
-
-#if defined(MEMORY_DEBUG) || defined(BSTRLIB_MEMORY_DEBUG)
-#include "memdbg.h"
-#endif
 
 #ifndef bstr__alloc
 #define bstr__alloc(x) malloc (x)

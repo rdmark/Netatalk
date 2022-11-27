@@ -5,23 +5,24 @@
 
 #include "config.h"
 
-
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/un.h>
+#include <sys/select.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <sys/types.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 #include <atalk/logger.h>
+
 #include "usockfd.h"
 
-#include <sys/select.h>
+
 
 int usockfd_create(char *usock_fn, mode_t mode, int backlog)
 {

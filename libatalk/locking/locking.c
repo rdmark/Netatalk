@@ -5,16 +5,16 @@
 
 #include "config.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
-#include <atalk/logger.h>
+#include <atalk/cnid.h>
 #include <atalk/errchk.h>
 #include <atalk/locking.h>
-#include <atalk/cnid.h>
+#include <atalk/logger.h>
 #include <atalk/paths.h>
 
 /***************************************************************************

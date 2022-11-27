@@ -20,13 +20,14 @@
 
 #include "config.h"
 
-#include <sys/types.h>
-#include <unistd.h>
+#include <execinfo.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
-#include <execinfo.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <atalk/logger.h>
 
 #ifndef SIGNAL_CAST

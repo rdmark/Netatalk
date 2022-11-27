@@ -7,17 +7,18 @@
 
 #include "config.h"
 
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/param.h>
-#include <sys/un.h>
-#include <sys/select.h>
+#include "db_param.h"
+
 #include <atalk/logger.h>
 
-#include "db_param.h"
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/param.h>
+#include <sys/select.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 #define DB_PARAM_FN       "db_param"
 #define MAXKEYLEN         64

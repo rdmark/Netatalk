@@ -6,10 +6,10 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <string.h>
 #include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
 
 #include <atalk/dsi.h>
 

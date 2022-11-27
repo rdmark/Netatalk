@@ -31,20 +31,19 @@
 #include <unistd.h>
 #undef __USE_GNU
 
-#include <stdlib.h>
-#include <sys/param.h>
 #include <errno.h>
-#include <string.h>
 #include <signal.h>
-#include <sys/types.h>
-#include <sys/time.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/param.h>
 #include <sys/resource.h>
-#include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/un.h>
-// #define _XPG4_2 1
-#include <sys/socket.h>
+#include <sys/wait.h>
 #include <stdio.h>
+#include <sys/socket.h>
 #include <time.h>
 
 #ifndef WEXITSTATUS
@@ -65,32 +64,23 @@
 #endif
 
 /* functions for username and group */
-#include <pwd.h>
 #include <grp.h>
+#include <pwd.h>
 
-/* FIXME */
-#ifdef linux
-#ifndef USE_SETRESUID
-#define USE_SETRESUID 1
-#define SWITCH_TO_GID(gid)  ((setresgid(gid,gid,gid) < 0 || setgid(gid) < 0) ? -1 : 0)
-#define SWITCH_TO_UID(uid)  ((setresuid(uid,uid,uid) < 0 || setuid(uid) < 0) ? -1 : 0)
-#endif  /* USE_SETRESUID */
-#else   /* ! linux */
 #ifndef USE_SETEUID
 #define USE_SETEUID 1
-#define SWITCH_TO_GID(gid)  ((setegid(gid) < 0 || setgid(gid) < 0) ? -1 : 0)
-#define SWITCH_TO_UID(uid)  ((setuid(uid) < 0 || seteuid(uid) < 0 || setuid(uid) < 0) ? -1 : 0)
-#endif  /* USE_SETEUID */
-#endif  /* linux */
+#define SWITCH_TO_GID(gid) ((setegid(gid) < 0 || setgid(gid) < 0) ? -1 : 0)
+#define SWITCH_TO_UID(uid) ((setuid(uid) < 0 || seteuid(uid) < 0 || setuid(uid) < 0) ? -1 : 0)
+#endif /* USE_SETEUID */
 
-#include <atalk/util.h>
-#include <atalk/logger.h>
-#include <atalk/cnid_bdb_private.h>
-#include <atalk/paths.h>
-#include <atalk/errchk.h>
-#include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
+#include <atalk/bstrlib.h>
+#include <atalk/cnid_bdb_private.h>
+#include <atalk/errchk.h>
+#include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
+#include <atalk/paths.h>
+#include <atalk/util.h>
 #include <atalk/volume.h>
 
 #include "usockfd.h"

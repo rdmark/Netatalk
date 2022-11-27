@@ -17,9 +17,9 @@
  * $Name:  $
  */
 #define NDEBUG
-#include <stdlib.h>
-#include <stddef.h>
 #include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 #define HASH_IMPLEMENTATION
 #include "hash.h"
@@ -901,9 +901,9 @@ static hash_val_t hash_fun2(const void *key)
     return hash;
 }
 
-#include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 typedef char input_t[256];
 

@@ -54,14 +54,11 @@
  * forgets to setup logging before calling LOG.
  */
 
+#include "config.h"
 
 #include <limits.h>
-#include <stdio.h>
 #include <stdbool.h>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <stdio.h>
 
 /* logger is used by pam modules */
 #ifndef UAM_MODULE_EXPORT

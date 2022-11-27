@@ -14,8 +14,8 @@
 
 #include "config.h"
 
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include <atalk/logger.h>
 

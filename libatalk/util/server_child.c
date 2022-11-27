@@ -14,20 +14,20 @@
 
 #include "config.h"
 
+#include <errno.h>
+#include <pthread.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <signal.h>
-#include <errno.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/time.h>
-#include <pthread.h>
+#include <unistd.h>
 
-#include <atalk/logger.h>
 #include <atalk/errchk.h>
-#include <atalk/util.h>
+#include <atalk/logger.h>
 #include <atalk/server_child.h>
+#include <atalk/util.h>
 
 #ifndef WEXITSTATUS
 #define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)

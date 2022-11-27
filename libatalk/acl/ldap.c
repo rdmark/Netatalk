@@ -16,20 +16,21 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <string.h>
-#include <errno.h>
-#include <ctype.h>
-#define LDAP_DEPRECATED 1
+#include <sys/time.h>
 #include <ldap.h>
 
-#include <atalk/logger.h>
 #include <atalk/afp.h>
 #include <atalk/uuid.h>
 #include <atalk/ldapconfig.h>   /* For struct ldap_pref */
 #include <atalk/errchk.h>
+#include <atalk/ldapconfig.h> /* For struct ldap_pref */
+#include <atalk/logger.h>
+#include <atalk/uuid.h>
 
 #if defined(__has_warning)
 #if __has_warning("-Wdeprecated-declarations")

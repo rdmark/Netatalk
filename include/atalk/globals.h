@@ -6,16 +6,16 @@
 #ifndef AFPD_GLOBALS_H
 #define AFPD_GLOBALS_H 1
 
-#include <sys/param.h>
 #include <grp.h>
-#include <sys/types.h>
-#include <stdbool.h>
 #include <netdb.h>
+#include <stdbool.h>
+#include <sys/param.h>
+#include <sys/types.h>
 
 #include <atalk/afp.h>
-#include <atalk/unicode.h>
-#include <atalk/uam.h>
 #include <atalk/iniparser.h>
+#include <atalk/uam.h>
+#include <atalk/unicode.h>
 /* List of empty dtrace macros */
 #define AFP_AFPFUNC_START(a,b)
 #define AFP_AFPFUNC_DONE(a, b)

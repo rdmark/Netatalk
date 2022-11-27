@@ -17,9 +17,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <atalk/unicode.h>
 #include <iconv.h>
+
 #include <atalk/byteorder.h>
+#include <atalk/unicode.h>
+
 
 #define CJK_PUSH_BUFFER 4
 #define CJK_PULL_BUFFER 8

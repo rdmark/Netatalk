@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ ! -d /tmp/AFPtestvolume ] ; then
     mkdir -p /tmp/AFPtestvolume
     if [ $? -ne 0 ] ; then

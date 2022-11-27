@@ -5,8 +5,8 @@
 
 #include "config.h"
 
-#include <stdio.h>
 #include <arpa/inet.h>
+#include <stdio.h>
 
 #include <atalk/dsi.h>
 #include <atalk/logger.h>

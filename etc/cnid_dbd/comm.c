@@ -5,39 +5,36 @@
  * All Rights Reserved.  See COPYING.
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include <atalk/standards.h>
 
+#include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <unistd.h>
 #include <sys/param.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/uio.h>
-#include <sys/socket.h>
 #include <sys/select.h>
-#include <assert.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/uio.h>
 #include <time.h>
+#include <unistd.h>
 
+#include <atalk/bstradd.h>
+#include <atalk/cnid_bdb_private.h>
 #include <atalk/logger.h>
 #include <atalk/util.h>
-#include <atalk/cnid_bdb_private.h>
 
 #include "db_param.h"
-#include "usockfd.h"
 #include "comm.h"
 
 /* Length of the space taken up by a padded control message of length len */
 #ifndef CMSG_SPACE
 #define CMSG_SPACE(len) (__CMSG_ALIGN(sizeof(struct cmsghdr)) + __CMSG_ALIGN(len))
 #endif
-
 
 struct connection {
     time_t tm;                    /* When respawned last */

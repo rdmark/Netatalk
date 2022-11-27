@@ -2,14 +2,13 @@
  *  Interface to the cnid_dbd daemon that stores/retrieves CNIDs from a database.
  */
 
-
 #ifndef _ATALK_CNID_DBD_PRIVATE_H
 #define _ATALK_CNID_DBD_PRIVATE_H 1
 
-#include <sys/stat.h>
-#include <atalk/adouble.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 
+#include <atalk/adouble.h>
 #include <atalk/cnid_private.h>
 
 #define CNID_DBD_OP_OPEN        0x01

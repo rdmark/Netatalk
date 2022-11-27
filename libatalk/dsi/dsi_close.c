@@ -6,9 +6,9 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <arpa/inet.h>
 
 #include <atalk/dsi.h>
 

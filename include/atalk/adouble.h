@@ -29,23 +29,18 @@
 #ifndef _ATALK_ADOUBLE_H
 #define _ATALK_ADOUBLE_H
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
-#include <atalk/standards.h>
-
-#include <inttypes.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <fcntl.h>
-
+#include <inttypes.h>
 #include <sys/mman.h>
-
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <atalk/bstrlib.h>
+#include <atalk/standards.h>
 
 /* version info */
 #define AD_VERSION2     0x00020000

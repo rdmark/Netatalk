@@ -54,8 +54,11 @@
 #define CNID_DBD_DBIF_H 1
 
 #include <db.h>
+
 #include <atalk/adouble.h>
+
 #include "db_param.h"
+
 
 #define DBIF_DB_CNT 4
  

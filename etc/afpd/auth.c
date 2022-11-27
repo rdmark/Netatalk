@@ -5,37 +5,36 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
+#include <ctype.h>
+#include <errno.h>
+#include <grp.h>
+#include <limits.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
+#include <string.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#include <arpa/inet.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
 
 #include <atalk/afp.h>
-#include <atalk/util.h>
-#include <limits.h>
-#include <string.h>
-#include <ctype.h>
-#include <time.h>
-#include <pwd.h>
-#include <grp.h>
-
+#include <atalk/fce_api.h>
+#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/server_ipc.h>
-#include <atalk/uuid.h>
-#include <atalk/globals.h>
-#include <atalk/fce_api.h>
+#include <atalk/util.h>
 #include <atalk/unix.h>
+#include <atalk/uuid.h>
 
 #include "auth.h"
-#include "uam_auth.h"
-#include "switch.h"
-#include "status.h"
-#include "fork.h"
 #include "extattrs.h"
+#include "fork.h"
+#include "status.h"
+#include "switch.h"
+#include "uam_auth.h"
 
 static int afp_version_index;
 static struct uam_mod uam_modules = {NULL, NULL, &uam_modules, &uam_modules};

@@ -33,8 +33,8 @@
 extern "C" {
 #endif
 
-#include <sys/types.h>
 #include <signal.h>
+#include <sys/types.h>
 
 /* flags to tdb_store() */
 #define TDB_REPLACE 1		/* Unused */

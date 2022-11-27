@@ -8,33 +8,27 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <signal.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <netdb.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <stdint.h>
-
 #include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/tcp.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-#include <signal.h>
-#include <atalk/logger.h>
-
-#ifdef __svr4__
-#include <sys/sockio.h>
-#endif /* __svr4__ */
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <atalk/dsi.h>
-#include <atalk/util.h>
 #include <atalk/errchk.h>
+#include <atalk/logger.h>
+#include <atalk/util.h>
 
 #define min(a,b)  ((a) < (b) ? (a) : (b))
 

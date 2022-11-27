@@ -8,23 +8,23 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <arpa/inet.h>
 
-#include <atalk/logger.h>
 #include <atalk/afp.h>
+#include <atalk/globals.h>
+#include <atalk/logger.h>
 #include <atalk/uam.h>
 #include <atalk/util.h>
-#include <atalk/globals.h>
 
-#include <gssapi/gssapi.h>
 #include <gssapi.h>
+#include <gssapi/gssapi.h>
 
-#include <krb5/krb5.h>
 #include <krb5.h>
+#include <krb5/krb5.h>
 
 #if defined(__has_warning)
 #  if __has_warning("-Wdeprecated-declarations")

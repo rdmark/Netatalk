@@ -10,14 +10,10 @@
 #include <config.h>
 #endif
 
-#include <sys/types.h>
 #include <inttypes.h>
+#include <sys/types.h>
 
 #include <atalk/lockrpc.gen.h>
-
-#include "event2/event.h"
-#include "event2/http.h"
-#include "event2/rpc.h"
 
 struct adouble;
 extern int rpc_init(const char *addr, unsigned short port);

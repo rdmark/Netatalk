@@ -14,39 +14,39 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
+#include <ctype.h>
+#include <errno.h>
+#include <grp.h>
+#include <inttypes.h>
+#include <langinfo.h>
+#include <locale.h>
+#include <netinet/in.h>
+#include <pwd.h>
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <pwd.h>
-#include <grp.h>
-#include <utime.h>
-#include <errno.h>
 #include <string.h>
 #include <sys/file.h>
 #include <sys/param.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <inttypes.h>
 #include <time.h>
-#include <regex.h>
-#include <locale.h>
-#include <langinfo.h>
+#include <utime.h>
 
 #include <atalk/afp.h>
-#include <atalk/util.h>
-#include <atalk/logger.h>
-#include <atalk/ea.h>
-#include <atalk/globals.h>
-#include <atalk/errchk.h>
-#include <atalk/iniparser.h>
-#include <atalk/unix.h>
+#include <atalk/bstradd.h>
+#include <atalk/bstrlib.h>
 #include <atalk/cnid.h>
 #include <atalk/dsi.h>
-#include <atalk/uuid.h>
+#include <atalk/ea.h>
+#include <atalk/errchk.h>
+#include <atalk/globals.h>
+#include <atalk/iniparser.h>
+#include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
-#include <atalk/bstrlib.h>
-#include <atalk/bstradd.h>
+#include <atalk/unix.h>
+#include <atalk/util.h>
+#include <atalk/uuid.h>
 
 #define VOLPASSLEN  8
 #ifndef UUID_PRINTABLE_STRING_LENGTH

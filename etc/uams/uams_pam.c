@@ -7,21 +7,17 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
+#include <security/pam_appl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <security/pam_appl.h>
-
-#ifdef HAVE_PAM_PAM_APPL_H
-#include <pam/pam_appl.h>
-#endif
-#include <arpa/inet.h>
+#include <unistd.h>
 
 #include <atalk/afp.h>
+#include <atalk/logger.h>
 #include <atalk/uam.h>
 #include <atalk/util.h>
-#include <atalk/logger.h>
 
 #define PASSWDLEN 8
 
@@ -50,7 +46,7 @@ static int PAM_conv (int num_msg,
 #ifdef LINUX
                      const struct pam_message **msg,
 #else
-                     struct pam_message **msg,
+                    struct pam_message **msg,
 #endif
                      struct pam_response **resp,
                      void *appdata_ptr _U_)

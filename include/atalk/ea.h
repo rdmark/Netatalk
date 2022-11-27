@@ -15,17 +15,15 @@
 #ifndef ATALK_EA_H
 #define ATALK_EA_H
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include <sys/xattr.h>
+
+#include <atalk/vfs.h>
 
 #ifndef ENOATTR
 #define ENOATTR ENODATA
 #endif
-
-#include <atalk/vfs.h>
 
 /*
  * This seems to be the current limit fo HFS+, we arbitrarily force that

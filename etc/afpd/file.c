@@ -5,34 +5,33 @@
 
 #include "config.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-#include <utime.h>
-#include <errno.h>
 #include <sys/param.h>
+#include <utime.h>
 
 #include <atalk/adouble.h>
-#include <atalk/vfs.h>
-#include <atalk/logger.h>
 #include <atalk/afp.h>
-#include <atalk/util.h>
 #include <atalk/cnid.h>
-#include <atalk/unix.h>
-#include <atalk/globals.h>
-#include <atalk/fce_api.h>
-#include <atalk/netatalk_conf.h>
 #include <atalk/dsi.h>
+#include <atalk/fce_api.h>
+#include <atalk/globals.h>
+#include <atalk/logger.h>
+#include <atalk/netatalk_conf.h>
+#include <atalk/unix.h>
+#include <atalk/util.h>
+#include <atalk/vfs.h>
 
-#include "directory.h"
-#include "dircache.h"
 #include "desktop.h"
-#include "volume.h"
-#include "fork.h"
+#include "dircache.h"
+#include "directory.h"
 #include "file.h"
 #include "filedir.h"
+#include "fork.h"
 #include "unix.h"
+#include "volume.h"
 
 /* the format for the finderinfo fields (from IM: Toolbox Essentials):
  * field         bytes        subfield    bytes

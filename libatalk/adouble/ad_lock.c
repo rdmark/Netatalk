@@ -14,15 +14,15 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <atalk/adouble.h>
-#include <atalk/logger.h>
 #include <atalk/errchk.h>
+#include <atalk/logger.h>
 #include <atalk/util.h>
 
 #include "ad_lock.h"

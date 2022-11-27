@@ -27,22 +27,19 @@
    Samba 3.0.28, modified for netatalk.
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <errno.h>
-
 #include <sys/xattr.h>
 
 #include <atalk/adouble.h>
-#include <atalk/util.h>
-#include <atalk/logger.h>
 #include <atalk/ea.h>
 #include <atalk/errchk.h>
+#include <atalk/logger.h>
+#include <atalk/util.h>
 
 /**************************************************************************
  Wrappers for extented attribute calls. Based on the Linux package with

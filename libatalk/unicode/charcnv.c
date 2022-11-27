@@ -19,26 +19,25 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 */
+
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+#include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
-#include <sys/stat.h>
-#include <sys/param.h>
 #include <iconv.h>
-#include <arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/param.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+#include <atalk/byteorder.h>
 #include <atalk/logger.h>
 #include <atalk/unicode.h>
 #include <atalk/util.h>
-#include <atalk/byteorder.h>
-
 
 /**
  * @file

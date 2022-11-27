@@ -25,14 +25,14 @@
 */
 
 #include "config.h"
+#include <arpa/inet.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <arpa/inet.h>
 
-#include <atalk/unicode.h>
-#include <atalk/logger.h>
 #include <atalk/byteorder.h>
+#include <atalk/logger.h>
+#include <atalk/unicode.h>
 
 #include "mac_hebrew.h"
 

@@ -108,20 +108,19 @@ to be safe we must assign new CNIDs to both files.
 
 #include "config.h"
 
-
+#include <arpa/inet.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>
-#include <errno.h>
-#include <arpa/inet.h>
 
-#include <atalk/logger.h>
-#include <atalk/cnid_bdb_private.h>
 #include <atalk/cnid.h>
+#include <atalk/cnid_bdb_private.h>
+#include <atalk/logger.h>
 
-#include "pack.h"
-#include "dbif.h"
 #include "dbd.h"
+#include "dbif.h"
+#include "pack.h"
 
 /*
  *  This returns the CNID corresponding to a particular file.  It will also fix

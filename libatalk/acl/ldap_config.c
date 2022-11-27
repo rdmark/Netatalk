@@ -16,17 +16,17 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <ctype.h>
+#include <errno.h>
+#include <ldap.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
-#include <ctype.h>
-#include <ldap.h>
 
 #include <atalk/globals.h>
+#include <atalk/iniparser.h>
 #include <atalk/ldapconfig.h>
 #include <atalk/logger.h>
-#include <atalk/iniparser.h>
 
 void acl_ldap_freeconfig(void)
 {

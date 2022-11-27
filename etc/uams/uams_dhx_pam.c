@@ -7,24 +7,24 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <atalk/logger.h>
-
-#include <unistd.h>
-#include <errno.h>
 #include <security/pam_appl.h>
-#include <arpa/inet.h>
+#include <unistd.h>
 
 #include <openssl/bn.h>
-#include <openssl/dh.h>
 #include <openssl/cast.h>
+#include <openssl/dh.h>
 #include <openssl/err.h>
-#include "openssl_compat.h"
 
 #include <atalk/afp.h>
+#include <atalk/logger.h>
 #include <atalk/uam.h>
+
+#include "openssl_compat.h"
 
 #define KEYSIZE 16
 #define PASSWDLEN 64

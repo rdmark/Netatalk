@@ -14,24 +14,24 @@
 
 #include "config.h"
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <string.h>
 #include <errno.h>
+#include <limits.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
+#include "ad.h"
 #include <atalk/adouble.h>
+#include <atalk/bstradd.h>
+#include <atalk/bstrlib.h>
 #include <atalk/cnid.h>
 #include <atalk/cnid_bdb_private.h>
-#include <atalk/bstrlib.h>
-#include <atalk/bstradd.h>
 #include <atalk/directory.h>
-#include <atalk/util.h>
 #include <atalk/unicode.h>
-#include "ad.h"
+#include <atalk/util.h>
 
 static volatile sig_atomic_t alarmed;
 

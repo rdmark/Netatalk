@@ -6,20 +6,19 @@
 
 #include "config.h"
 
+#include <errno.h>
+#include <security/pam_appl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <atalk/logger.h>
-
 #include <unistd.h>
-#include <errno.h>
-#include <security/pam_appl.h>
 
 #include <gcrypt.h>
 
 #include <atalk/afp.h>
-#include <atalk/uam.h>
 #include <atalk/globals.h>
+#include <atalk/logger.h>
+#include <atalk/uam.h>
 
 /* Number of bits for p which we generate. Everybode out there uses 512, so we beet them */
 #define PRIMEBITS 1024
@@ -126,7 +125,7 @@ static int PAM_conv (int num_msg,
 #ifdef LINUX
                      const struct pam_message **msg,
 #else
-                     struct pam_message **msg,
+                    struct pam_message **msg,
 #endif
                      struct pam_response **resp,
                      void *appdata_ptr _U_) {

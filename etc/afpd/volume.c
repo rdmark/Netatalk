@@ -5,41 +5,40 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
+#include <ctype.h>
+#include <errno.h>
+#include <grp.h>
+#include <inttypes.h>
+#include <netinet/in.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <pwd.h>
-#include <grp.h>
-#include <utime.h>
-#include <errno.h>
 #include <string.h>
 #include <sys/param.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <inttypes.h>
 #include <time.h>
+#include <utime.h>
 
-#include <atalk/dsi.h>
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
-#include <atalk/util.h>
-#include <atalk/logger.h>
-#include <atalk/vfs.h>
-#include <atalk/uuid.h>
-#include <atalk/ea.h>
-#include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
+#include <atalk/bstrlib.h>
+#include <atalk/dsi.h>
+#include <atalk/ea.h>
+#include <atalk/errchk.h>
+#include <atalk/fce_api.h>
 #include <atalk/ftw.h>
 #include <atalk/globals.h>
-#include <atalk/fce_api.h>
-#include <atalk/errchk.h>
 #include <atalk/iniparser.h>
-#include <atalk/unix.h>
+#include <atalk/ldapconfig.h>
+#include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
 #include <atalk/server_ipc.h>
-
-#include <atalk/ldapconfig.h>
+#include <atalk/unix.h>
+#include <atalk/util.h>
+#include <atalk/uuid.h>
+#include <atalk/vfs.h>
 
 #ifdef CNID_DB
 #include <atalk/cnid.h>
@@ -47,11 +46,11 @@
 
 #include "directory.h"
 #include "file.h"
-#include "volume.h"
-#include "unix.h"
-#include "mangle.h"
 #include "fork.h"
 #include "hash.h"
+#include "mangle.h"
+#include "unix.h"
+#include "volume.h"
 
 #define VOLPASSLEN  8
 

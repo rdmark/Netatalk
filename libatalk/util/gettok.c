@@ -6,10 +6,10 @@
 
 #include "config.h"
 
-#include <sys/param.h>
-#include <string.h>
 #include <ctype.h>
 #include <pwd.h>
+#include <string.h>
+#include <sys/param.h>
 
 #include <atalk/globals.h>
 

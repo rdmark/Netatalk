@@ -6,16 +6,16 @@
 
 #include "config.h"
 
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
-#include <arpa/inet.h>
 
-#include <atalk/logger.h>
 #include <atalk/cnid_bdb_private.h>
+#include <atalk/logger.h>
 
-#include "pack.h"
-#include "dbif.h"
 #include "dbd.h"
+#include "dbif.h"
+#include "pack.h"
 
 
 /* rebuild_add: Enter all fields (including the CNID) into the database and

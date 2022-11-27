@@ -14,33 +14,33 @@
 
 #include "config.h"
 
+#include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include <sys/param.h>
-#include <sys/uio.h>
-#include <sys/time.h>
-#include <sys/socket.h>
 #include <sys/poll.h>
-#include <errno.h>
-#include <sys/wait.h>
 #include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/uio.h>
+#include <sys/wait.h>
 
-#include <atalk/logger.h>
+#include "afp_zeroconf.h"
 #include <atalk/adouble.h>
-#include <atalk/dsi.h>
 #include <atalk/afp.h>
-#include <atalk/paths.h>
-#include <atalk/util.h>
-#include <atalk/server_child.h>
-#include <atalk/server_ipc.h>
+#include <atalk/bstradd.h>
+#include <atalk/bstrlib.h>
+#include <atalk/dsi.h>
 #include <atalk/errchk.h>
 #include <atalk/globals.h>
+#include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
-#include <atalk/bstrlib.h>
-#include <atalk/bstradd.h>
-#include "afp_zeroconf.h"
+#include <atalk/paths.h>
+#include <atalk/server_child.h>
+#include <atalk/server_ipc.h>
+#include <atalk/util.h>
 
 #include <event2/event.h>
 

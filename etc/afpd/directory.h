@@ -24,15 +24,9 @@
 #ifndef AFPD_DIRECTORY_H
 #define AFPD_DIRECTORY_H 1
 
-#include <sys/types.h>
 #include <arpa/inet.h>
 #include <dirent.h>
-
-/* sys/types.h usually snarfs in major/minor macros. if they don't
- * try this file. */
-#ifndef major
-#include <sys/sysmacros.h>
-#endif
+#include <sys/types.h>
 
 #include <atalk/directory.h>
 #include <atalk/globals.h>

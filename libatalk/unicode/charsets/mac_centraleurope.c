@@ -25,13 +25,14 @@
 */
 
 #include "config.h"
-#include <stdlib.h>
+
 #include <arpa/inet.h>
+#include <stdlib.h>
 
 #include <atalk/unicode.h>
 
-#include "mac_centraleurope.h"
 #include "generic_mb.h"
+#include "mac_centraleurope.h"
 
 static size_t   mac_centraleurope_pull(void *,char **, size_t *, char **, size_t *);
 static size_t   mac_centraleurope_push(void *,char **, size_t *, char **, size_t *);

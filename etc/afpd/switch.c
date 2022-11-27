@@ -25,22 +25,22 @@
 
 #include <stdio.h>  /* to pick up NULL */
 #include <sys/stat.h> /* works around a bug */
-#include <atalk/logger.h>
 
 #include <atalk/afp.h>
-#include <atalk/uam.h>
 #include <atalk/globals.h>
+#include <atalk/logger.h>
+#include <atalk/uam.h>
 
 /* grab the FP functions */
 #include "auth.h" 
 #include "desktop.h"
-#include "switch.h"
-#include "fork.h"
-#include "file.h"
 #include "directory.h"
+#include "file.h"
 #include "filedir.h"
-#include "status.h"
+#include "fork.h"
 #include "misc.h"
+#include "status.h"
+#include "switch.h"
 
 static int afp_null(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,  size_t *rbuflen)
 {

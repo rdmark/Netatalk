@@ -34,9 +34,9 @@
 #include <search.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
 #include <sys/param.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <atalk/ftw.h>
 
