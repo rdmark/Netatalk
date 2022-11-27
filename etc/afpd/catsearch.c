@@ -29,13 +29,10 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <netinet/in.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -47,17 +44,13 @@
 #include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
-#include <atalk/unicode.h>
 #include <atalk/util.h>
 
 #include "desktop.h"
 #include "dircache.h"
 #include "directory.h"
 #include "file.h"
-#include "filedir.h"
 #include "fork.h"
-#include "volume.h"
-
 
 struct finderinfo {
 	uint32_t f_type;

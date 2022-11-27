@@ -7,7 +7,6 @@
 #include "config.h"
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <string.h>
 
 #include <atalk/cnid_bdb_private.h>
@@ -16,8 +15,6 @@
 #include "dbd.h"
 
 #include "dbif.h"
-#include "pack.h"
-
 
 /* Return the did/name pair corresponding to a CNID. */
 

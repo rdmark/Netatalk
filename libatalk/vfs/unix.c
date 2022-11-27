@@ -8,9 +8,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <atalk/acl.h>
@@ -21,7 +19,6 @@
 #include <atalk/logger.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/volume.h>
 
 /* ------------------------- */
 int dir_rx_set(mode_t mode)

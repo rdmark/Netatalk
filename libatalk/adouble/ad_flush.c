@@ -22,17 +22,11 @@
  *  netatalk@itd.umich.edu
  */
 
-#include <config.h>
-
-#include <arpa/inet.h>
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <atalk/adouble.h>
-#include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/ea.h>
 #include <atalk/errchk.h>
 #include <atalk/logger.h>

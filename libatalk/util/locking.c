@@ -19,9 +19,9 @@
 
 #include "config.h"
 
-#include <atalk/util.h>
 #include <fcntl.h>
-#include <unistd.h>
+
+#include <atalk/util.h>
 
 /*!
  * @def read_lock(fd, offset, whence, len)

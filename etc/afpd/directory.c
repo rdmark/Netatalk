@@ -5,13 +5,11 @@
 
 #include "config.h"
 
-#include <assert.h>
 #include <errno.h>
 #include <grp.h>
 #include <pwd.h>
 #include <signal.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
@@ -21,17 +19,13 @@
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
 #include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/cnid.h>
 #include <atalk/errchk.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/uuid.h>
-#include <atalk/vfs.h>
 
 #include "desktop.h"
 #include "dircache.h"

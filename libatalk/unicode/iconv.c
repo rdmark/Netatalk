@@ -26,21 +26,15 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
-#include <ctype.h>
 #include <errno.h>
 #include <iconv.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 #include <atalk/byteorder.h>
 #include <atalk/logger.h>
 #include <atalk/unicode.h>
-
 
 /**
  * @file

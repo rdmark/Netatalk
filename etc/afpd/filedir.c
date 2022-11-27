@@ -6,25 +6,20 @@
 #include "config.h"
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
 
-#include <atalk/acl.h>
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
 #include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/cnid.h>
 #include <atalk/errchk.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/vfs.h>
 
 #include "desktop.h"
 #include "dircache.h"
@@ -32,7 +27,6 @@
 #include "file.h"
 #include "filedir.h"
 #include "fork.h"
-#include "unix.h"
 #include "volume.h"
 
 int afp_getfildirparams(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)

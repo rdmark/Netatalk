@@ -26,7 +26,6 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
 #include <stdlib.h> /* for size_t */
 
 #include <atalk/unicode.h>

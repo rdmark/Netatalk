@@ -5,8 +5,6 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
-#include <ctype.h>
 #include <errno.h>
 #include <grp.h>
 #include <limits.h>
@@ -16,18 +14,15 @@
 #include <string.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
 #include <atalk/afp.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/server_ipc.h>
 #include <atalk/util.h>
 #include <atalk/unix.h>
-#include <atalk/uuid.h>
 
 #include "auth.h"
 #include "extattrs.h"

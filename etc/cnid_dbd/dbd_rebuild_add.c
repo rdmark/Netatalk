@@ -7,7 +7,6 @@
 #include "config.h"
 
 #include <arpa/inet.h>
-#include <stdio.h>
 #include <string.h>
 
 #include <atalk/cnid_bdb_private.h>

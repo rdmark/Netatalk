@@ -12,27 +12,18 @@
   GNU General Public License for more details.
 */
 
-#include "config.h"
-
-#include <arpa/inet.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-#include <atalk/adouble.h>
 #include <atalk/afp.h>
 #include <atalk/ea.h>
 #include <atalk/logger.h>
-#include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/vfs.h>
-#include <atalk/volume.h>
 
 /**********************************************************************************
  * EA VFS funcs for storing EAs in nativa filesystem EAs

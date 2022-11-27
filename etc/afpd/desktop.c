@@ -9,23 +9,19 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
 #include <ctype.h>
 
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>
-#include <sys/socket.h>
 #include <sys/uio.h>
 
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
 #include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/dsi.h>
 #include <atalk/errchk.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
 #include <atalk/unix.h>
@@ -35,7 +31,6 @@
 #include "directory.h"
 #include "fork.h"
 #include "mangle.h"
-#include "volume.h"
 
 #define EXEC_MODE (S_IXGRP | S_IXUSR | S_IXOTH)
 

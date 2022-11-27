@@ -14,13 +14,10 @@
 
 #include "config.h"
 
-#include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include <atalk/afp.h>
 #include <atalk/logger.h>
 #include <atalk/uuid.h>
 

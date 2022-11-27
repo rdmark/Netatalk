@@ -13,10 +13,8 @@
 
 #include <atalk/afp.h>
 #include <atalk/dsi.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/unix.h>
-#include <atalk/util.h>
 
 #include "misc.h"
 

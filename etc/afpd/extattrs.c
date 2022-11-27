@@ -17,22 +17,16 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
 #include <atalk/ea.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
-#include <atalk/util.h>
-#include <atalk/vfs.h>
 
-#include "desktop.h"
 #include "directory.h"
 #include "extattrs.h"
 #include "fork.h"
-#include "volume.h"
 
 static const char *ea_finderinfo = "com.apple.FinderInfo";
 static const char *ea_resourcefork = "com.apple.ResourceFork";

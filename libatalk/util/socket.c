@@ -17,8 +17,6 @@
  * Netatalk utility functions
  */
 
-#include "config.h"
-
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -28,14 +26,12 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <sys/uio.h>
 #include <time.h>
 #include <unistd.h>
 
 #include <atalk/errchk.h>
 #include <atalk/logger.h>
-#include <atalk/standards.h>
 #include <atalk/util.h>
 
 static char ipv4mapprefix[] = {0,0,0,0,0,0,0,0,0,0,0xff,0xff};

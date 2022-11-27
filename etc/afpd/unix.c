@@ -7,11 +7,8 @@
 
 #include <errno.h>
 #include <inttypes.h>
-#include <limits.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 
 #include <atalk/acl.h>
 #include <atalk/adouble.h>
@@ -21,7 +18,6 @@
 #include <atalk/util.h>
 #include <atalk/vfs.h>
 
-#include "auth.h"
 #include "directory.h"
 #include "fork.h"
 #include "unix.h"

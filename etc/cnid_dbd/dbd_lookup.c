@@ -109,10 +109,7 @@ to be safe we must assign new CNIDs to both files.
 #include "config.h"
 
 #include <arpa/inet.h>
-#include <errno.h>
-#include <stdio.h>
 #include <string.h>
-#include <sys/param.h>
 
 #include <atalk/cnid.h>
 #include <atalk/cnid_bdb_private.h>

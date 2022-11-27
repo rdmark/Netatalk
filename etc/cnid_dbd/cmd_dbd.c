@@ -15,14 +15,12 @@
 #include "config.h"
 
 #include <errno.h>
-#include <limits.h>
 #include <pwd.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <atalk/errchk.h>

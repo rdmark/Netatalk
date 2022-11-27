@@ -18,7 +18,6 @@
 #include <sys/param.h>
 #include <sys/select.h>
 #include <sys/un.h>
-#include <unistd.h>
 
 #define DB_PARAM_FN       "db_param"
 #define MAXKEYLEN         64

@@ -23,16 +23,14 @@
 
 #include "config.h"
 
-#include <stdio.h>  /* to pick up NULL */
-#include <sys/stat.h> /* works around a bug */
+#include <stdio.h>    /* to pick up NULL */
 
 #include <atalk/afp.h>
 #include <atalk/globals.h>
 #include <atalk/logger.h>
-#include <atalk/uam.h>
 
 /* grab the FP functions */
-#include "auth.h" 
+#include "auth.h"
 #include "desktop.h"
 #include "directory.h"
 #include "file.h"

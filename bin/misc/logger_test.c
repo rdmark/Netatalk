@@ -14,9 +14,6 @@
 
 #include "config.h"
 
-#include <stdbool.h>
-#include <stdio.h>
-
 #include <atalk/logger.h>
 
 int main(int argc _U_, char *argv[] _U_)

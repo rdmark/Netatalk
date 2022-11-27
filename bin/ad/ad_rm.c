@@ -15,24 +15,17 @@
 #include "config.h"
 
 #include <errno.h>
-#include <limits.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <atalk/adouble.h>
-#include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/ftw.h>
-#include <atalk/queue.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/vfs.h>
-#include <atalk/volume.h>
 
 #include "ad.h"
 

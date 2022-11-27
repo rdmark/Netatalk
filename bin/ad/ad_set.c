@@ -14,24 +14,18 @@
 
 #include "config.h"
 
-#include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
-#include <limits.h>
-#include <pwd.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
-#include "ad.h"
 #include <atalk/adouble.h>
 #include <atalk/cnid.h>
+
+#include "ad.h"
 
 #define ADv2_DIRNAME ".AppleDouble"
 

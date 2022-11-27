@@ -6,15 +6,8 @@
 
 #include "config.h"
 
-#include <ctype.h>
-#include <pwd.h>
-#include <string.h>
-#include <sys/param.h>
-
-#include <atalk/globals.h>
-
-static char	*l_curr;
-static char	*l_end;
+static char *l_curr;
+static char *l_end;
 
 void initline( int len, char *line)
 {

@@ -17,32 +17,24 @@
  * Netatalk utility functions
  */
 
-#include "config.h"
-
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
 #include <atalk/acl.h>
-#include <atalk/adouble.h>
-#include <atalk/afp.h>
-#include <atalk/ea.h>
 #include <atalk/errchk.h>
 #include <atalk/logger.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/vfs.h>
 
 /* close all FDs >= a specified value */
 static void closeall(int fd)

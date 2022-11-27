@@ -8,31 +8,15 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
-#include <ctype.h>
-#include <netinet/in.h>
-#include <grp.h>
-#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-#include <atalk/errchk.h>
-#include <atalk/fce_api.h>
 #include <atalk/globals.h>
-#include <atalk/logger.h>
-#include <atalk/paths.h>
-#include <atalk/util.h>
 
 #include "auth.h"
-#include "dircache.h"
 #include "status.h"
-
-#define LENGTH 512
 
 /*
  * Show version information about afpd.
@@ -58,31 +42,12 @@ static void show_version( void )
 	}
 	puts( "" );
 
-	printf( "         CNID backends:\t" );
-#ifdef CNID_BACKEND_CDB
-	printf( "cdb ");
-#endif
-#ifdef CNID_BACKEND_DB3
-	printf( "db3 " );
-#endif
+    printf("         CNID backends:\t");
 #ifdef CNID_BACKEND_DBD
-#ifdef CNID_BACKEND_DBD_TXN
-	printf( "dbd-txn " );
-#else
-	printf( "dbd " );
-#endif
-#endif
-#ifdef CNID_BACKEND_HASH
-	printf( "hash " );
+    printf("dbd ");
 #endif
 #ifdef CNID_BACKEND_LAST
 	printf( "last " );
-#endif
-#ifdef CNID_BACKEND_MTAB
-	printf( "mtab " );
-#endif
-#ifdef CNID_BACKEND_TDB
-	printf( "tdb " );
 #endif
 #ifdef CNID_BACKEND_MYSQL
 	printf( "mysql " );

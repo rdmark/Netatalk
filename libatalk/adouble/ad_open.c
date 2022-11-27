@@ -31,9 +31,6 @@
  * @sa include/atalk/adouble.h
  */
 
-#include "config.h"
-
-#include <arpa/inet.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -41,14 +38,11 @@
 #include <sys/param.h>
 
 #include <atalk/adouble.h>
-#include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/ea.h>
 #include <atalk/errchk.h>
 #include <atalk/logger.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/volume.h>
 
 #include "ad_lock.h"
 

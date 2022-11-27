@@ -8,7 +8,6 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -18,7 +17,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -27,15 +25,11 @@
 
 #include <atalk/dsi.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
-#include <atalk/paths.h>
 #include <atalk/server_ipc.h>
 #include <atalk/util.h>
-#include <atalk/uuid.h>
 
-#include "auth.h"
 #include "dircache.h"
 #include "fork.h"
 #include "switch.h"

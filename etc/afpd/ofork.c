@@ -6,7 +6,6 @@
 #include "config.h"
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
@@ -14,10 +13,7 @@
 #include <unistd.h>
 
 #include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
-#include <atalk/ea.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/util.h>
 

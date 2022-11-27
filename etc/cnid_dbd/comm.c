@@ -7,23 +7,16 @@
 
 #include "config.h"
 
-#include <atalk/standards.h>
-
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/types.h>
 #include <sys/uio.h>
 #include <time.h>
 #include <unistd.h>
 
-#include <atalk/bstradd.h>
 #include <atalk/cnid_bdb_private.h>
 #include <atalk/logger.h>
 #include <atalk/util.h>

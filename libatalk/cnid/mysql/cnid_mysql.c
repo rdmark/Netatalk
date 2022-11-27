@@ -7,17 +7,10 @@
 
 #undef _FORTIFY_SOURCE
 
-#include <arpa/inet.h>
 #include <errno.h>
-#include <net/if.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
 #include <stdlib.h>
 #include <sys/param.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <sys/uio.h>
 #include <sys/un.h>
 #include <time.h>

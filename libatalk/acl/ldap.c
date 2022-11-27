@@ -24,9 +24,6 @@
 #include <sys/time.h>
 #include <ldap.h>
 
-#include <atalk/afp.h>
-#include <atalk/uuid.h>
-#include <atalk/ldapconfig.h>   /* For struct ldap_pref */
 #include <atalk/errchk.h>
 #include <atalk/ldapconfig.h> /* For struct ldap_pref */
 #include <atalk/logger.h>

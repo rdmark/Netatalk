@@ -6,11 +6,7 @@
 
 #include "config.h"
 
-#include <errno.h>
-#include <fcntl.h>
 #include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
 #include <db.h>
 
 #include <atalk/cnid.h>

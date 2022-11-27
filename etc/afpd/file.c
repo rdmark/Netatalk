@@ -17,12 +17,10 @@
 #include <atalk/cnid.h>
 #include <atalk/dsi.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/vfs.h>
 
 #include "desktop.h"
 #include "dircache.h"

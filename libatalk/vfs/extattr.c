@@ -30,16 +30,10 @@
 #include "config.h"
 
 #include <errno.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/xattr.h>
 
-#include <atalk/adouble.h>
 #include <atalk/ea.h>
-#include <atalk/errchk.h>
-#include <atalk/logger.h>
-#include <atalk/util.h>
 
 /**************************************************************************
  Wrappers for extented attribute calls. Based on the Linux package with

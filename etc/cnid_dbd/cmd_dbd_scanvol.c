@@ -21,18 +21,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-#include <atalk/acl.h>
 #include <atalk/adouble.h>
 #include <atalk/cnid.h>
 #include <atalk/ea.h>
 #include <atalk/errchk.h>
-#include <atalk/netatalk_conf.h>
-#include <atalk/unicode.h>
 #include <atalk/util.h>
-#include <atalk/volume.h>
 
 #include "cmd_dbd.h"
 #include "db_param.h"

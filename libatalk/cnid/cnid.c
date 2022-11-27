@@ -18,13 +18,10 @@
 #include <string.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
 #include <atalk/cnid.h>
-#include <atalk/list.h>
 #include <atalk/logger.h>
 #include <atalk/util.h>
 #include <atalk/volume.h>

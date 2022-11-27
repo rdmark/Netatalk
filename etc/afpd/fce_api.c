@@ -32,12 +32,8 @@
 
 #include "config.h"
 
-#include <stdio.h>
-
-#include <arpa/inet.h>
 #include <errno.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,19 +43,9 @@
 
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
-#include <atalk/cnid.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
-#include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/vfs.h>
-
-#include "desktop.h"
-#include "directory.h"
-#include "file.h"
-#include "fork.h"
-#include "volume.h"
 
 // ONLY USED IN THIS FILE
 #include "fce_api_internal.h"

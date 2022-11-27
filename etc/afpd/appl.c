@@ -16,7 +16,6 @@
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
 #include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
@@ -24,7 +23,6 @@
 #include "desktop.h"
 #include "directory.h"
 #include "file.h"
-#include "volume.h"
 
 static struct savedt	sa = { { 0, 0, 0, 0 }, -1, 0, 0};
 

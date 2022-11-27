@@ -5,32 +5,25 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <unistd.h>
 
-#include <atalk/afp.h>
 #include <atalk/dsi.h>
 #include <atalk/errchk.h>
 #include <atalk/fce_api.h>
-#include <atalk/globals.h>
 #include <atalk/ldapconfig.h>
 #include <atalk/logger.h>
 #include <atalk/netatalk_conf.h>
-#include <atalk/server_child.h>
 #include <atalk/util.h>
 
 #include "afp_config.h"
 #include "status.h"
 #include "uam_auth.h"
-#include "volume.h"
 
 /*!
  * Free and cleanup config and DSI

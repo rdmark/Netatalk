@@ -14,20 +14,15 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
-#include <errno.h>
 #include <grp.h>
 #include <inttypes.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 
-#include <atalk/afp.h>
 #include <atalk/ldapconfig.h>
 #include <atalk/logger.h>
-#include <atalk/util.h>
 #include <atalk/uuid.h>
 
 #include "aclldap.h"

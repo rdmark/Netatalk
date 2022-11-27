@@ -8,12 +8,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 
 #include <atalk/adouble.h>
-#include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
-#include <atalk/ea.h>
 #include <atalk/errchk.h>
 #include <atalk/logger.h>
 #include <atalk/util.h>

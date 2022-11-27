@@ -5,16 +5,11 @@
 
 #include "config.h"
 
-#include <signal.h>
-#include <stdio.h>
 #include <string.h>
-#include <sys/time.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #include <atalk/dsi.h>
 #include <atalk/logger.h>
-#include <atalk/util.h>
 
 /* streaming i/o for afp_read. this is all from the perspective of the
  * client. it basically does the reverse of dsi_write. on first entry,

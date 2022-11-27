@@ -23,15 +23,11 @@
 
 #include "config.h"
 
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 
 #include <atalk/adouble.h>
-#include <atalk/ea.h>
 #include <atalk/logger.h>
-#include <atalk/util.h>
 
 ssize_t adf_pread(struct ad_fd *ad_fd, void *buf, size_t count, off_t offset)
 {

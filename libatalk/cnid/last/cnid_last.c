@@ -8,14 +8,10 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
+#include <stdlib.h>
 #include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 #include <atalk/logger.h>
-#include <atalk/util.h>
-#include <stdlib.h>
 
 #include "cnid_last.h"
 

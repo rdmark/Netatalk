@@ -5,8 +5,6 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
-#include <errno.h>
 #include <string.h>
 
 #include <atalk/cnid_bdb_private.h>
@@ -14,7 +12,6 @@
 
 #include "dbd.h"
 #include "dbif.h"
-#include "pack.h"
 
 int dbd_search(DBD *dbd, struct cnid_dbd_rqst *rqst, struct cnid_dbd_rply *rply)
 {

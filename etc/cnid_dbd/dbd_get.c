@@ -7,7 +7,6 @@
 #include "config.h"
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <string.h>
 #include <sys/param.h>
 
@@ -16,7 +15,6 @@
 
 #include "dbd.h"
 #include "dbif.h"
-#include "pack.h"
 
 /* Return CNID for a given did/name. */
 

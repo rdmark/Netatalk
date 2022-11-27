@@ -6,12 +6,9 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
 #include <ctype.h>
 #include <dlfcn.h>
 #include <fcntl.h>
-#include <netinet/in.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
@@ -22,13 +19,10 @@
 #include <atalk/afp.h>
 #include <atalk/bstrlib.h>
 #include <atalk/dsi.h>
-#include <atalk/globals.h>
 #include <atalk/logger.h>
 #include <atalk/util.h>
 #include <atalk/volume.h>
 
-#include "afp_config.h"
-#include "auth.h"
 #include "uam_auth.h"
 
 /* --- server uam functions -- */

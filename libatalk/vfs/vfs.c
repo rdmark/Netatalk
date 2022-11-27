@@ -15,31 +15,24 @@
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 */
-#include "config.h"
 
 #include <libgen.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <atalk/acl.h>
 #include <atalk/adouble.h>
 #include <atalk/afp.h>
 #include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/directory.h>
 #include <atalk/ea.h>
 #include <atalk/errchk.h>
 #include <atalk/logger.h>
 #include <atalk/unix.h>
 #include <atalk/util.h>
-#include <atalk/vfs.h>
-#include <atalk/volume.h>
 
 struct perm {
     uid_t uid;

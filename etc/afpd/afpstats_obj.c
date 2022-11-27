@@ -15,13 +15,11 @@
 #include "config.h"
 
 #include <pwd.h>
-#include <strings.h>
+
 #include <glib-object.h>
 #include <glib.h>
-#include <glib/gprintf.h>
 
 #include <atalk/dsi.h>
-#include <atalk/logger.h>
 
 #include "afpstats.h"
 #include "afpstats_obj.h"

@@ -25,8 +25,6 @@
 #include <atalk/logger.h>
 #include <atalk/util.h>
 
-#include "ad_lock.h"
-
 static const char *shmdstrfromoff(off_t off)
 {
     switch (off) {

@@ -14,7 +14,6 @@
 
 #include "config.h"
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,12 +21,10 @@
 #include <time.h>
 
 #include <atalk/bstradd.h>
-#include <atalk/bstrlib.h>
 #include <atalk/cnid.h>
 #include <atalk/directory.h>
 #include <atalk/globals.h>
 #include <atalk/logger.h>
-#include <atalk/queue.h>
 #include <atalk/util.h>
 #include <atalk/volume.h>
 

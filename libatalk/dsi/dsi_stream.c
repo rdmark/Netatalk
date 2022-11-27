@@ -13,14 +13,12 @@
 #include "config.h"
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #ifdef HAVE_SENDFILEV
 #include <sys/sendfile.h>
 #endif
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
 
