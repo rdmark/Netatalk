@@ -73,7 +73,7 @@ afp_child_t *server_child_resolve(server_child_t *childs, id_t pid)
     afp_child_t *child;
 
     for (child = childs->servch_table[HASH(pid)]; child; child = child->afpch_next) {
-        if (child->afpch_pid == pid)
+        if (child->afpch_pid == (int)pid)
             break;
     }
 

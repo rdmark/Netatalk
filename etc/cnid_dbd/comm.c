@@ -221,7 +221,7 @@ int comm_rcv(struct cnid_dbd_rqst *rqst, time_t timeout, const sigset_t *sigmask
     }
     rqst->name = nametmp;
     if (rqst->namelen && readt(cur_fd, (char *)rqst->name, rqst->namelen, 1, CNID_DBD_TIMEOUT)
-        != rqst->namelen) {
+        != (long)rqst->namelen) {
         LOG(log_error, logtype_cnid, "error reading message name: %s", strerror(errno));
         invalidate_fd(cur_fd);
         return 0;
@@ -260,7 +260,7 @@ int comm_snd(struct cnid_dbd_rply *rply)
     iov[1].iov_len = rply->namelen;
     towrite = sizeof(struct cnid_dbd_rply) +rply->namelen;
 
-    if (writev(cur_fd, iov, 2) != towrite) {
+    if (writev(cur_fd, iov, 2) != (long)towrite) {
         LOG(log_error, logtype_cnid, "error writing message : %s", strerror(errno));
         invalidate_fd(cur_fd);
         return 0;

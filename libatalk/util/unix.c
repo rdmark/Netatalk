@@ -163,7 +163,7 @@ void become_root(void)
 void unbecome_root(void)
 {
     if (getuid() == 0) {
-        if (saved_uid == -1 || seteuid(saved_uid) < 0)
+        if ((int)saved_uid == -1 || seteuid(saved_uid) < 0)
             AFP_PANIC("Can't seteuid back");
         saved_uid = -1;
     }

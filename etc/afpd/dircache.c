@@ -375,7 +375,7 @@ struct dir *dircache_search_by_name(const struct vol *vol,
     AFP_ASSERT(vol);
     AFP_ASSERT(dir);
     AFP_ASSERT(name);
-    AFP_ASSERT(len == strlen(name));
+    AFP_ASSERT(len == (long)strlen(name));
     AFP_ASSERT(len < 256);
 
     dircache_stat.lookups++;
@@ -564,7 +564,7 @@ int dircache_init(int reqsize)
 
     /* Initialize the main dircache */
     if (reqsize > DEFAULT_MAX_DIRCACHE_SIZE && reqsize < MAX_POSSIBLE_DIRCACHE_SIZE) {
-        while ((dircache_maxsize < MAX_POSSIBLE_DIRCACHE_SIZE) && (dircache_maxsize < reqsize))
+        while ((dircache_maxsize < MAX_POSSIBLE_DIRCACHE_SIZE) && ((int)dircache_maxsize < reqsize))
                dircache_maxsize *= 2;
     }
     if ((dircache = hash_create(dircache_maxsize, hash_comp_vid_did, hash_vid_did)) == NULL)
@@ -674,7 +674,7 @@ void dircache_dump(void)
     fprintf(dump, "       VID     DID    CNID STAT PATH\n");
     fprintf(dump, "====================================================================\n");
 
-    for (i = 1; i <= queue_count; i++) {
+    for (i = 1; i <= (long)queue_count; i++) {
         if (n == index_queue)
             break;
         dir = (struct dir *)n->data;

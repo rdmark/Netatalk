@@ -144,7 +144,7 @@ static struct server *test_usockfn(const char *path)
 {
     int i;
 
-    for (i = 0; i < maxvol; i++) {
+    for (i = 0; i < (int)maxvol; i++) {
         if (srv[i].v_path && STRCMP(path, ==, srv[i].v_path))
             return &srv[i];
     }
@@ -190,14 +190,14 @@ static struct server *test_usockfn(const char *path)
     time(&t);
     if (!up) {
         /* find an empty slot (i < maxvol) or the first free slot (i == maxvol)*/
-        for (i = 0; i <= maxvol && i < MAXVOLS; i++) {
+        for (i = 0; i <= (int)maxvol && i < MAXVOLS; i++) {
             if (srv[i].v_path == NULL) {
                 up = &srv[i];
                 if ((up->v_path = strdup(volpath)) == NULL)
                     return -1;
                 up->tm = t;
                 up->count = 0;
-                if (i == maxvol)
+                if (i == (int)maxvol)
                     maxvol++;
                 break;
             }

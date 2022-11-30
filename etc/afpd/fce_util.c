@@ -143,7 +143,7 @@ bool fce_handle_coalescation(int event, const char *path)
 		}
 
 		/* Detect oldest entry for next new entry */
-		if (oldest_entry_idx == -1 || fh->fce_h_tv.tv_sec < oldest_entry) {
+		if (oldest_entry_idx == -1 || fh->fce_h_tv.tv_sec < (long)oldest_entry) {
 			oldest_entry = fh->fce_h_tv.tv_sec;
 			oldest_entry_idx = i;
 		}

@@ -212,7 +212,7 @@ int copy_ea(const char *ea, int dirfd, const char *src, const char *dst, mode_t 
     EC_INIT;
     int    sfd = -1;
     int    dfd = -1;
-    size_t easize;
+    ssize_t easize;
     char   *eabuf = NULL;
 
     if (dirfd == -1)

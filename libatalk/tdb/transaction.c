@@ -587,7 +587,7 @@ int _tdb_transaction_cancel(struct tdb_context *tdb)
 	tdb->map_size = tdb->transaction->old_map_size;
 
 	/* free all the transaction blocks */
-	for (i=0;i<tdb->transaction->num_blocks;i++) {
+	for (i=0;i<(int)tdb->transaction->num_blocks;i++) {
 		if (tdb->transaction->blocks[i] != NULL) {
 			free(tdb->transaction->blocks[i]);
 		}
@@ -657,7 +657,7 @@ static tdb_len_t tdb_recovery_size(struct tdb_context *tdb)
 	int i;
 
 	recovery_size = sizeof(uint32_t);
-	for (i=0;i<tdb->transaction->num_blocks;i++) {
+	for (i=0;i<(int)tdb->transaction->num_blocks;i++) {
 		if (i * tdb->transaction->block_size >= tdb->transaction->old_map_size) {
 			break;
 		}
@@ -665,7 +665,7 @@ static tdb_len_t tdb_recovery_size(struct tdb_context *tdb)
 			continue;
 		}
 		recovery_size += 2*sizeof(tdb_off_t);
-		if (i == tdb->transaction->num_blocks-1) {
+		if (i == (int)tdb->transaction->num_blocks-1) {
 			recovery_size += tdb->transaction->last_block_size;
 		} else {
 			recovery_size += tdb->transaction->block_size;
@@ -802,7 +802,7 @@ static int transaction_setup_recovery(struct tdb_context *tdb,
 	/* build the recovery data into a single blob to allow us to do a single
 	   large write, which should be more efficient */
 	p = data + sizeof(*rec);
-	for (i=0;i<tdb->transaction->num_blocks;i++) {
+	for (i=0;i<(int)tdb->transaction->num_blocks;i++) {
 		tdb_off_t offset;
 		tdb_len_t length;
 
@@ -812,7 +812,7 @@ static int transaction_setup_recovery(struct tdb_context *tdb,
 
 		offset = i * tdb->transaction->block_size;
 		length = tdb->transaction->block_size;
-		if (i == tdb->transaction->num_blocks-1) {
+		if (i == (int)tdb->transaction->num_blocks-1) {
 			length = tdb->transaction->last_block_size;
 		}
 
@@ -1040,7 +1040,7 @@ int tdb_transaction_commit(struct tdb_context *tdb)
 	methods = tdb->transaction->io_methods;
 
 	/* perform all the writes */
-	for (i=0;i<tdb->transaction->num_blocks;i++) {
+	for (i=0;i<(int)tdb->transaction->num_blocks;i++) {
 		tdb_off_t offset;
 		tdb_len_t length;
 
@@ -1050,7 +1050,7 @@ int tdb_transaction_commit(struct tdb_context *tdb)
 
 		offset = i * tdb->transaction->block_size;
 		length = tdb->transaction->block_size;
-		if (i == tdb->transaction->num_blocks-1) {
+		if (i == (int)tdb->transaction->num_blocks-1) {
 			length = tdb->transaction->last_block_size;
 		}
 

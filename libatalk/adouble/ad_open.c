@@ -490,7 +490,7 @@ static int ad_header_read(const char *path, struct adouble *ad, const struct sta
         return -1;
     }
     if (!ad_getentryoff(ad, ADEID_RFORK)
-        || (ad_getentryoff(ad, ADEID_RFORK) > sizeof(ad->ad_data))
+        || (ad_getentryoff(ad, ADEID_RFORK) > (long)sizeof(ad->ad_data))
         ) {
         LOG(log_error, logtype_ad, "ad_header_read: problem with rfork entry offset.");
         errno = EIO;
@@ -722,7 +722,7 @@ reread:
     }
 
     if (ad_getentryoff(&adosx, ADEID_RFORK) == 0
-        || ad_getentryoff(&adosx, ADEID_RFORK) > sizeof(ad->ad_data)
+        || ad_getentryoff(&adosx, ADEID_RFORK) > (long)sizeof(ad->ad_data)
         || ad_getentryoff(&adosx, ADEID_RFORK) > header_len
         ) {
         LOG(log_error, logtype_ad, "ad_header_read_osx: problem with rfork entry offset.");

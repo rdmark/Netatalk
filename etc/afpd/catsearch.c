@@ -754,7 +754,7 @@ static int catsearch_db(const AFPObj *obj,
         }
     }
 	
-	while (cur_pos < num_matches) {
+	while ((int)cur_pos < num_matches) {
         char *name;
         cnid_t cnid, did;
         char resolvebuf[12 + MAXPATHLEN + 1];

@@ -108,7 +108,7 @@ void uuid_string2bin( const char *uuidstring, unsigned char *uuid) {
 const char *uuid_bin2string(const unsigned char *uuid) {
     static char uuidstring[64];
     const char *uuidmask;
-    int i = 0;
+    unsigned int i = 0;
     unsigned char c;
 
     if (ldap_uuid_string)

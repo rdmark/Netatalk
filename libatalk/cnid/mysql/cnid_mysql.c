@@ -528,7 +528,7 @@ cnid_t cnid_mysql_add(struct _cnid_db *cdb,
 
     do {
         if ((id = cnid_mysql_lookup(cdb, st, did, name, len)) == CNID_INVALID) {
-            if (errno == CNID_ERR_DB)
+            if (errno == (int)CNID_ERR_DB)
                 EC_FAIL;
             /*
              * If the CNID set overflowed before (CNID_MYSQL_FLAG_DEPLETED)

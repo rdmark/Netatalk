@@ -932,7 +932,7 @@ int dbif_search(DBD *dbd, DBT *key, char *resbuf)
 
     ret = cursorp->pget(cursorp, key, &pkey, &data, DB_SET_RANGE);
     while (count < DBD_MAX_SRCH_RSLTS && ret != DB_NOTFOUND) {
-        if (!((namelenbkp <= key->size) && (strncmp(namebkp, key->data, namelenbkp) == 0)))
+        if (!((namelenbkp <= (int)key->size) && (strncmp(namebkp, key->data, namelenbkp) == 0)))
             break;
         count++;
         memcpy(cnids, pkey.data, sizeof(cnid_t));

@@ -1096,7 +1096,7 @@ int get_eacontent(VFS_FUNC_ARGS_EA_GETCONTENT)
             maxreply -= MAX_REPLY_EXTRA_BYTES;
             if (maxreply > MAX_EA_SIZE)
                 maxreply = MAX_EA_SIZE;
-            toread = (maxreply < (*ea.ea_entries)[count].ea_size) ? maxreply : (*ea.ea_entries)[count].ea_size;
+            toread = (maxreply < (long)(*ea.ea_entries)[count].ea_size) ? maxreply : (*ea.ea_entries)[count].ea_size;
             LOG(log_debug, logtype_afpd, "get_eacontent('%s'): sending %u bytes", attruname, toread);
 
             /* Put length of EA data in reply buffer */

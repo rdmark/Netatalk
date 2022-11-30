@@ -1,4 +1,4 @@
- /* 
+ /*
    Unix SMB/CIFS implementation.
 
    trivial database library
@@ -6,11 +6,11 @@
    Copyright (C) Andrew Tridgell              1999-2005
    Copyright (C) Paul `Rusty' Russell		   2000
    Copyright (C) Jeremy Allison			   2000-2003
-   
+
      ** NOTE! The following LGPL license applies to the tdb
      ** library. This does NOT imply that all of Samba is released
      ** under the LGPL
-   
+
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -29,7 +29,7 @@
 
 /* check for an out of bounds access - if it is out of bounds then
    see if the database has been expanded by someone else and expand
-   if necessary 
+   if necessary
    note that "len" is the minimum length needed for the db
 */
 static int tdb_oob(struct tdb_context *tdb, tdb_off_t len, int probe)
@@ -52,7 +52,7 @@ static int tdb_oob(struct tdb_context *tdb, tdb_off_t len, int probe)
 		return -1;
 	}
 
-	if (st.st_size < (size_t)len) {
+	if (st.st_size < (ssize_t)len) {
 		if (!probe) {
 			/* Ensure ecode is set for log fn. */
 			tdb->ecode = TDB_ERR_IO;
@@ -73,7 +73,7 @@ static int tdb_oob(struct tdb_context *tdb, tdb_off_t len, int probe)
 }
 
 /* write a lump of data at a specified offset */
-static int tdb_write(struct tdb_context *tdb, tdb_off_t off, 
+static int tdb_write(struct tdb_context *tdb, tdb_off_t off,
 		     const void *buf, tdb_len_t len)
 {
 	if (len == 0) {
@@ -130,7 +130,7 @@ void *tdb_convert(void *buf, uint32_t size)
 
 
 /* read a lump of data at a specified offset, maybe convert */
-static int tdb_read(struct tdb_context *tdb, tdb_off_t off, void *buf, 
+static int tdb_read(struct tdb_context *tdb, tdb_off_t off, void *buf,
 		    tdb_len_t len, int cv)
 {
 	if (tdb->methods->tdb_oob(tdb, off + len, 0) != 0) {
@@ -162,7 +162,7 @@ static int tdb_read(struct tdb_context *tdb, tdb_off_t off, void *buf,
 /*
   do an unlocked scan of the hash table heads to find the next non-zero head. The value
   will then be confirmed with the lock held
-*/		
+*/
 static void tdb_next_hash_chain(struct tdb_context *tdb, uint32_t *chain)
 {
 	uint32_t h = *chain;
@@ -209,8 +209,8 @@ void tdb_mmap(struct tdb_context *tdb)
 
 #ifdef HAVE_MMAP
 	if (!(tdb->flags & TDB_NOMMAP)) {
-		tdb->map_ptr = mmap(NULL, tdb->map_size, 
-				    PROT_READ|(tdb->read_only? 0:PROT_WRITE), 
+		tdb->map_ptr = mmap(NULL, tdb->map_size,
+				    PROT_READ|(tdb->read_only? 0:PROT_WRITE),
 				    MAP_SHARED, tdb->fd, 0);
 
 		/*
@@ -219,7 +219,7 @@ void tdb_mmap(struct tdb_context *tdb)
 
 		if (tdb->map_ptr == MAP_FAILED) {
 			tdb->map_ptr = NULL;
-			TDB_LOG((tdb, TDB_DEBUG_WARNING, "tdb_mmap failed for size %d (%s)\n", 
+			TDB_LOG((tdb, TDB_DEBUG_WARNING, "tdb_mmap failed for size %d (%s)\n",
 				 tdb->map_size, strerror(errno)));
 		}
 	} else {
@@ -253,7 +253,7 @@ static int tdb_expand_file(struct tdb_context *tdb, tdb_off_t size, tdb_off_t ad
 			errno = ENOSPC;
 		}
 		if (written != 1) {
-			TDB_LOG((tdb, TDB_DEBUG_FATAL, "expand_file to %d failed (%s)\n", 
+			TDB_LOG((tdb, TDB_DEBUG_FATAL, "expand_file to %d failed (%s)\n",
 				 size+addition, strerror(errno)));
 			return -1;
 		}
@@ -281,7 +281,7 @@ static int tdb_expand_file(struct tdb_context *tdb, tdb_off_t size, tdb_off_t ad
 				 "%d bytes failed (%s)\n", (int)n,
 				 strerror(errno)));
 			return -1;
-		} else if (written != n) {
+		} else if (written != (long)n) {
 			TDB_LOG((tdb, TDB_DEBUG_WARNING, "expand_file: wrote "
 				 "only %d of %d bytes - retrying\n", (int)written,
 				 (int)n));
@@ -298,7 +298,7 @@ static int tdb_expand_file(struct tdb_context *tdb, tdb_off_t size, tdb_off_t ad
 int tdb_expand(struct tdb_context *tdb, tdb_off_t size)
 {
 	struct tdb_record rec;
-	tdb_off_t offset, new_size;	
+	tdb_off_t offset, new_size;
 
 	if (tdb_lock(tdb, -1, F_WRLCK) == -1) {
 		TDB_LOG((tdb, TDB_DEBUG_ERROR, "lock failed in tdb_expand\n"));

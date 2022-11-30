@@ -384,7 +384,7 @@ static int pam_login_ext(void *obj, char *uname, struct passwd **uam_pwd,
     memcpy(&temp16, uname, sizeof(temp16));
     len = ntohs(temp16);
 
-    if ( !len || len > ulen ) {
+    if ( !len || len > (long)ulen ) {
         LOG(log_info, logtype_uams, "uams_dhx_pam.c :PAM: Signature Retrieval Failure -- %s",
 		  strerror(errno));
 	return AFPERR_PARAM;

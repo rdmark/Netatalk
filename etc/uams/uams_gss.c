@@ -163,7 +163,7 @@ static int get_client_username(char *username,
         *p = 0;
 
     /* check if this username fits into afpd's username buffer */
-    size_t cnblen = strlen(client_name_buffer.value);
+    ssize_t cnblen = strlen(client_name_buffer.value);
     if (cnblen >= ulen) {
         /* The username is too long for afpd's buffer, bail out */
         LOG_LOGINCONT(log_info,

@@ -157,7 +157,7 @@ static int get_tm_used(struct vol * restrict vol)
 
     if (vol->v_tm_cachetime
         && ((vol->v_tm_cachetime + TM_USED_CACHETIME) >= now)) {
-        if (vol->v_tm_used == -1)
+        if ((long long)vol->v_tm_used == -1)
             EC_FAIL;
         vol->v_tm_used += vol->v_appended;
         vol->v_appended = 0;
@@ -172,7 +172,7 @@ static int get_tm_used(struct vol * restrict vol)
 
     while ((entry = readdir(dir)) != NULL) {
         if (((p = strstr(entry->d_name, "sparsebundle")) != NULL)
-            && (strlen(entry->d_name) == (p + strlen("sparsebundle") - entry->d_name))) {
+            && ((long)strlen(entry->d_name) == (p + strlen("sparsebundle") - entry->d_name))) {
 
             EC_NULL_LOG( infoplist = bformat("%s/%s/%s", vol->v_path, entry->d_name, "Info.plist") );
 

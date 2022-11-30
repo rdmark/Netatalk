@@ -969,7 +969,7 @@ static struct vol *creatvol(AFPObj *obj,
         EC_FAIL;
     }
     suffixlen = snprintf(suffix, sizeof(suffix), "#%X", lastvid + 1 );
-    if (suffixlen >= sizeof(suffix)) {
+    if (suffixlen >= (long)sizeof(suffix)) {
         LOG(log_error, logtype_default, "vid overflow");
         EC_FAIL;
     }

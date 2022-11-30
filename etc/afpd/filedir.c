@@ -651,7 +651,7 @@ int afp_delete(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size
         } else {
             if ((rc = deletefile(vol, -1, upath, 1)) == AFP_OK) {
 				fce_register(obj, FCE_FILE_DELETE, fullpathname(upath), NULL);
-                if (vol->v_tm_used < s_path->st.st_size)
+                if ((long long)vol->v_tm_used < s_path->st.st_size)
                     vol->v_tm_used = 0;
                 else 
                     vol->v_tm_used -= s_path->st.st_size;

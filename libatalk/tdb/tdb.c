@@ -785,7 +785,7 @@ void tdb_enable_seqnum(struct tdb_context *tdb)
 static int tdb_free_region(struct tdb_context *tdb, tdb_off_t offset, ssize_t length)
 {
 	struct tdb_record rec;
-	if (length <= sizeof(rec)) {
+	if (length <= (long)sizeof(rec)) {
 		/* the region is not worth adding */
 		return 0;
 	}
@@ -842,7 +842,7 @@ int tdb_wipe_all(struct tdb_context *tdb)
 	}
 
 	/* wipe the hashes */
-	for (i=0;i<tdb->header.hash_size;i++) {
+	for (i=0;i<(int)tdb->header.hash_size;i++) {
 		if (tdb_ofs_write(tdb, TDB_HASH_TOP(i), &offset) == -1) {
 			TDB_LOG((tdb, TDB_DEBUG_FATAL,"tdb_wipe_all: failed to write hash %d\n", i));
 			goto failed;

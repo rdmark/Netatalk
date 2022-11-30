@@ -56,7 +56,7 @@ ssize_t ad_read( struct adouble *ad, const uint32_t eid, off_t off, char *buf, c
         if (ad->ad_data_fork.adf_syml !=0 ) {
             /* It's a symlink, we already have the target in adf_syml */
             cc = strlen(ad->ad_data_fork.adf_syml);
-            if (buflen < cc)
+            if ((const long)buflen < cc)
                 /* Request buffersize is too small, force AFPERR_PARAM */
                 return -1;
             memcpy(buf, ad->ad_data_fork.adf_syml, cc);

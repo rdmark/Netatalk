@@ -46,7 +46,7 @@ int main(int argc, char **argv)
             macName = strdup(optarg);
             break;
         case 'o':
-            for (int i = 0; i < sizeof(flag_map)/sizeof(struct flag_map) - 1; i++)
+            for (int i = 0; i < (long)sizeof(flag_map)/(long)sizeof(struct flag_map) - 1; i++)
                 if ((strcmp(flag_map[i].flagname, optarg)) == 0)
                     flags |= flag_map[i].flag;
             break;
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
         printf("Usage: test [-o <conversion option> [...]] [-f <from charset>] [-t <to charset>] [-m legacy Mac charset] <string>\n");
         printf("Defaults: -f: UTF8-MAC, -t: UTF8, -m MAC_ROMAN\n");
         printf("Available conversion options:\n");
-        for (int i = 0; i < (sizeof(flag_map)/sizeof(struct flag_map) - 1); i++) {
+        for (int i = 0; i < (long)(sizeof(flag_map)/sizeof(struct flag_map) - 1); i++) {
             printf("%s\n", flag_map[i].flagname);
         }
         return 1;

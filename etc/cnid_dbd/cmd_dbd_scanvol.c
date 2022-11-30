@@ -307,7 +307,7 @@ static int check_eafiles(const char *fname)
             else
                 dbd_log(LOGSTD, "Bogus EA: %s/%s", cwdbuf, eaname);
             remove = 1;
-        } else if (st.st_size != (*ea.ea_entries)[count].ea_size) {
+        } else if (st.st_size != (long)(*ea.ea_entries)[count].ea_size) {
             dbd_log(LOGSTD, "Bogus EA: %s/%s, removing it...", cwdbuf, eaname);
             remove = 1;
             if ((unlink(eaname)) != 0)

@@ -49,7 +49,7 @@ static unsigned int default_tdb_hash(TDB_DATA *key)
 static int tdb_new_database(struct tdb_context *tdb, int hash_size)
 {
 	struct tdb_header *newdb;
-	size_t size;
+	ssize_t size;
 	int ret = -1;
 	ssize_t written;
 

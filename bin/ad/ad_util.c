@@ -214,7 +214,7 @@ int convert_dots_encoding(const afpvol_t *svol, const afpvol_t *dvol, char *path
     if (len == -1)
         return -1;
 
-    if (strlcpy(bname, buf, MAXPATHLEN - pos) > MAXPATHLEN - pos)
+    if ((long)strlcpy(bname, buf, MAXPATHLEN - pos) > MAXPATHLEN - pos)
         return -1;
     return 0;
 }

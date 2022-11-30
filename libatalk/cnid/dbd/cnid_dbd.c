@@ -293,7 +293,7 @@ static int send_packet(CNID_bdb_private *db, struct cnid_dbd_rqst *rqst)
         vecs++;
     }
 
-    if (write_vec(db->fd, iov, towrite, vecs) != towrite) {
+    if (write_vec(db->fd, iov, towrite, vecs) != (long)towrite) {
         LOG(log_warning, logtype_cnid, "send_packet: Error writev rqst (volume %s): %s",
             db->vol->v_localname, strerror(errno));
         return -1;
