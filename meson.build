@@ -8,9 +8,6 @@ project('netatalk', 'c',
 cc = meson.get_compiler('c')
 
 add_global_arguments('-D_U_=__attribute__((unused))', language : 'c')
-add_global_arguments('-Wno-pedantic', language : 'c')
-add_global_arguments('-Wno-extra', language : 'c')
-add_global_arguments('-Wno-all', language : 'c')
 
 inc = include_directories('include' , 'etc/afpd', '.')
 
