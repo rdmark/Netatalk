@@ -1,4 +1,4 @@
- /* 
+ /*
    Unix SMB/CIFS implementation.
 
    trivial database library
@@ -6,11 +6,11 @@
    Copyright (C) Andrew Tridgell              1999-2005
    Copyright (C) Paul `Rusty' Russell		   2000
    Copyright (C) Jeremy Allison			   2000-2003
-   
+
      ** NOTE! The following LGPL license applies to the tdb
      ** library. This does NOT imply that all of Samba is released
      ** under the LGPL
-   
+
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -41,7 +41,7 @@ static unsigned int default_tdb_hash(TDB_DATA *key)
 	for (value = 0x238F13AF * key->dsize, i=0; i < key->dsize; i++)
 		value = (value + (key->dptr[i] << (i*5 % 24)));
 
-	return (1103515243 * value + 12345);  
+	return (1103515243 * value + 12345);
 }
 
 
@@ -111,7 +111,7 @@ static int tdb_already_open(dev_t device,
 			    ino_t ino)
 {
 	struct tdb_context *i;
-	
+
 	for (i = tdbs; i; i = i->next) {
 		if (i->device == device && i->inode == ino) {
 			return 1;
@@ -121,13 +121,13 @@ static int tdb_already_open(dev_t device,
 	return 0;
 }
 
-/* open the database, creating it if necessary 
+/* open the database, creating it if necessary
 
    The open_flags and mode are passed straight to the open call on the
    database file. A flags value of O_WRONLY is invalid. The hash size
    is advisory, use zero for a default value.
 
-   Return is NULL on error, in which case errno is also set.  Don't 
+   Return is NULL on error, in which case errno is also set.  Don't
    try to call tdb_error or tdb_errname, just do strerror(errno).
 
    @param name may be NULL for internal databases. */
@@ -139,7 +139,7 @@ struct tdb_context *tdb_open(const char *name, int hash_size, int tdb_flags,
 
 /* a default logging function */
 static void null_log_fn(struct tdb_context *tdb, enum tdb_debug_level level, const char *fmt, ...) PRINTF_ATTRIBUTE(3, 4);
-static void null_log_fn(struct tdb_context *tdb, enum tdb_debug_level level, const char *fmt, ...)
+static void null_log_fn(struct tdb_context *tdb _U_, enum tdb_debug_level level _U_, const char *fmt _U_, ...)
 {
 }
 
@@ -192,7 +192,7 @@ struct tdb_context *tdb_open_ex(const char *name, int hash_size, int tdb_flags,
 		errno = EINVAL;
 		goto fail;
 	}
-	
+
 	if (hash_size == 0)
 		hash_size = DEFAULT_HASH_SIZE;
 	if ((open_flags & O_ACCMODE) == O_RDONLY) {

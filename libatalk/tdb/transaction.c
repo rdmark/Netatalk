@@ -1,4 +1,4 @@
- /* 
+ /*
    Unix SMB/CIFS implementation.
 
    trivial database library
@@ -8,7 +8,7 @@
      ** NOTE! The following LGPL license applies to the tdb
      ** library. This does NOT imply that all of Samba is released
      ** under the LGPL
-   
+
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -59,7 +59,7 @@
   - allow for nested calls to tdb_transaction_start(), re-using the
     existing transaction record. If the inner transaction is cancelled
     then a subsequent commit will fail
- 
+
   - keep a mirrored copy of the tdb hash chain heads to allow for the
     fast hash heads scan on traverse, updating the mirrored copy in
     the transaction version of tdb_write
@@ -150,7 +150,7 @@ struct tdb_transaction {
   read while in a transaction. We need to check first if the data is in our list
   of transaction elements, then if not do a real read
 */
-static int transaction_read(struct tdb_context *tdb, tdb_off_t off, void *buf, 
+static int transaction_read(struct tdb_context *tdb, tdb_off_t off, void *buf,
 			    tdb_len_t len, int cv)
 {
 	uint32_t blk;
@@ -188,7 +188,7 @@ static int transaction_read(struct tdb_context *tdb, tdb_off_t off, void *buf,
 			goto fail;
 		}
 	}
-	
+
 	/* now copy it out of this block */
 	memcpy(buf, tdb->transaction->blocks[blk] + (off % tdb->transaction->block_size), len);
 	if (cv) {
@@ -207,7 +207,7 @@ fail:
 /*
   write while in a transaction
 */
-static int transaction_write(struct tdb_context *tdb, tdb_off_t off, 
+static int transaction_write(struct tdb_context *tdb, tdb_off_t off,
 			     const void *buf, tdb_len_t len)
 {
 	uint32_t blk;
@@ -263,7 +263,7 @@ static int transaction_write(struct tdb_context *tdb, tdb_off_t off,
 			tdb->ecode = TDB_ERR_OOM;
 			goto fail;
 		}
-		memset(&new_blocks[tdb->transaction->num_blocks], 0, 
+		memset(&new_blocks[tdb->transaction->num_blocks], 0,
 		       (1+(blk - tdb->transaction->num_blocks))*sizeof(uint8_t *));
 		tdb->transaction->blocks = new_blocks;
 		tdb->transaction->num_blocks = blk+1;
@@ -276,26 +276,26 @@ static int transaction_write(struct tdb_context *tdb, tdb_off_t off,
 		if (tdb->transaction->blocks[blk] == NULL) {
 			tdb->ecode = TDB_ERR_OOM;
 			tdb->transaction->transaction_error = 1;
-			return -1;			
+			return -1;
 		}
 		if (tdb->transaction->old_map_size > blk * tdb->transaction->block_size) {
 			tdb_len_t len2 = tdb->transaction->block_size;
 			if (len2 + (blk * tdb->transaction->block_size) > tdb->transaction->old_map_size) {
 				len2 = tdb->transaction->old_map_size - (blk * tdb->transaction->block_size);
 			}
-			if (tdb->transaction->io_methods->tdb_read(tdb, blk * tdb->transaction->block_size, 
-								   tdb->transaction->blocks[blk], 
+			if (tdb->transaction->io_methods->tdb_read(tdb, blk * tdb->transaction->block_size,
+								   tdb->transaction->blocks[blk],
 								   len2, 0) != 0) {
-				SAFE_FREE(tdb->transaction->blocks[blk]);				
+				SAFE_FREE(tdb->transaction->blocks[blk]);
 				tdb->ecode = TDB_ERR_IO;
 				goto fail;
 			}
 			if (blk == tdb->transaction->num_blocks-1) {
 				tdb->transaction->last_block_size = len2;
-			}			
+			}
 		}
 	}
-	
+
 	/* overwrite part of an existing block */
 	if (buf == NULL) {
 		memset(tdb->transaction->blocks[blk] + off, 0, len);
@@ -311,7 +311,7 @@ static int transaction_write(struct tdb_context *tdb, tdb_off_t off,
 	return 0;
 
 fail:
-	TDB_LOG((tdb, TDB_DEBUG_FATAL, "transaction_write: failed at off=%d len=%d\n", 
+	TDB_LOG((tdb, TDB_DEBUG_FATAL, "transaction_write: failed at off=%d len=%d\n",
 		 (blk*tdb->transaction->block_size) + off, len));
 	tdb->transaction->transaction_error = 1;
 	return -1;
@@ -322,7 +322,7 @@ fail:
   write while in a transaction - this varient never expands the transaction blocks, it only
   updates existing blocks. This means it cannot change the recovery size
 */
-static int transaction_write_existing(struct tdb_context *tdb, tdb_off_t off, 
+static int transaction_write_existing(struct tdb_context *tdb, tdb_off_t off,
 				      const void *buf, tdb_len_t len)
 {
 	uint32_t blk;
@@ -385,7 +385,7 @@ static void transaction_next_hash_chain(struct tdb_context *tdb, uint32_t *chain
 /*
   out of bounds check during a transaction
 */
-static int transaction_oob(struct tdb_context *tdb, tdb_off_t len, int probe)
+static int transaction_oob(struct tdb_context *tdb, tdb_off_t len, int probe _U_)
 {
 	if (len <= tdb->map_size) {
 		return 0;
@@ -397,7 +397,7 @@ static int transaction_oob(struct tdb_context *tdb, tdb_off_t len, int probe)
 /*
   transaction version of tdb_expand().
 */
-static int transaction_expand_file(struct tdb_context *tdb, tdb_off_t size, 
+static int transaction_expand_file(struct tdb_context *tdb, tdb_off_t size,
 				   tdb_off_t addition)
 {
 	/* add a write to the transaction elements, so subsequent
@@ -414,8 +414,8 @@ static int transaction_expand_file(struct tdb_context *tdb, tdb_off_t size,
 /*
   brlock during a transaction - ignore them
 */
-static int transaction_brlock(struct tdb_context *tdb, tdb_off_t offset, 
-			      int rw_type, int lck_type, int probe, size_t len)
+static int transaction_brlock(struct tdb_context *tdb _U_, tdb_off_t offset _U_,
+			      int rw_type _U_, int lck_type _U_, int probe _U_, size_t len _U_)
 {
 	return 0;
 }
@@ -450,7 +450,7 @@ int tdb_transaction_start(struct tdb_context *tdb)
 			return -1;
 		}
 		tdb->transaction->nesting++;
-		TDB_LOG((tdb, TDB_DEBUG_TRACE, "tdb_transaction_start: nesting %d\n", 
+		TDB_LOG((tdb, TDB_DEBUG_TRACE, "tdb_transaction_start: nesting %d\n",
 			 tdb->transaction->nesting));
 		return 0;
 	}
@@ -491,7 +491,7 @@ int tdb_transaction_start(struct tdb_context *tdb)
 		SAFE_FREE(tdb->transaction);
 		return -1;
 	}
-	
+
 	/* get a read lock from the freelist to the end of file. This
 	   is upgraded to a write lock during the commit */
 	if (tdb_brlock(tdb, FREELIST_TOP, F_RDLCK, F_SETLKW, 0, 0) == -1) {
@@ -528,7 +528,7 @@ int tdb_transaction_start(struct tdb_context *tdb)
 	/* Trace at the end, so we get sequence number correct. */
 	tdb_trace(tdb, "tdb_transaction_start");
 	return 0;
-	
+
 fail:
 	tdb_brlock(tdb, FREELIST_TOP, F_UNLCK, F_SETLKW, 0, 0);
 	tdb_transaction_unlock(tdb);
@@ -542,8 +542,8 @@ fail:
 /*
   sync to disk
 */
-static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset, tdb_len_t length)
-{	
+static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset _U_, tdb_len_t length _U_)
+{
 	if (tdb->flags & TDB_NOSYNC) {
 		return 0;
 	}
@@ -556,7 +556,7 @@ static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset, tdb_len_t
 #ifdef HAVE_MMAP
 	if (tdb->map_ptr) {
 		tdb_off_t moffset = offset & ~(tdb->page_size-1);
-		if (msync(moffset + (char *)tdb->map_ptr, 
+		if (msync(moffset + (char *)tdb->map_ptr,
 			  length + (offset - moffset), MS_SYNC) != 0) {
 			tdb->ecode = TDB_ERR_IO;
 			TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction: msync failed - %s\n",
@@ -570,7 +570,7 @@ static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset, tdb_len_t
 
 
 int _tdb_transaction_cancel(struct tdb_context *tdb)
-{	
+{
 	int i, ret = 0;
 
 	if (tdb->transaction == NULL) {
@@ -582,7 +582,7 @@ int _tdb_transaction_cancel(struct tdb_context *tdb)
 		tdb->transaction->transaction_error = 1;
 		tdb->transaction->nesting--;
 		return 0;
-	}		
+	}
 
 	tdb->map_size = tdb->transaction->old_map_size;
 
@@ -635,7 +635,7 @@ int _tdb_transaction_cancel(struct tdb_context *tdb)
 	tdb_transaction_unlock(tdb);
 	SAFE_FREE(tdb->transaction->hash_heads);
 	SAFE_FREE(tdb->transaction);
-	
+
 	return ret;
 }
 
@@ -670,7 +670,7 @@ static tdb_len_t tdb_recovery_size(struct tdb_context *tdb)
 		} else {
 			recovery_size += tdb->transaction->block_size;
 		}
-	}	
+	}
 
 	return recovery_size;
 }
@@ -679,7 +679,7 @@ static tdb_len_t tdb_recovery_size(struct tdb_context *tdb)
   allocate the recovery area, or use an existing recovery area if it is
   large enough
 */
-static int tdb_recovery_allocate(struct tdb_context *tdb, 
+static int tdb_recovery_allocate(struct tdb_context *tdb,
 				 tdb_len_t *recovery_size,
 				 tdb_off_t *recovery_offset,
 				 tdb_len_t *recovery_max_size)
@@ -695,7 +695,7 @@ static int tdb_recovery_allocate(struct tdb_context *tdb,
 
 	rec.rec_len = 0;
 
-	if (recovery_head != 0 && 
+	if (recovery_head != 0 &&
 	    methods->tdb_read(tdb, recovery_head, &rec, sizeof(rec), DOCONV()) == -1) {
 		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_recovery_allocate: failed to read recovery record\n"));
 		return -1;
@@ -730,7 +730,7 @@ static int tdb_recovery_allocate(struct tdb_context *tdb,
 	*recovery_offset = tdb->map_size;
 	recovery_head = *recovery_offset;
 
-	if (methods->tdb_expand_file(tdb, tdb->transaction->old_map_size, 
+	if (methods->tdb_expand_file(tdb, tdb->transaction->old_map_size,
 				     (tdb->map_size - tdb->transaction->old_map_size) +
 				     sizeof(rec) + *recovery_max_size) == -1) {
 		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_recovery_allocate: failed to create recovery area\n"));
@@ -747,7 +747,7 @@ static int tdb_recovery_allocate(struct tdb_context *tdb,
 	/* write the recovery header offset and sync - we can sync without a race here
 	   as the magic ptr in the recovery record has not been set */
 	CONVERT(recovery_head);
-	if (methods->tdb_write(tdb, TDB_RECOVERY_HEAD, 
+	if (methods->tdb_write(tdb, TDB_RECOVERY_HEAD,
 			       &recovery_head, sizeof(tdb_off_t)) == -1) {
 		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_recovery_allocate: failed to write recovery head\n"));
 		return -1;
@@ -764,7 +764,7 @@ static int tdb_recovery_allocate(struct tdb_context *tdb,
 /*
   setup the recovery data that will be used on a crash during commit
 */
-static int transaction_setup_recovery(struct tdb_context *tdb, 
+static int transaction_setup_recovery(struct tdb_context *tdb,
 				      tdb_off_t *magic_offset)
 {
 	tdb_len_t recovery_size;
@@ -779,7 +779,7 @@ static int transaction_setup_recovery(struct tdb_context *tdb,
 	/*
 	  check that the recovery area has enough space
 	*/
-	if (tdb_recovery_allocate(tdb, &recovery_size, 
+	if (tdb_recovery_allocate(tdb, &recovery_size,
 				  &recovery_offset, &recovery_max_size) == -1) {
 		return -1;
 	}
@@ -815,7 +815,7 @@ static int transaction_setup_recovery(struct tdb_context *tdb,
 		if (i == tdb->transaction->num_blocks-1) {
 			length = tdb->transaction->last_block_size;
 		}
-		
+
 		if (offset >= old_map_size) {
 			continue;
 		}
@@ -895,7 +895,7 @@ static int transaction_setup_recovery(struct tdb_context *tdb,
 }
 
 static int _tdb_transaction_prepare_commit(struct tdb_context *tdb)
-{	
+{
 	const struct tdb_methods *methods;
 
 	if (tdb->transaction == NULL) {
@@ -920,7 +920,7 @@ static int _tdb_transaction_prepare_commit(struct tdb_context *tdb)
 
 	if (tdb->transaction->nesting != 0) {
 		return 0;
-	}		
+	}
 
 	/* check for a null transaction */
 	if (tdb->transaction->blocks == NULL) {
@@ -928,7 +928,7 @@ static int _tdb_transaction_prepare_commit(struct tdb_context *tdb)
 	}
 
 	methods = tdb->transaction->io_methods;
-	
+
 	/* if there are any locks pending then the caller has not
 	   nested their locks properly, so fail the transaction */
 	if (tdb->num_locks || tdb->global_lock.count) {
@@ -970,8 +970,8 @@ static int _tdb_transaction_prepare_commit(struct tdb_context *tdb)
 
 	/* expand the file to the new size if needed */
 	if (tdb->map_size != tdb->transaction->old_map_size) {
-		if (methods->tdb_expand_file(tdb, tdb->transaction->old_map_size, 
-					     tdb->map_size - 
+		if (methods->tdb_expand_file(tdb, tdb->transaction->old_map_size,
+					     tdb->map_size -
 					     tdb->transaction->old_map_size) == -1) {
 			tdb->ecode = TDB_ERR_IO;
 			TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_prepare_commit: expansion failed\n"));
@@ -991,7 +991,7 @@ static int _tdb_transaction_prepare_commit(struct tdb_context *tdb)
    prepare to commit the current transaction
 */
 int tdb_transaction_prepare_commit(struct tdb_context *tdb)
-{	
+{
 	tdb_trace(tdb, "tdb_transaction_prepare_commit");
 	return _tdb_transaction_prepare_commit(tdb);
 }
@@ -1000,7 +1000,7 @@ int tdb_transaction_prepare_commit(struct tdb_context *tdb)
   commit the current transaction
 */
 int tdb_transaction_commit(struct tdb_context *tdb)
-{	
+{
 	const struct tdb_methods *methods;
 	int i;
 	bool need_repack;
@@ -1056,12 +1056,12 @@ int tdb_transaction_commit(struct tdb_context *tdb)
 
 		if (methods->tdb_write(tdb, offset, tdb->transaction->blocks[i], length) == -1) {
 			TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_commit: write failed during commit\n"));
-			
+
 			/* we've overwritten part of the data and
 			   possibly expanded the file, so we need to
 			   run the crash recovery code */
 			tdb->methods = methods;
-			tdb_transaction_recover(tdb); 
+			tdb_transaction_recover(tdb);
 
 			_tdb_transaction_cancel(tdb);
 
@@ -1069,7 +1069,7 @@ int tdb_transaction_commit(struct tdb_context *tdb)
 			return -1;
 		}
 		SAFE_FREE(tdb->transaction->blocks[i]);
-	} 
+	}
 
 	SAFE_FREE(tdb->transaction->blocks);
 	tdb->transaction->num_blocks = 0;
@@ -1133,9 +1133,9 @@ int tdb_transaction_recover(struct tdb_context *tdb)
 	}
 
 	/* read the recovery record */
-	if (tdb->methods->tdb_read(tdb, recovery_head, &rec, 
+	if (tdb->methods->tdb_read(tdb, recovery_head, &rec,
 				   sizeof(rec), DOCONV()) == -1) {
-		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to read recovery record\n"));		
+		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to read recovery record\n"));
 		tdb->ecode = TDB_ERR_IO;
 		return -1;
 	}
@@ -1155,7 +1155,7 @@ int tdb_transaction_recover(struct tdb_context *tdb)
 
 	data = (unsigned char *)malloc(rec.data_len);
 	if (data == NULL) {
-		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to allocate recovery data\n"));		
+		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to allocate recovery data\n"));
 		tdb->ecode = TDB_ERR_OOM;
 		return -1;
 	}
@@ -1163,7 +1163,7 @@ int tdb_transaction_recover(struct tdb_context *tdb)
 	/* read the full recovery data */
 	if (tdb->methods->tdb_read(tdb, recovery_head + sizeof(rec), data,
 				   rec.data_len, 0) == -1) {
-		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to read recovery data\n"));		
+		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to read recovery data\n"));
 		tdb->ecode = TDB_ERR_IO;
 		return -1;
 	}
@@ -1200,7 +1200,7 @@ int tdb_transaction_recover(struct tdb_context *tdb)
 		if (tdb_ofs_write(tdb, TDB_RECOVERY_HEAD, &zero) == -1) {
 			TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to remove recovery head\n"));
 			tdb->ecode = TDB_ERR_IO;
-			return -1;			
+			return -1;
 		}
 	}
 
@@ -1209,15 +1209,15 @@ int tdb_transaction_recover(struct tdb_context *tdb)
 			  &zero) == -1) {
 		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to remove recovery magic\n"));
 		tdb->ecode = TDB_ERR_IO;
-		return -1;			
+		return -1;
 	}
-	
+
 	/* reduce the file size to the old size */
 	tdb_munmap(tdb);
 	if (ftruncate(tdb->fd, recovery_eof) != 0) {
 		TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction_recover: failed to reduce to recovery size\n"));
 		tdb->ecode = TDB_ERR_IO;
-		return -1;			
+		return -1;
 	}
 	tdb->map_size = recovery_eof;
 	tdb_mmap(tdb);
@@ -1228,7 +1228,7 @@ int tdb_transaction_recover(struct tdb_context *tdb)
 		return -1;
 	}
 
-	TDB_LOG((tdb, TDB_DEBUG_TRACE, "tdb_transaction_recover: recovered %d byte database\n", 
+	TDB_LOG((tdb, TDB_DEBUG_TRACE, "tdb_transaction_recover: recovered %d byte database\n",
 		 recovery_eof));
 
 	/* all done */

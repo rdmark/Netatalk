@@ -270,7 +270,7 @@ static int accept_sec_context(gss_ctx_id_t *context,
     return 0;
 }
 
-static int do_gss_auth(void *obj,
+static int do_gss_auth(void *obj _U_,
                        char *ibuf, size_t ibuflen,
                        char *rbuf, int *rbuflen,
                        char *username, size_t ulen,
@@ -334,9 +334,9 @@ cleanup_client_name:
  * login-session id. None of the data provided by the client up to this
  * point is trustworthy as we'll have a signed ticket to parse in logincont.
  */
-static int gss_login(void *obj,
-                     struct passwd **uam_pwd,
-                     char *ibuf, size_t ibuflen,
+static int gss_login(void *obj _U_,
+                     struct passwd **uam_pwd _U_,
+                     char *ibuf _U_, size_t ibuflen _U_,
                      char *rbuf, size_t *rbuflen)
 {
     *rbuflen = 0;
@@ -475,7 +475,7 @@ static void gss_logout(void)
 }
 
 static int gss_login_ext(void *obj,
-                         char *uname,
+                         char *uname _U_,
                          struct passwd **uam_pwd,
                          char *ibuf, size_t ibuflen,
                          char *rbuf, size_t *rbuflen)

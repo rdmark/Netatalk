@@ -102,10 +102,6 @@ static int  log_src_linenumber;
 static const char *arr_logtype_strings[] =  LOGTYPE_STRING_IDENTIFIERS;
 static const unsigned int num_logtype_strings = COUNT_ARRAY(arr_logtype_strings);
 
-/* Array for charachters representing log severity in the log file */
-static const char arr_loglevel_chars[] = {'-','S', 'E', 'W', 'N', 'I', 'D'};
-static const unsigned int num_loglevel_chars = COUNT_ARRAY(arr_loglevel_chars);
-
 static const char *arr_loglevel_strings[] = LOGLEVEL_STRING_IDENTIFIERS;
 static const unsigned int num_loglevel_strings = COUNT_ARRAY(arr_loglevel_strings);
 
@@ -115,7 +111,7 @@ static const unsigned int num_loglevel_strings = COUNT_ARRAY(arr_loglevel_string
 
 static int generate_message(char **message_details_buffer,
                             char *user_message,
-                            int display_options,
+                            int display_options _U_,
                             enum loglevels loglevel,
                             enum logtypes logtype)
 {

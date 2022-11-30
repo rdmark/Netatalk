@@ -125,13 +125,6 @@ static int afp_errpwdexpired(AFPObj *obj _U_, char *ibuf _U_, size_t ibuflen _U_
     return AFPERR_PWDEXPR;
 }
 
-static int afp_null_nolog(AFPObj *obj _U_, char *ibuf _U_, size_t ibuflen _U_,
-                          char *rbuf _U_, size_t *rbuflen)
-{
-    *rbuflen = 0;
-    return( AFPERR_NOOP );
-}
-
 static int set_auth_switch(const AFPObj *obj, int expired)
 {
     int i;

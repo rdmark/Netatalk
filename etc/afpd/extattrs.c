@@ -70,7 +70,7 @@ static void hexdump(void *m, size_t l) {
 int afp_listextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
 {
     int                 ret, oflag = 0, adflags = 0, fd = -1;
-    uint16_t            vid, bitmap, uint16;
+    uint16_t            vid, bitmap, uint16 _U_;
     uint32_t            did, maxreply, tmpattr;
     struct vol          *vol;
     struct dir          *dir;
@@ -251,7 +251,7 @@ int afp_getextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, 
     struct vol          *vol;
     struct dir          *dir;
     struct path         *s_path;
-    struct adouble	ad, *adp = NULL;
+    struct adouble	ad _U_, *adp = NULL;
     struct ofork	*opened = NULL;
 
 
@@ -347,7 +347,7 @@ int afp_setextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _
     struct vol          *vol;
     struct dir          *dir;
     struct path         *s_path;
-    struct adouble	ad, *adp = NULL;
+    struct adouble	ad _U_, *adp = NULL;
     struct ofork	*opened = NULL;
 
     *rbuflen = 0;
@@ -440,7 +440,7 @@ int afp_remextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _
     struct vol          *vol;
     struct dir          *dir;
     struct path         *s_path;
-    struct adouble	ad, *adp = NULL;
+    struct adouble	ad _U_, *adp = NULL;
     struct ofork	*opened = NULL;
 
     *rbuflen = 0;

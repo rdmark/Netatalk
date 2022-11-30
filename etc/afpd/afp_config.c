@@ -79,7 +79,7 @@ int configinit(AFPObj *obj)
     char *p = NULL, *q = NULL, *savep;
     const char *r;
     struct ifaddrs *ifaddr, *ifa;
-    int family, s;
+    int family, s _U_;
     static char interfaddr[NI_MAXHOST];
 
     auth_load(obj, obj->options.uampath, obj->options.uamlist);

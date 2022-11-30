@@ -35,9 +35,9 @@ static char *fce_ev_names[] = {
 static int unpack_fce_packet(unsigned char *buf, struct fce_packet *packet)
 {
     unsigned char *p = buf;
-    uint16_t uint16;
-    uint32_t uint32;
-    uint64_t uint64;
+    uint16_t uint16 _U_;
+    uint32_t uint32 _U_;
+    uint64_t uint64 _U_;
 
     memcpy(&packet->fcep_magic[0], p, sizeof(packet->fcep_magic));
     p += sizeof(packet->fcep_magic);
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
     struct sockaddr_storage their_addr;
     char buf[MAXBUFLEN];
     socklen_t addr_len;
-    char s[INET6_ADDRSTRLEN];
+    char s[INET6_ADDRSTRLEN] _U_;
     char *host = "localhost";
 
     while ((c = getopt(argc, argv, "h:")) != -1) {

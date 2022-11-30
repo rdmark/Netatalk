@@ -124,7 +124,7 @@ static int RF_renamedir_adouble(VFS_FUNC_ARGS_RENAMEDIR)
 }
 
 /* ----------------- */
-static int deletecurdir_adouble_loop(const struct vol *vol, struct dirent *de, char *name, void *data _U_, int flag _U_)
+static int deletecurdir_adouble_loop(const struct vol *vol _U_, struct dirent *de, char *name, void *data _U_, int flag _U_)
 {
     struct stat st;
     int         err;
@@ -468,16 +468,7 @@ static int RF_renamedir_ea(VFS_FUNC_ARGS_RENAMEDIR)
     return 0;
 }
 
-/* Returns 1 if the entry is NOT an ._ file */
-static int deletecurdir_ea_osx_chkifempty_loop(const struct vol *vol, struct dirent *de, char *name, void *data _U_, int flag _U_)
-{
-    if (de->d_name[0] != '.' || de->d_name[0] == '_')
-        return 1;
-
-    return 0;
-}
-
-static int deletecurdir_ea_osx_loop(const struct vol *vol, struct dirent *de, char *name, void *data _U_, int flag _U_)
+static int deletecurdir_ea_osx_loop(const struct vol *vol _U_, struct dirent *de _U_, char *name, void *data _U_, int flag _U_)
 {
     int ret;
     struct stat sb;

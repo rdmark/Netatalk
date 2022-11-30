@@ -303,22 +303,6 @@ static void check_ea_support(struct vol *vol)
     }
 }
 
-/*!
- * Check whether a volume supports ACLs
- *
- * @param vol  (r) volume
- *
- * @returns        0 if not, 1 if yes
- */
-static int check_vol_acl_support(const struct vol *vol)
-{
-    int ret = 0;
-
-    LOG(log_debug, logtype_afpd, "Volume \"%s\" ACL support: %s",
-        vol->v_path, ret ? "yes" : "no");
-    return ret;
-}
-
 /*
  * Handle variable substitutions. here's what we understand:
  * $b   -> basename of path
@@ -504,7 +488,7 @@ EC_CLEANUP:
     EC_EXIT;
 }
 
-static int hostaccessvol(const AFPObj *obj, const char *volname, const char *args)
+static int hostaccessvol(const AFPObj *obj, const char *volname _U_, const char *args)
 {
     int mask_int;
     char buf[MAXPATHLEN + 1], *p, *b;
@@ -1963,7 +1947,7 @@ int afp_config_parse(AFPObj *AFPObj, char *processname)
     EC_INIT;
     dictionary *config;
     struct afp_options *options = &AFPObj->options;
-    int c;
+    int c _U_;
     const char *p;
     char *q, *r;
     char val[MAXVAL];

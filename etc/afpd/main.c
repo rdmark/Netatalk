@@ -163,26 +163,6 @@ static void child_handler(void)
     }
 }
 
-static int setlimits(void)
-{
-    struct rlimit rlim;
-
-    if (getrlimit(RLIMIT_NOFILE, &rlim) != 0) {
-        LOG(log_warning, logtype_afpd, "setlimits: reading current limits failed: %s", strerror(errno));
-        return -1;
-    }
-    if (rlim.rlim_cur != RLIM_INFINITY && rlim.rlim_cur < 65535) {
-        rlim.rlim_cur = 65535;
-        if (rlim.rlim_max != RLIM_INFINITY && rlim.rlim_max < 65535)
-            rlim.rlim_max = 65535;
-        if (setrlimit(RLIMIT_NOFILE, &rlim) != 0) {
-            LOG(log_warning, logtype_afpd, "setlimits: increasing limits failed: %s", strerror(errno));
-            return -1;
-        }
-    }
-    return 0;
-}
-
 int main(int ac, char **av)
 {
     struct sigaction	sv;
