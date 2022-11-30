@@ -15,7 +15,7 @@ all developers past and present.
 
 2. Install Netatalk's dependencies from Homebrew:
 
-    brew install berkeley-db dgsga/netatalk-dbus/dbus-glib docbook-xsl libevent libgcrypt meson mysql openssl@1.1 pkg-config
+    brew install berkeley-db dgsga/netatalk-dbus/dbus-glib docbook-xsl libevent libgcrypt meson mysql libressl pkg-config
 
 3. Clone the repo:
 
