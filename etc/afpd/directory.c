@@ -1744,6 +1744,7 @@ int setdirparams(struct vol *vol, struct path *path, uint16_t d_bitmap, char *bu
     struct timeval      tv;
 
     char                *upath;
+    char                *ade = NULL;
     struct dir          *dir;
     int         bit, isad = 0;
     int                 cdate, bdate;
@@ -1905,6 +1906,8 @@ int setdirparams(struct vol *vol, struct path *path, uint16_t d_bitmap, char *bu
                 fflags &= htons(~FINDERINFO_ISHARED);
                 memcpy(finder_buf + FINDERINFO_FRFLAGOFF, &fflags, sizeof(uint16_t));
                 /* #2802236 end */
+                ade = ad_entry(&ad, ADEID_FINDERI);
+                AFP_ASSERT(ade != NULL);
 
                 if (  dir->d_did == DIRDID_ROOT ) {
                     /*
@@ -1915,10 +1918,10 @@ int setdirparams(struct vol *vol, struct path *path, uint16_t d_bitmap, char *bu
                      * behavior one sees when mounting above another mount
                      * point.
                      */
-                    memcpy( ad_entry( &ad, ADEID_FINDERI ), finder_buf, 10 );
-                    memcpy( ad_entry( &ad, ADEID_FINDERI ) + 14, finder_buf + 14, 18 );
+                    memcpy( ade, finder_buf, 10 );
+                    memcpy( ade + 14, finder_buf + 14, 18 );
                 } else {
-                    memcpy( ad_entry( &ad, ADEID_FINDERI ), finder_buf, 32 );
+                    memcpy( ade, finder_buf, 32 );
                 }
             }
             break;

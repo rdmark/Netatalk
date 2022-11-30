@@ -9,7 +9,7 @@
 #define FILEIOFF_ATTR 14
 #define AFPFILEIOFF_ATTR 2
 
-/* 
+/*
    Note:
    the "shared" and "invisible" attributes are opaque and stored and
    retrieved from the FinderFlags. This fixes Bug #2802236:
@@ -21,11 +21,16 @@ int ad_getattr(const struct adouble *ad, uint16_t *attr)
     *attr = 0;
 
     if (ad_getentryoff(ad, ADEID_AFPFILEI) && ad_entry(ad, ADEID_AFPFILEI)) {
-        memcpy(attr, ad_entry(ad, ADEID_AFPFILEI) + AFPFILEIOFF_ATTR, 2);
+        char *adp = NULL;
+        adp = ad_entry(ad, ADEID_AFPFILEI);
+        AFP_ASSERT(adp != NULL);
+        memcpy(attr, adp + AFPFILEIOFF_ATTR, 2);
 
         /* Now get opaque flags from FinderInfo */
         if (ad_entry(ad, ADEID_FINDERI)) {
-            memcpy(&fflags, ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRFLAGOFF, 2);
+            adp = ad_entry(ad, ADEID_FINDERI);
+            AFP_ASSERT(adp != NULL);
+            memcpy(&fflags, adp + FINDERINFO_FRFLAGOFF, 2);
         } else {
             LOG(log_debug, logtype_default, "ad_getattr(%s): invalid FinderInfo", ad->ad_name);
             memset(&fflags, 0, 2);
@@ -66,10 +71,14 @@ int ad_setattr(const struct adouble *ad, const uint16_t attribute)
 
     if (ad_getentryoff(ad, ADEID_AFPFILEI) && ad_entry(ad, ADEID_AFPFILEI)
         && ad_getentryoff(ad, ADEID_FINDERI) && ad_entry(ad, ADEID_FINDERI)) {
-        memcpy(ad_entry(ad, ADEID_AFPFILEI) + AFPFILEIOFF_ATTR, &attr, sizeof(attr));
-            
+        char *adp = NULL;
+
+        adp = ad_entry(ad, ADEID_FINDERI);
+        AFP_ASSERT(adp != NULL);
+        memcpy(adp + AFPFILEIOFF_ATTR, &attr, sizeof(attr));
+
         /* Now set opaque flags in FinderInfo too */
-        memcpy(&fflags, ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRFLAGOFF, 2);
+        memcpy(&fflags, adp + FINDERINFO_FRFLAGOFF, 2);
         if (attr & htons(ATTRBIT_INVISIBLE))
             fflags |= htons(FINDERINFO_INVISIBLE);
         else
@@ -82,7 +91,7 @@ int ad_setattr(const struct adouble *ad, const uint16_t attribute)
         } else
             fflags &= htons(~FINDERINFO_ISHARED);
 
-        memcpy(ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRFLAGOFF, &fflags, 2);
+        memcpy(adp + FINDERINFO_FRFLAGOFF, &fflags, 2);
     }
 
     return 0;

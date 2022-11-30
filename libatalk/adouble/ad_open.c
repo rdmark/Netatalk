@@ -359,6 +359,7 @@ static int new_ad_header(struct adouble *ad, const char *path, struct stat *stp,
     const struct entry  *eid _U_;
     uint16_t            ashort;
     struct stat         st;
+    char                *adp = NULL;
 
     LOG(log_debug, logtype_ad, "new_ad_header(\"%s\")", path);
 
@@ -369,9 +370,12 @@ static int new_ad_header(struct adouble *ad, const char *path, struct stat *stp,
         LOG(log_debug, logtype_ad, "new_ad_header(\"%s\"): invalid FinderInfo", path);
         return -1;
     }
+    adp = ad_entry(ad, ADEID_FINDERI);
+    AFP_ASSERT(adp != NULL);
+
     /* set default creator/type fields */
-    memcpy(ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRTYPEOFF,"\0\0\0\0", 4);
-    memcpy(ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRCREATOFF,"\0\0\0\0", 4);
+    memcpy(adp + FINDERINFO_FRTYPEOFF,"\0\0\0\0", 4);
+    memcpy(adp + FINDERINFO_FRCREATOFF,"\0\0\0\0", 4);
 
     /* make things invisible */
     if ((ad->ad_options & ADVOL_INVDOTS)
@@ -381,7 +385,7 @@ static int new_ad_header(struct adouble *ad, const char *path, struct stat *stp,
         ashort = htons(ATTRBIT_INVISIBLE);
         ad_setattr(ad, ashort);
         ashort = htons(FINDERINFO_INVISIBLE);
-        memcpy(ad_entry(ad, ADEID_FINDERI) + FINDERINFO_FRFLAGOFF, &ashort, sizeof(ashort));
+        memcpy(adp + FINDERINFO_FRFLAGOFF, &ashort, sizeof(ashort));
     }
 
     /* put something sane in the date fields */
