@@ -17,8 +17,10 @@ elif 'x86_64'.contains(host_machine.cpu_family())
                 install_dir : '/usr/local/etc/dbus-1/system.d')
 endif
 
-install_data('README',
-              install_dir : join_paths(get_option('localstatedir'), meson.project_name()))
+localstate_dir = join_paths(get_option('prefix'), 'var', meson.project_name())
 
 install_data('README',
-              install_dir : join_paths(get_option('localstatedir'), meson.project_name(), 'CNID'))
+              install_dir : localstate_dir)
+
+install_data('README',
+              install_dir : join_paths(localstate_dir, 'CNID'))
