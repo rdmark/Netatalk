@@ -54,11 +54,6 @@ threads = dependency('threads', required : true)
 
 xsltproc = find_program('xsltproc', required : true)
 
-cdata.set('CNID_BACKEND_DBD', '1')
-cdata.set('CNID_BACKEND_LAST', '1')
-cdata.set('CNID_BACKEND_MYSQL', '1')
-cdata.set('CNID_BACKEND_TDB', '1')
-cdata.set('USE_BUILTIN_TDB', '1')
 cdata.set('DEFAULT_CNID_SCHEME', '"dbd"')
 cdata.set('EA_MODULES', '"ad | sys"')
 cdata.set('ICONV_CONST', '')

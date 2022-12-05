@@ -6,8 +6,6 @@
 
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
-
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -220,5 +218,3 @@ cnid_t cnid_tdb_add(struct _cnid_db *cdb, const struct stat *st,
 
     return hint;
 }
-
-#endif

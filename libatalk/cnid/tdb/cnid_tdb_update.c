@@ -1,7 +1,5 @@
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
-
 #include "cnid_tdb.h"
 #include <atalk/logger.h>
 
@@ -101,5 +99,3 @@ update_err:
     LOG(log_error, logtype_default, "cnid_update: Unable to update CNID %u", ntohl(id));
     return -1;
 }
-
-#endif

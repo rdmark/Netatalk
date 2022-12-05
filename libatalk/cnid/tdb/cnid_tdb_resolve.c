@@ -3,8 +3,6 @@
 
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
-
 #include "cnid_tdb.h"
 
 /* Return the did/name pair corresponding to a CNID. */
@@ -30,5 +28,3 @@ char *cnid_tdb_resolve(struct _cnid_db *cdb, cnid_t *id, void *buffer, size_t le
     }
     return NULL;
 }
-
-#endif

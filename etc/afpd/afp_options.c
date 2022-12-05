@@ -43,16 +43,11 @@ static void show_version( void )
 	puts( "" );
 
     printf("         CNID backends:\t");
-#ifdef CNID_BACKEND_DBD
     printf("dbd ");
-#endif
-#ifdef CNID_BACKEND_LAST
-	printf( "last " );
-#endif
-#ifdef CNID_BACKEND_MYSQL
-	printf( "mysql " );
-#endif
-	puts( "" );
+    printf("last ");
+    printf("tdb ");
+    printf("mysql ");
+    puts("");
 }
 
 /*

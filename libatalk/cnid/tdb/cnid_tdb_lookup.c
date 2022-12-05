@@ -1,7 +1,5 @@
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
-
 #include <atalk/logger.h>
 
 #include "cnid_tdb.h"
@@ -141,5 +139,3 @@ cnid_t cnid_tdb_lookup(struct _cnid_db *cdb, const struct stat *st, cnid_t did, 
     cnid_tdb_update(cdb, id, st, did, name, len);
     return id;
 }
-
-#endif

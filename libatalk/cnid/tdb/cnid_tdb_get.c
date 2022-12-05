@@ -1,7 +1,5 @@
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
-
 #include "cnid_tdb.h"
 
 /* Return CNID for a given did/name. */
@@ -34,5 +32,3 @@ cnid_t cnid_tdb_get(struct _cnid_db *cdb, cnid_t did, const char *name, size_t l
     free(data.dptr);
     return id;
 }
-
-#endif

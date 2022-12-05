@@ -6,7 +6,6 @@
 
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
 #include <stdlib.h>
 #include <sys/param.h>
 
@@ -145,6 +144,3 @@ struct _cnid_module cnid_tdb_module = {
     {NULL, NULL},
     cnid_tdb_open,
     CNID_FLAG_SETUID | CNID_FLAG_BLOCK};
-
-
-#endif

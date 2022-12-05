@@ -8,8 +8,6 @@
 
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
-
 #include "cnid_tdb.h"
 
 int cnid_tdb_delete(struct _cnid_db *cdb, const cnid_t id)
@@ -43,5 +41,3 @@ int cnid_tdb_delete(struct _cnid_db *cdb, const cnid_t id)
     free(data.dptr);
     return 0;
 }
-
-#endif

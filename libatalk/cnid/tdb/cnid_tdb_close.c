@@ -3,8 +3,6 @@
 
 #include "config.h"
 
-#ifdef CNID_BACKEND_TDB
-
 #include "cnid_tdb.h"
 
 void cnid_tdb_close(struct _cnid_db *cdb)
@@ -16,5 +14,3 @@ void cnid_tdb_close(struct _cnid_db *cdb)
     free(cdb->cnid_db_private);
     free(cdb);
 }
-
-#endif
