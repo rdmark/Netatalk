@@ -119,14 +119,11 @@ error:
  * Here we assume (for now, at least) that echo on means login name, and
  * echo off means password.
  */
-static int PAM_conv (int num_msg,
-#ifdef LINUX
-                     const struct pam_message **msg,
-#else
+static int PAM_conv(int num_msg,
                     struct pam_message **msg,
-#endif
-                     struct pam_response **resp,
-                     void *appdata_ptr _U_) {
+                    struct pam_response **resp,
+                    void *appdata_ptr _U_)
+{
     int count = 0;
     struct pam_response *reply;
 
