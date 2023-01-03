@@ -24,7 +24,9 @@
    - it doesn't know about Apple extension
 */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <stdlib.h>		/* for size_t */
 
 #include <netatalk/endian.h>

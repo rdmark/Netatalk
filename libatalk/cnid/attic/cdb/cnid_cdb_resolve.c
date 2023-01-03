@@ -2,7 +2,9 @@
  * $Id: cnid_cdb_resolve.c,v 1.5 2009-10-29 13:38:16 didg Exp $
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #ifdef CNID_BACKEND_CDB
 #include "cnid_cdb_private.h"

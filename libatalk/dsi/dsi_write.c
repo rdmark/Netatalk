@@ -7,7 +7,9 @@
  * 7 Oct 1997 added checks for 0 data.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 /* this streams writes */
 #include <stdio.h>

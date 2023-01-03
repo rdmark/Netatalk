@@ -5,7 +5,9 @@
  * All Rights Reserved. See COPYRIGHT.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <string.h>
 #include <errno.h>

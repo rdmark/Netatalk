@@ -4,7 +4,9 @@
  * files/directories into appledouble v2.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <atalk/adouble.h>
 #include <stdio.h>

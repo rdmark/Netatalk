@@ -5,7 +5,9 @@
 #ifndef LIBATALK_CDB_PRIVATE_H
 #define LIBATALK_CDB_PRIVATE_H 1
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <netatalk/endian.h>
 

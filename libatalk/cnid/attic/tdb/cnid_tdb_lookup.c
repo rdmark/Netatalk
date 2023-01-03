@@ -2,7 +2,9 @@
  * $Id: cnid_tdb_lookup.c,v 1.6 2009-11-21 11:12:49 didg Exp $
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #ifdef CNID_BACKEND_TDB
 

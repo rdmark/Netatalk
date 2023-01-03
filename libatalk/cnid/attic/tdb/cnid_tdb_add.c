@@ -6,7 +6,9 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #ifdef CNID_BACKEND_TDB
 #include "cnid_tdb.h"

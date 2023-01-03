@@ -7,7 +7,9 @@
 #ifndef __AT_HEADER__
 #define __AT_HEADER__
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 
 #if defined(linux)		/* pull in the linux header */

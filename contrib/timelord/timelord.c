@@ -16,7 +16,9 @@
  *	Copyright (c) 1990, The University of Melbourne.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <sys/param.h>
 #include <sys/types.h>

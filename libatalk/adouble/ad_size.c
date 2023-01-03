@@ -7,7 +7,9 @@
  * if we could depend upon inline functions, this would be one.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <string.h>
 #include <atalk/logger.h>

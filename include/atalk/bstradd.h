@@ -20,7 +20,9 @@
 #ifndef ATALK_BSTRADD_H
 #define ATALK_BSTRADD_H
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include <atalk/bstrlib.h>
 

@@ -14,7 +14,9 @@
  * Technische Universitaet Braunschweig, FRG
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #if !defined(NO_QUOTA_SUPPORT) && !defined(HAVE_LIBQUOTA)
 #include <stdio.h>

@@ -2,7 +2,9 @@
  * $Id: cnid_tdb_resolve.c,v 1.4 2009-11-22 14:14:05 franklahm Exp $
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #ifdef CNID_BACKEND_TDB
 

@@ -16,7 +16,9 @@
 #ifndef ATALK_EA_H
 #define ATALK_EA_H
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #ifdef HAVE_SOLARIS_ACLS
 #include <sys/acl.h>

@@ -17,7 +17,9 @@
    copyright Bjoern Fernhomberg, 2004
 */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <unistd.h>
 #include <sys/types.h>

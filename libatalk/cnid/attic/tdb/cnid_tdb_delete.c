@@ -7,7 +7,9 @@
  * cnid_delete: delete a CNID from the database 
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif 
 
 #ifdef CNID_BACKEND_TDB
 

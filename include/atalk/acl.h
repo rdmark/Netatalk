@@ -15,7 +15,9 @@
 #ifndef ATALK_ACL_H
 #define ATALK_ACL_H
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 
 #define O_NETATALK_ACL 0

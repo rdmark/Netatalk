@@ -8,7 +8,9 @@
  * modified from main.c. this handles afp over asp. 
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 
 #include <stdio.h>

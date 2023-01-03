@@ -7,7 +7,9 @@
  * ad_read/ad_write routines to avoid confusion.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #ifdef USE_MMAPPED_HEADERS
 #include <stdio.h>
