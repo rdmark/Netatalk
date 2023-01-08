@@ -635,7 +635,6 @@ static int ad_header_read(struct adouble *ad, struct stat *hst)
 	if (len + AD_HEADER_LEN > sizeof(ad->ad_data))
 		len = sizeof(ad->ad_data) - AD_HEADER_LEN;
 
-	buf += AD_HEADER_LEN;
 	if (len > header_len - AD_HEADER_LEN) {
 		LOG(log_error, logtype_default, "ad_header_read: too many entries: %zd",
 				header_len);
