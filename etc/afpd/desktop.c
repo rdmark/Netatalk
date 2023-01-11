@@ -237,7 +237,7 @@ int afp_addicon(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 
 		if (debug)
 			if (obj->options.flags & OPTION_DEBUG) {
-				printf("(write) len: %ld\n", (u_int64_t) buflen);
+				printf("(write) len: %lld\n", (u_int64_t) buflen);
 				bprint(rbuf, buflen);
 			}
 

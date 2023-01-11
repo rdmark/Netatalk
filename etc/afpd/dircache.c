@@ -666,7 +666,7 @@ void dircache_dump(void)
 	}
 	setbuf(dump, NULL);
 
-	fprintf(dump, "Number of cache entries in LRU queue: %lu\n",
+	fprintf(dump, "Number of cache entries in LRU queue: %llu\n",
 		queue_count);
 	fprintf(dump, "Configured maximum cache size: %u\n\n",
 		dircache_maxsize);

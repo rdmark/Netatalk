@@ -943,10 +943,10 @@ int main(void)
 			puts(val);
 			break;
 		case 'n':
-			printf("%lu\n", (u_int64_t) hash_size(h));
+			printf("%llu\n", (u_int64_t) hash_size(h));
 			break;
 		case 'c':
-			printf("%lu\n", (u_int64_t) hash_count(h));
+			printf("%llu\n", (u_int64_t) hash_count(h));
 			break;
 		case 't':
 			hash_scan_begin(&hs, h);
