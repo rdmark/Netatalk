@@ -110,7 +110,7 @@ function installNetatalk() {
     sudo sed -i /^~/d "$SYSCONFDIR/netatalk/AppleVolumes.default"
     echo "$AFP_SHARE_PATH \"$AFP_SHARE_NAME\"" | sudo tee -a "$SYSCONFDIR/netatalk/AppleVolumes.default"
     echo "afpd.conf:"
-    echo "- -transall -uamlist uams_guest.so,uams_clrtxt.so,uams_dhx2.so -nosavepassword -noicon" | sudo tee -a "$SYSCONFDIR/netatalk/afpd.conf"
+    echo "- -transall -uamlist uams_guest.so,uams_clrtxt.so,uams_dhx2.so -nosavepassword -icon" | sudo tee -a "$SYSCONFDIR/netatalk/afpd.conf"
     echo "papd.conf:"
     echo "cupsautoadd:op=root:" | sudo tee -a "$SYSCONFDIR/netatalk/papd.conf"
     sudo usermod -a -G lpadmin $USER
