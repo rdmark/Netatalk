@@ -1,3 +1,15 @@
+Changes in 2.x v230101
+======================
+* FIX: Restore the HAVE_CONFIG_H macro to allow macipgw to be configured.
+* UPD: Remove OpenSSL 1.0 backwards compatibility header. Better use 1.1 now!
+* UPD: Use the Daemon icon instead of the Globe icon with the "-icon" afpd option.
+       (Align with Netatalk 3.1)
+* UPD: Restore Perl as a dependency.
+* UPD: Backport improvements to the asip-status.pl script:
+       - IPv6 support
+       - Better formatting of output
+       - Show GSS-UAM SPNEGO blob
+
 Changes in 2.x v221101
 ======================
 * FIX: debian_install.sh: Enable systemd services to make them persist between
