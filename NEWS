@@ -1,3 +1,10 @@
+Changes in 2.x v230201
+======================
+* FIX: Create EA file system compat check temp files in /tmp rather than /
+       then explicitly delete them afterwards.
+       https://github.com/Netatalk/Netatalk/issues/188
+* FIX: Fix largefile-check macro for clang 16 and gcc 14 (patch by nekopsykose)
+
 Changes in 2.x v230101
 ======================
 * FIX: Restore the HAVE_CONFIG_H macro to allow macipgw to be configured.
