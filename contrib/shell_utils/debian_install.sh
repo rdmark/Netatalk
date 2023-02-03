@@ -32,11 +32,11 @@ function initialChecks() {
     fi
     echo "Netatalk install script for Debian Linux. May work on other flavors too."
     echo "It attempts to set up a universally compatible AFP server:"
+    echo " - One shared volume named '$AFP_SHARE_NAME' ($AFP_SHARE_PATH)"
     echo " - Classic AppleTalk (DDP) support enabled"
     echo " - TCP/IP (DSI) support and service discovery with Zeroconf / Bonjour enabled"
     echo " - Cleartxt UAM to authenticate Classic Mac OS clients"
     echo " - DHX2 UAM to authenticate Mac OS X / macOS clients"
-    echo " - Sharing $AFP_SHARE_PATH as $AFP_SHARE_NAME"
     echo " - Additional AppleTalk daemons papd (printer server), timelord (time server), and a2boot (Apple II netboot server)"
     echo ""
     echo "The following changes will be made to your system:"
