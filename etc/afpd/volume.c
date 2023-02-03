@@ -2335,7 +2335,6 @@ static void check_ea_sys_support(struct vol *vol)
 			LOG(log_warning, logtype_afpd,
 			    "volume \"%s\" does not support Extended Attributes, using ea:ad instead",
 			    vol->v_localname);
-			unlink(eaname);
 			vol->v_vfs_ea = AFPVOL_EA_AD;
 		}
 
@@ -2344,6 +2343,7 @@ static void check_ea_sys_support(struct vol *vol)
 				LOG(log_error, logtype_afpd,
 				    "check_ea_sys_support: can't seteuid back to %i (%s)",
 				    process_uid, strerror(errno));
+				unlink(eaname);
 				exit(EXITERR_SYS);
 			}
 		}
