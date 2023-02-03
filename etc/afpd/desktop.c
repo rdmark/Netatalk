@@ -490,7 +490,7 @@ int afp_geticon(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 		 * a problem. much confusion results otherwise. */
 		while (*rbuflen > 0) {
 #ifdef WITH_SENDFILE
-			if (!obj->options.flags & OPTION_DEBUG) {
+			if ((!obj->options.flags) & OPTION_DEBUG) {
 				if (dsi_stream_read_file
 				    (dsi, si.sdt_fd, offset,
 				     dsi->datasize) < 0) {
