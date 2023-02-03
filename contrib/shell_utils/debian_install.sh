@@ -165,4 +165,3 @@ done
 
 initialChecks
 installNetatalk
-exit 0
