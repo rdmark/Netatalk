@@ -15,9 +15,14 @@ set -e
 
 USER=$(whoami)
 BASE=$(dirname "$(readlink -f "${0}")")
+CORES=$(nproc)
 AFP_SHARE_NAME="Netatalk File Server"
 AFP_SHARE_PATH="$HOME/afpshare"
 SYSCONFDIR="/etc"
+INSTALL_PACKAGES=1
+MAKE_CLEAN=1
+START_SERVICES=1
+INTERACTIVE=1
 
 # checks to run before installation
 function initialChecks() {
@@ -46,6 +51,14 @@ function initialChecks() {
     echo ""
     echo "Input your password to allow this script to make the above changes."
     sudo -v
+
+    echo ""
+    echo "IMPORTANT: "$USER" needs to have a password of 8 chars or less due to Classic Mac OS limitations."
+    echo "Do you want to change your password now? [y/N]"
+    read -r REPLY
+    if [ "$REPLY" == "y" ] || [ "$REPLY" == "Y" ]; then
+        passwd
+    fi
 }
 
 function installNetatalk() {
@@ -79,10 +92,12 @@ function installNetatalk() {
         chmod -R 2775 "$AFP_SHARE_PATH"
     fi
 
-    echo ""
-    echo "Installing dependencies..."
-    sudo apt-get update || true
-    sudo apt-get install libssl-dev libdb-dev libcups2-dev cups libavahi-client-dev autotools-dev automake libtool libgcrypt20-dev pkg-config --assume-yes </dev/null
+    if [ $INSTALL_PACKAGES ]; then
+        echo ""
+        echo "Installing dependencies..."
+        sudo apt-get update || true
+        sudo apt-get install libssl-dev libdb-dev libcups2-dev cups libavahi-client-dev autotools-dev automake libtool libgcrypt20-dev pkg-config --assume-yes </dev/null
+    fi
 
     echo ""
     echo "Bootstrapping and configuring Netatalk..."
@@ -91,8 +106,11 @@ function installNetatalk() {
     ./configure --enable-systemd --enable-overwrite --sysconfdir="$SYSCONFDIR" --with-uams-path=/usr/lib/netatalk </dev/null
 
     echo ""
-    echo "Compiling Netatalk with ${CORES:-1} simultaneous core(s)..."
-    ( make clean && make all -j "${CORES:-1}" ) </dev/null
+    echo "Compiling Netatalk with ${CORES} simultaneous core(s)..."
+    if [ $MAKE_CLEAN ]; then
+        make clean </dev/null
+    fi
+    make all -j "${CORES}" </dev/null
 
     sudo make install </dev/null
 
@@ -120,25 +138,20 @@ function installNetatalk() {
         sudo sed -i "/MaxLogSize/a PreserveJobHistory\ No" /etc/cups/cupsd.conf
     fi
 
-    echo ""
-    echo "Starting systemd services... (this may take a while)"
-    sudo systemctl enable afpd atalkd papd timelord a2boot cups
-    sudo systemctl start afpd atalkd papd timelord a2boot cups
+    if [ $START_SERVICES ]; then
+        echo ""
+        echo "Starting systemd services... (this may take a while)"
+        sudo systemctl enable afpd atalkd papd timelord a2boot cups
+        sudo systemctl start afpd atalkd papd timelord a2boot cups
 
-    echo ""
-    echo "Netatalk daemons are now installed and running, and should be discoverable by your Macs."
-    echo "To authenticate with the file server, use the current username ("$USER") and password."
-    echo ""
-    echo "IMPORTANT: "$USER" needs to have a password of 8 chars or less due to Classic Mac OS limitations."
-    echo "Do you want to change your password now? [y/N]"
-    read -r REPLY
-    if [ "$REPLY" == "y" ] || [ "$REPLY" == "Y" ]; then
-        passwd
+        echo ""
+        echo "Netatalk daemons are now installed and running, and should be discoverable by your Macs."
+        echo "To authenticate with the file server, use the current username ("$USER") and password."
+        echo ""
+        echo "For more information on how to use the various Netatalk features, see README.md"
+        echo "Enjoy Netatalk!"
+        echo ""
     fi
-    echo ""
-    echo "For more information on how to use the various Netatalk features, see README.md"
-    echo "Enjoy Netatalk!"
-    echo ""
 }
 
 # parse arguments passed to the script
@@ -155,6 +168,18 @@ while [ "$1" != "" ]; do
         -p | --share-path)
             AFP_SHARE_PATH=$VALUE
             ;;
+        -a | --no-packages)
+            INSTALL_PACKAGES=
+            ;;
+        -c | --no-make-clean)
+            MAKE_CLEAN=
+            ;;
+        -s | --no-start)
+            START_SERVICES=
+            ;;
+        -h | --headless)
+            INTERACTIVE=
+            ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""
             exit 1
@@ -163,5 +188,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-initialChecks
+if [ $INTERACTIVE ]; then
+    initialChecks
+fi
 installNetatalk
