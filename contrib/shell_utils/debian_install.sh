@@ -96,7 +96,7 @@ function installNetatalk() {
         echo ""
         echo "Installing dependencies..."
         sudo apt-get update || true
-        sudo apt-get install libssl-dev libdb-dev libcups2-dev cups libavahi-client-dev autotools-dev automake libtool libgcrypt20-dev pkg-config --assume-yes </dev/null
+        sudo apt-get install libssl-dev libdb-dev libcups2-dev cups libavahi-client-dev autotools-dev automake libtool libgcrypt20-dev pkg-config --assume-yes --no-install-recommends </dev/null
     fi
 
     echo ""
