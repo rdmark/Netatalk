@@ -56,14 +56,14 @@ extern int debug;
  *                           putawayID    4  home directory id
  */
 
-const u_char ufinderi[ADEDLEN_FINDERI] = {
+const u_int8_t ufinderi[ADEDLEN_FINDERI] = {
 	0, 0, 0, 0, 0, 0, 0, 0,
 	1, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static const u_char old_ufinderi[] = {
+static const u_int8_t old_ufinderi[] = {
 	'T', 'E', 'X', 'T', 'U', 'N', 'I', 'X'
 };
 
@@ -313,7 +313,7 @@ int getmetadata(struct vol *vol,
 	u_int32_t aint;
 	cnid_t id = 0;
 	u_int16_t ashort;
-	u_char achar, fdType[4];
+	u_int8_t achar, fdType[4];
 	u_int32_t utf8 = 0;
 	struct stat *st;
 	struct maccess ma;
@@ -902,8 +902,8 @@ int setfilparams(struct vol *vol,
 	struct extmap *em;
 	int bit, isad = 1, err = AFP_OK;
 	char *upath;
-	u_char achar, xyy[4];
-	u_char *fdType = NULL;	/* "uninitialized, OK 310105" -- yeah, no */
+	u_int8_t achar, xyy[4];
+	u_int8_t *fdType = NULL;	/* "uninitialized, OK 310105" -- yeah, no */
 	u_int16_t ashort = 0;
 	u_int16_t bshort, oshort;
 	u_int32_t aint;
@@ -921,7 +921,7 @@ int setfilparams(struct vol *vol,
 	u_int16_t bitmap = f_bitmap;
 	u_int32_t cdate = 0;
 	u_int32_t bdate = 0;
-	u_char finder_buf[32];
+	u_int8_t finder_buf[32];
 	int fp;
 	ssize_t len;
 	char symbuf[MAXPATHLEN + 1];
@@ -1029,11 +1029,11 @@ int setfilparams(struct vol *vol,
 				achar = *buf;
 				buf += 2;
 				/* Keep special case to support crlf translations */
-				if ((unsigned int) achar == 0x04) {
-					fdType = (u_char *) "TEXT";
+				if (achar == 0x04) {
+					fdType = (u_int8_t *) "TEXT";
 					buf += 2;
 				} else {
-					xyy[0] = (u_char) 'p';
+					xyy[0] = (u_int8_t) 'p';
 					xyy[1] = achar;
 					xyy[3] = *buf++;
 					xyy[2] = *buf++;
@@ -1793,7 +1793,7 @@ int afp_createid(AFPObj * obj _U_, char *ibuf, size_t ibuflen _U_,
 	char *upath;
 	int len;
 	cnid_t did, id;
-	u_short vid;
+	u_int16_t vid;
 	struct path *s_path;
 
 	*rbuflen = 0;
@@ -2061,7 +2061,7 @@ int afp_deleteid(AFPObj * obj _U_, char *ibuf, size_t ibuflen _U_,
 	int err;
 	cnid_t id;
 	cnid_t fileid;
-	u_short vid;
+	u_int16_t vid;
 	static char buffer[12 + MAXPATHLEN + 1];
 	int len = 12 + MAXPATHLEN + 1;
 

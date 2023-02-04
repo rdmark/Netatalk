@@ -31,15 +31,15 @@
 #include "volume.h"
 
 struct savedt {
-    u_char	sdt_creator[ 4 ];
+    u_int8_t	sdt_creator[ 4 ];
     int		sdt_fd;
     int		sdt_index;
-    short	sdt_vid;
+    int16_t	sdt_vid;
 };
 
 typedef unsigned char CreatorType[4];
 
-extern char	*dtfile (const struct vol *, u_char [], char *);
+extern char	*dtfile (const struct vol *, u_int8_t [], char *);
 extern char	*mtoupath (const struct vol *, char *, cnid_t, int utf8);
 extern char	*utompath (const struct vol *, char *, cnid_t, int utf8);
 

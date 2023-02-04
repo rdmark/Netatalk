@@ -20,6 +20,8 @@ ltmain.sh
 autom4te.cache
 autoscan.log
 test-driver
+patches
+**/.AppleDouble/**
 *.rpm
 *.deb
 *.dsc

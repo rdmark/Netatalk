@@ -350,7 +350,7 @@ void afp_over_asp(AFPObj * obj)
 			break;
 
 		case ASPFUNC_CMD:
-			func = (u_char) asp->commands[0];
+			func = (u_int8_t) asp->commands[0];
 			if (debug)
 				if (obj->options.flags & OPTION_DEBUG) {
 					printf("command: %d (%s)\n", func,
@@ -394,7 +394,7 @@ void afp_over_asp(AFPObj * obj)
 			break;
 
 		case ASPFUNC_WRITE:
-			func = (u_char) asp->commands[0];
+			func = (u_int8_t) asp->commands[0];
 
 			if (debug)
 				if (obj->options.flags & OPTION_DEBUG) {
