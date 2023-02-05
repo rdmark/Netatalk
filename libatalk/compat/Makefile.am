@@ -3,7 +3,6 @@
 noinst_LTLIBRARIES = libcompat.la
 
 libcompat_la_SOURCES =	\
-<<<<<<< HEAD
 	misc.c \
 	inet_aton.c	\
 	rquota_xdr.c
