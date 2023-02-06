@@ -232,7 +232,13 @@ int main( int ac, char **av )
             exit( 1 );
             }
 
+// TODO: Find a portable way to get time zone adjusted time
+// tm_gmtoff does not exist on Solaris with kin
+#if defined (HAVE_STRUCT_TM_GMTOFF)
             mtime = tv.tv_sec + EPOCH + tm->tm_gmtoff;
+#else
+            mtime = tv.tv_sec + EPOCH;
+#endif
             LOG(log_info, logtype_default, "Time zone is localtime" );
         }
         else {
