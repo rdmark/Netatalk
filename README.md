@@ -81,30 +81,30 @@ $ dnf install openssl-devel libgcrypt-devel libdb-devel automake libtool avahi-d
 ```
 
 ### OmniOS
-These packages may apply also to other OpenSolaris descendents, such as OpenIndiana, or even to Solaris proper.
+**Note:** These packages may apply also to other OpenSolaris descendents, such as OpenIndiana, or even to Solaris proper.
 
 ```
 $ pkg install git libtool automake gcc7 bdb
 ```
 
 ## Feature Configuration Examples
-### Linux
-**Note: For systems running legacy versions of autotools, you may need to replace the first few lines of ```configure.a```c with the commented out legacy syntax before running the ```bootstrap``` script. Has been confirmed on f.e. Ubuntu 18.04 and earlier, and Illumos (Tribblix 0m28).**
+**Note:** For systems running legacy versions of autotools, you may need to replace the first few lines of ```configure.a```c with the commented out legacy syntax before running the ```bootstrap``` script. Has been confirmed on f.e. Ubuntu 18.04 and earlier, and Illumos (Tribblix 0m28).
 
 First of all, it is worth noting that unlike upstream Netatalk 2, DDP (AppleTalk), papd, timelord, and a2boot are all configured and compiled by default.
 
-For most setups, the only parameter you need is for picking the init script option for your OS. Here as an example is the *systemd* option, which will install systemd services that you can start once installation is complete. Use ```./configure --help``` to see the other init script options available.
+For most setups, the only parameter you need is for picking the init script option for your OS. Here as an example is the cross-platform *systemd* option, which will install systemd services that you can start once installation is complete. Run ```./configure --help``` to see the other init script options available.
 ```
 $ ./configure --enable-systemd
 ```
 
-If you want to use Netatalk with Mac OS X 10.2 or later, make sure you have installed *libavahi* and *libgcrypt* as per the instructions in the section above before configuring and compiling.
+### SLP
+If you want to use Netatalk with Mac OS X 10.2 or later, make sure you have installed `libavahi` and `libgcrypt` as per the instructions in the section above before configuring and compiling.
 
-Mac OS X 10.0 and 10.1 uses SLP rather than Zeroconf for service discovery. Netatalk does not support SLP and Zeroconf being enabled at the same time. [See bug #7.](https://github.com/rdmark/Netatalk-2.x/issues/7)
-```
-$ apt install libslp-dev
-$ ./configure --enable-systemd --enable-srvloc --disable-zeroconf
-```
+Mac OS X 10.0 and 10.1, however, uses SLP (Service Location Protocol) rather than Zeroconf for service discovery. Netatalk does not support SLP and Zeroconf being enabled at the same time. [See bug #7.](https://github.com/rdmark/Netatalk-2.x/issues/7)
+
+On Debian f.e., the SLP library package is called `libslp-dev`.
+
+Configure with `--enable-srvloc --disable-zeroconf`.
 
 ### OmniOS
 You need to point to the location where the Berkely DB libraries and headers are installed, e.g.:
@@ -114,7 +114,7 @@ You need to point to the location where the Berkely DB libraries and headers are
 ```
 
 ## Suggested Settings
-Netatalk is an incredibly versatile piece of software, with over 20 years worth of accumulated functionality. At one point in history, it was broadly deployed in enterprise environments, so part of the feature set is geared towards operation at scale. As such, choosing the right settings for your needs and environment as a hobbyist can be daunting.
+Netatalk is an incredibly versatile piece of software, with over 30 years worth of accumulated functionality. Up until the time Apple deprecated AFP, it was deployed in enterprise and educational environments, so part of the feature set is geared towards operation at scale. As such, choosing the right settings for your needs and environment as a hobbyist can be daunting.
 
 Here follows a configuration example that the author of this fork has found to be the most simple and universally useful, allowing System 6 and macOS Monterey clients to share one and the same file server. It uses a single shared directory, and authentication with a single user's credentials, as well as a single routerless AppleTalk network without Zones.
 
