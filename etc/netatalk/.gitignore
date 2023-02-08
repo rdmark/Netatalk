@@ -1,6 +1,0 @@
-Makefile
-Makefile.in
-netatalk
-.deps
-.libs
-*.o
