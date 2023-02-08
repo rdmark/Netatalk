@@ -291,24 +291,6 @@ AC_ARG_ENABLE(locking,
 
 )
 
-AC_ARG_ENABLE(redhat-sysv,
-	[  --enable-redhat-sysv    use redhat-style sysv (upstart) configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=redhat-sysv
-	fi
-	AC_MSG_RESULT([enabling redhat-style sysv support])
-	]
-)
-
-AC_ARG_ENABLE(suse-sysv,
-	[  --enable-suse-sysv      use suse-style sysv configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=suse-sysv
-	fi
-	AC_MSG_RESULT([enabling suse-style sysv support])
-	]
-)
-
 AC_ARG_ENABLE(gentoo,
 	[  --enable-gentoo         use gentoo-style sysv configuration ],[
 	if test "$enableval" = "yes"; then
@@ -326,21 +308,12 @@ AC_ARG_ENABLE(netbsd,
 	AC_MSG_RESULT([enabling NetBSD-style rc.d support])
 )
 
-AC_ARG_ENABLE(debian,
-	[  --enable-debian         use debian-style sysv configuration ],[
-	if test "$enableval" = "yes"; then
-		sysv_style=debian
-	fi
-	AC_MSG_RESULT([enabling debian-style sysv support])
-	]
-)
-
 AC_ARG_ENABLE(systemd,
 	[  --enable-systemd        use general systemd configuration],[
 	if test "$enableval" = "yes"; then
 		sysv_style=systemd
 	fi
-	AC_MSG_RESULT([enabling general systemd support])
+	AC_MSG_RESULT([enabling cross-platform systemd support])
 	]
 )
 
@@ -792,13 +765,10 @@ AM_CONDITIONAL(USE_PAM, test x$netatalk_cv_install_pam = xyes)
 AM_CONDITIONAL(BUILD_PAM, test x$compile_pam = xyes)
 AM_CONDITIONAL(DEFAULT_HOOK, test x$neta_cv_have_libgcrypt != xyes && test x$neta_cv_have_openssl != xyes)
 AM_CONDITIONAL(USE_NETBSD, test x$sysv_style = xnetbsd)
-AM_CONDITIONAL(USE_REDHAT_SYSV, test x$sysv_style = xredhat-sysv)
-AM_CONDITIONAL(USE_SUSE_SYSV, test x$sysv_style = xsuse-sysv)
 AM_CONDITIONAL(USE_SHADOWPW, test x$shadowpw = xyes)
 AM_CONDITIONAL(USE_SOLARIS, test x$sysv_style = xsolaris)
 AM_CONDITIONAL(USE_GENTOO, test x$sysv_style = xgentoo)
-AM_CONDITIONAL(USE_DEBIAN, test x$sysv_style = xdebian)
-AM_CONDITIONAL(USE_SYSTEMD, test x$sysv_style = xsystemd || test x$sysv_style = xredhat-systemd || test x$sysv_style = xsuse-systemd)
+AM_CONDITIONAL(USE_SYSTEMD, test x$sysv_style = xsystemd)
 AM_CONDITIONAL(USE_UNDEF, test x$sysv_style = x)
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
 AM_CONDITIONAL(SYSTEMD_START, test x$netatalk_systemd_start = xyes)
