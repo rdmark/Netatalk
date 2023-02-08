@@ -1,3 +1,40 @@
+# Netatalk
+Netatalk is an implementation of "AFP over TCP".
+Netatalk also support the AppleTalk Protocol Suite for legacy Macs.
+The current release contains support for EtherTalk Phase I and II, 
+DDP, RTMP, NBP, ZIP, AEP, ATP, PAP, ASP, AFP and DSI.
+The complete stack looks like this on a BSD-derived system:
+
+```
+    AFP                          AFP
+     |                            |
+    ASP    PAP                   DSI
+      \   /                       |
+       ATP RTMP NBP ZIP AEP       |
+        |    |   |   |   |        |
+   -+---------------------------------------------------+- (kernel boundary)
+    |                    Socket                         |
+    +-----------------------+------------+--------------+
+    |                       |     TCP    |    UDP       |
+    |          DDP          +------------+--------------+
+    |                       |           IP              |
+    +-----------------------+---------------------------+
+    |                Network-Interface                  |
+    +---------------------------------------------------+
+```
+
+DSI is a session layer used to carry AFP over TCP.
+DDP is in the kernel.  "atalkd" implements RTMP, NBP, ZIP, and AEP.  It
+is the AppleTalk equivalent of Unix "routed".  There is also a
+client-stub library for NBP.  ATP and ASP are implemented as
+libraries.  "papd" allows Macs to spool to "lpd", and "pap" allows Unix
+machines to print to AppleTalk connected printers.  "psf" is a
+PostScript printer filter for "lpd", designed to use "pap".  "psorder"
+is a PostScript reverser, called by "psf" to reverse pages printed to
+face-up stacking printers.  "afpd" provides Macs with an interface to
+the Unix file system.  Refer to the appropriate man pages for
+operational information.
+
 # Netatalk 2.x
 Netatalk 2.x is a fork of the Netatalk 2.2 codebase, which aims to be clean and easy to set up on modern systems. It has taken in all community patches that emerged since upstream Netatalk 2.2 stopped being actively developed, for ultimate performance, compatibility and usability. It has also aggressively deprecated broken or long outdated features, as well as backported a select few security patches from upstream.
 
