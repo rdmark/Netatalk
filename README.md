@@ -48,13 +48,14 @@ As of Netatalk 3.0, support for Apple's legacy AppleTalk (DDP) protocol was drop
 One major motivation for keeping Netatalk 2.2 alive, is the ability to understand both AppleTalk (DDP) and TCP/IP (DSI) which allows it to serve as a bridge between very old Apple II and Mac systems, and modern macOS and other systems that understand AFP.
 
 # Installation
-**For Debian Linux (and derivates) users, there is an [automated installation script](https://github.com/rdmark/Netatalk-2.x/blob/branch-netatalk-2-x/contrib/shell_utils/debian_install.sh) that configures and installs the universal Netatalk setup described below.**
-
-Follow the [installation steps in the official Netatalk 2.2 documentation](http://netatalk.sourceforge.net/2.2/htmldocs/installation.html) to configure and install Netatalk.
+Follow the [installation steps in the official Netatalk 2.2 documentation](https://github.com/rdmark/Netatalk-2.x/wiki/Chapter-2.-Installation) to configure and install Netatalk.
 
 The general installation flow follows that of most traditional *NIX software: Run the ```bootstrap``` script to generate the Makefiles, then run the ```configure``` script to configure the feature set, then finally run ```make``` and ```make install``` to compile and install the software.
 
-As supplementary information when installing on a Debian based Linux distros (which is the primary environment the author of this fork is using), you need at least these apt packages:
+## Recommended packages
+### Debian Linux
+**For Debian Linux (and derivates), there is an [automated installation script](https://github.com/rdmark/Netatalk-2.x/blob/branch-netatalk-2-x/contrib/shell_utils/debian_install.sh) that configures and installs the universal Netatalk setup described below.**
+
 ```
 $ apt install libssl-dev libdb-dev autotools-dev automake libtool pkg-config
 ```
@@ -74,7 +75,20 @@ For DHX2 authentication support, required for Mac OS X 10.2 or later, install li
 $ apt install libgcrypt20-dev
 ```
 
+### Fedora Server
+```
+$ dnf install openssl-devel libgcrypt-devel libdb-devel automake libtool avahi-devel cups-devel
+```
+
+### OmniOS
+These packages may apply also to other OpenSolaris descendents, such as OpenIndiana, or even to Solaris proper.
+
+```
+$ pkg install git libtool automake gcc7 bdb
+```
+
 ## Feature Configuration Examples
+### Linux
 **Note: For systems running legacy versions of autotools, you may need to replace the first few lines of ```configure.a```c with the commented out legacy syntax before running the ```bootstrap``` script. Has been confirmed on f.e. Ubuntu 18.04 and earlier, and Illumos (Tribblix 0m28).**
 
 First of all, it is worth noting that unlike upstream Netatalk 2, DDP (AppleTalk), papd, timelord, and a2boot are all configured and compiled by default.
@@ -90,6 +104,13 @@ Mac OS X 10.0 and 10.1 uses SLP rather than Zeroconf for service discovery. Neta
 ```
 $ apt install libslp-dev
 $ ./configure --enable-systemd --enable-srvloc --disable-zeroconf
+```
+
+### OmniOS
+You need to point to the location where the Berkely DB libraries and headers are installed, e.g.:
+
+```
+./configure --with-bdb=/opt/ooce
 ```
 
 ## Suggested Settings
