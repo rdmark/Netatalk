@@ -17,11 +17,7 @@ EXTRA_DIST = \
 
 OVERWRITE_CONFIG = @OVERWRITE_CONFIG@
 
-if USE_DEBIAN
-CONFFILES = AppleVolumes.system
-else
 CONFFILES = AppleVolumes.system netatalk.conf
-endif
 
 if HAVE_LDAP
 CONFFILES += afp_ldap.conf
@@ -53,9 +49,6 @@ uninstall-local:
 		echo rm -f $(DESTDIR)$(pkgconfdir)/$$f; \
 		rm -f $(DESTDIR)$(pkgconfdir)/$$f; \
 	done
-if USE_DEBIAN
-	rm -f $(DESTDIR)/etc/default/netatalk
-endif
 
 install-config-files: $(CONFFILES) $(GENFILES)
 	$(mkinstalldirs) $(DESTDIR)$(pkgconfdir)
@@ -67,12 +60,3 @@ install-config-files: $(CONFFILES) $(GENFILES)
 			echo "not overwriting $$f"; \
 		fi; \
 	done
-if USE_DEBIAN
-	$(mkinstalldirs) $(DESTDIR)/etc/default
-	if test "x$(OVERWRITE_CONFIG)" = "xyes" -o ! -f /etc/default/netatalk; then \
-		echo "$(INSTALL_DATA) $(srcdir)/netatalk.conf $(DESTDIR)/etc/default/netatalk"; \
-		$(INSTALL_DATA) $(srcdir)/netatalk.conf $(DESTDIR)/etc/default/netatalk; \
-	else \
-		echo "not overwriting /etc/default/netatalk"; \
-	fi
-endif
