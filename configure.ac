@@ -291,6 +291,24 @@ AC_ARG_ENABLE(locking,
 
 )
 
+AC_ARG_ENABLE(redhat-sysv,
+	[  --enable-redhat-sysv    use redhat-style sysv (upstart) configuration ],[
+	if test "$enableval" = "yes"; then
+		sysv_style=redhat-sysv
+	fi
+	AC_MSG_RESULT([enabling redhat-style sysv support])
+	]
+)
+
+AC_ARG_ENABLE(suse-sysv,
+	[  --enable-suse-sysv      use suse-style sysv configuration ],[
+	if test "$enableval" = "yes"; then
+		sysv_style=suse-sysv
+	fi
+	AC_MSG_RESULT([enabling suse-style sysv support])
+	]
+)
+
 AC_ARG_ENABLE(gentoo,
 	[  --enable-gentoo         use gentoo-style sysv configuration ],[
 	if test "$enableval" = "yes"; then
