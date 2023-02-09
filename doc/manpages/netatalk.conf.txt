@@ -1,18 +1,17 @@
 NETATALK.CONF(5)                                              Netatalk 2.2                                             NETATALK.CONF(5)
 
 NAME
-       netatalk.conf - Configuration file used by Netatalk to determine its general configuration
+       netatalk.conf - Configuration file used by the Netatalk init script to determine its general configuration
 
 SYNOPSIS
        /usr/local/etc/netatalk/netatalk.conf
-                                                                           :DESTDIR:/etc/default/netatalk
 
 DESCRIPTION
-       /usr/local/etc/netatalk/netatalk.conf is the configuration file used by afpd to determine what portions of the file system will
-       be shared via AFP, as well as their behaviors.
+       /usr/local/etc/netatalk/netatalk.conf is the configuration file used by the Netatalk init script to determine what portions of
+       the file system will be shared via AFP, as well as their behaviors.
 
-       If netatalk has been configured with --enable-debian, it is not /usr/local/etc/netatalk/netatalk.conf but
-       :DESTDIR:/etc/default/netatalk.
+       If Netatalk has been configured with --enable-systemd, netatalk.conf is NOT used. In this scenario, configure using the systemd
+       unit configurations, as well as Netatalk's other configuration files.
 
        Any line not prefixed with # is interpreted. The configuration lines are composed like:
 

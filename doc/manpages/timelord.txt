@@ -1,20 +1,23 @@
-TIMELORD(8)                                                      LOCAL                                                      TIMELORD(8)
+TIMELORD(8)                                               The Netatalk Project                                              TIMELORD(8)
 
 NAME
-     timelord — Macintosh time server daemon
+       timelord - Macintosh time server daemon
 
 SYNOPSIS
-     timelord [-d] [-l] [-n nbpname]
+SYNTAX
+       timelord [-d] [-l] [-n filename]
 
 DESCRIPTION
-     timelord is a simple time server for Macintosh computers that use the tardis client.
+       timelord is a simple time server for Macintosh computers that use the tardis client.
 
 OPTIONS
-     -d       Debug mode, i.e. don´t disassociate from controlling TTY.
+       -d
+           Debug mode, i.e. don´t disassociate from controlling TTY.
 
-     -l       Use the time zone sensitive localtime of the server. The default behavior when not using this option is GMT.
+       -l
+           Use the time zone sensitive localtime of the server. The default behavior when not using this option is GMT.
 
-     -n nbpname
-              Register this server as nbpname.  This defaults to the hostname.
+       -n nbpname
+           Register this server as nbpname. This defaults to the hostname.
 
-                                                            February 9, 2023
+Netatalk 2.2                                                  01 Nov 2022                                                   TIMELORD(8)
