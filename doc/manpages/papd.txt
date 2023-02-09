@@ -1,0 +1,117 @@
+PAPD(8)                                                       Netatalk 2.2                                                      PAPD(8)
+
+NAME
+       papd - AppleTalk print server daemon
+
+SYNOPSIS
+       papd [-d] [-f configfile] [-p printcap]
+
+DESCRIPTION
+       papd is the AppleTalk printer daemon. This daemon accepts print jobs from AppleTalk clients (typically Macintosh computers)
+       using the Printer Access Protocol (PAP). When used with System V printing systems, papd spools jobs directly into an lpd(8)
+       spool directory and wakes up lpd after accepting a job from the network to have it re-examine the appropriate spool directory.
+       The actual printing and spooling is handled entirely by lpd.
+
+       papd can also pipe the print job to an external program for processing, and this is the preferred method on systems not using
+       CUPS to avoid compatibility problems with all the flavours of lpd in use.
+
+       As of version 2.0, CUPS is also supported. Simply using cupsautoadd as first papd.conf entry will share all CUPS printers
+       automagically using the PPD files configured in CUPS. It ist still possible to overwrite these defaults by individually define
+       printer shares. See papd.conf(5) for details.
+
+       papd is typically started at boot time, out of system init scripts. It first reads from its configuration file,
+       /usr/local/etc/netatalk/papd.conf. The file is in the same format as /etc/printcap. See printcap(5) for details. The name of the
+       entry is registered with NBP.
+
+       The following options are supported:
+
+       Name   Type    Default     Description
+        pd    str    ´.ppd´       Pathname to PPD file
+        pr    str    ´lp´         LPD or CUPS printer name
+                                  (or pipe to a print
+                                                command)
+        op    str    ´operator´   Operator name for LPD
+                                  spooling
+        au    bool   false        Whether to do authenticated
+                                  printing or not
+        ca    str    NULL         Pathname used for CAP-style
+                                  authentification
+        sp    bool   false        PSSP-style authetication
+        am    str    NULL         UAMS to use for
+                                  authentication
+        pa    str    NULL         Printer´s AppleTalk address
+        co    str    NULL         CUPS options as supplied to
+                                  the lp(1) command with "-o"
+        fo    bool   false        adjust lineending for
+                                  foomatic-rip
+
+       If no configuration file is given, the hostname of the machine is used as the NBP name and all options take their default value.
+
+OPTIONS
+       -d
+           Do not fork or disassociate from the terminal. Write some debugging information to stderr.
+
+       -f configfile
+           Consult configfile instead of /usr/local/etc/netatalk/papd.conf for the configuration information.
+
+       -p printcap
+           Consult printcap instead of /etc/printcap for LPD configuration information.
+
+NOTES
+       PSSP (Print Server Security Protocol) is an authentication protocol carried out through postscript printer queries to the print
+       server. Using PSSP requires LaserWriter 8.6.1 or greater on the client mac. The user will be prompted to enter their username
+       and password before they print. It may be necessary to re-setup the printer on each client the first time PSSP is enabled, so
+       that the client can figure out that authentication is required to print. You can enable PSSP on a per-printer basis. PSSP is the
+       recommended method of authenticating printers as it is more robust than CAP-style authentication, described below.
+
+       CAP-style authentication gets its name from the method the CAP (Columbia APpletalk) package used to authenticate its mac
+       clients´ printing. This method requires that a user login to a file share before they print.  afpd records the username in a
+       temporary file named after the client´s Appletalk address, and it deletes the temporary file when the user disconnects.
+       Therefore CAP style authentification will not work for clients connected to afpd via TCP/IP.  papd gets the username from the
+       file with the same Appletalk address as the machine connecting to it. CAP-style authentication will work with any mac client. If
+       both CAP and PSSP are enabled for a particular printer, CAP will be tried first, then papd will fall back to PSSP.
+
+       The list of UAMs to use for authentication (specified with the ´am´ option) applies to all printers. It is not possible to
+       define different authentication methods on each printer. You can specify the list of UAMS multiple times, but only the last
+       setting will be used. Currently only uams_guest.so and uams_clrtxt.so are supported as printer authentication methods. The guest
+       method requires a valid username, but not a password. The Cleartext UAM requires both a valid username and the correct password.
+
+           Note
+           As of this writing, Mac OS X makes no use of PSSP authentication any longer. CAP-style authentication normally won´t be an
+           option, too caused by the use of AFP over TCP these days.
+
+FILES
+       /usr/local/etc/netatalk/papd.conf
+           Default configuration file.
+
+       /etc/printcap
+           Printer capabilities database.
+
+       .ppd
+           PostScript Printer Description file. papd answers configuration and font queries from printing clients by consulting the
+           configured PPD file. Such files are available for download from Adobe, Inc.
+           (http://www.adobe.com/support/downloads/main.htm[1]), or from the printer´s manufacturer. If no PPD file is configured, papd
+           will return the default answer, possibly causing the client to send excessively large jobs.
+
+CAVEATS
+       papd accepts characters with the high bit set (a full 8-bits) from the clients, but some PostScript printers (including Apple
+       Computer´s LaserWriter family) only accept 7-bit characters on their serial interface by default. The same applies for some
+       printers when they´re accessed via TCP/IP methods (remote LPR or socket). You will need to configure your printer to accept a
+       full 8 bits or take special precautions and convert the printjob´s encoding (eg. by using co="protocol=BCP" when using CUPS
+       1.1.19 or above).
+
+       When printing clients run MacOS 10.2 or above, take care that PPDs do not make use of *cupsFilter: comments unless the
+       appropriate filters are installed at the client´s side, too (remember: Starting with 10.2 Apple chose to integrate CUPS into
+       MacOS X). For in-depth information on how CUPS uses PPDs see chapter 3.4 in http://tinyurl.com/zbxn[2]).
+
+SEE ALSO
+       lpr(1),lprm(1),printcap(5),lpc(8),lpd(8), lp(1).
+
+NOTES
+        1. http://www.adobe.com/support/downloads/main.htm
+           http://www.adobe.com/support/downloads/main.html#Printer
+
+        2. http://tinyurl.com/zbxn
+           http://tinyurl.com/zbxn
+
+Netatalk 2.2                                               06 September 2004                                                    PAPD(8)

@@ -1,0 +1,41 @@
+AFP_SIGNATURE.CONF(5)                                         Netatalk 2.2                                        AFP_SIGNATURE.CONF(5)
+
+NAME
+       afp_signature.conf - Configuration file used by afpd(8) to specify server signature
+
+DESCRIPTION
+       /usr/local/etc/netatalk/afp_signature.conf is the configuration file used by afpd to specify server signature automagically. The
+       configuration lines are composed like:
+
+       "server name" hexa-string
+
+       The first field is server name. Server names must be quoted if they contain spaces. The second field is the hexadecimal string
+       of 32 characters for 16-bytes server signature.
+
+       The leading spaces and tabs are ignored. Blank lines are ignored. The lines prefixed with # are ignored. The illegal lines are
+       ignored.
+
+           Note
+           Server Signature is unique 16-bytes identifier used to prevent logging on to the same server twice.
+
+           Netatalk 2.0 and earlier generated server signature by using gethostid(). There was a problem that another servers have the
+           same signature because the hostid is not unique enough.
+
+           Current netatalk generates the signature from random numbers and saves it into afp_signature.conf. When starting next time,
+           it is read from this file.
+
+           This file should not be thoughtlessly edited and be copied onto another server. If it wants to set the signature
+           intentionally, use the option "-signature user:xxxx" in afpd.conf. In this case, afp_signature.conf is not used.
+
+EXAMPLES
+       Example. afp_signature.conf three servers on one netatalk
+
+           # This is a comment.
+           "Guest Server" 251D25569CB29AFDF296C6B5B3A385B7
+           "User Server" 26B5D785046C019F55718F76B1C13BFB
+           special 74A0BB94EC8C13988B2E75042347E528
+
+SEE ALSO
+       afpd(8), afpd.conf(5), asip-status.pl(1)
+
+Netatalk 2.2                                                  08 Mar 2011                                         AFP_SIGNATURE.CONF(5)

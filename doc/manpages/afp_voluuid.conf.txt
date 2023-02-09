@@ -1,0 +1,37 @@
+AFP_VOLUUID.CONF(5)                                           Netatalk 2.2                                          AFP_VOLUUID.CONF(5)
+
+NAME
+       afp_voluuid.conf - Configuration file used by afpd(8) to specify UUID for Time Machine volume
+
+DESCRIPTION
+       /usr/local/etc/netatalk/afp_voluuid.conf is the configuration file used by afpd to specify UUID of Time Machine volume
+       automagically. The configuration lines are composed like:
+
+       "volume name" uuid-string
+
+       The first field is volume name. Volume names must be quoted if they contain spaces. The second field is the 36 character
+       hexadecimal ASCII string representation of a UUID.
+
+       The leading spaces and tabs are ignored. Blank lines are ignored. The lines prefixed with # are ignored. The illegal lines are
+       ignored.
+
+           Note
+           This UUID is advertised by Zeroconf in order to provide robust disambiguation of Time Machine volume.
+
+           The afpd generates the UUID from random numbers and saves it into afp_voluuid.conf, only when setting "tm" option in
+           AppleVolumes file.
+
+           This file should not be thoughtlessly edited and be copied onto another server.
+
+EXAMPLES
+       Example. afp_voluuid.conf three TM volumes on one netatalk
+
+           # This is a comment.
+           "Backup for John Smith" 1573974F-0ABD-69CC-C40A-8519B681A0E1
+           "bob" 39A487F4-55AA-8240-E584-69AA01800FE9
+           mary 6331E2D1-446C-B68C-3066-D685AADBE911
+
+SEE ALSO
+       afpd(8), AppleVolumes.default(5), avahi-daemon(8)
+
+Netatalk 2.2                                                  8 March 2011                                          AFP_VOLUUID.CONF(5)

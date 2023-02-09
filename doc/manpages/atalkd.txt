@@ -1,0 +1,56 @@
+ATALKD(8)                                                     Netatalk 2.2                                                    ATALKD(8)
+
+NAME
+       atalkd - AppleTalk RTMP, NBP, ZIP, and AEP manager
+
+SYNOPSIS
+       atalkd [-f configfile] [-1] [-2]
+
+DESCRIPTION
+       atalkd is responsible for all user level AppleTalk network management. This includes routing, name registration and lookup, zone
+       lookup, and the AppleTalk Echo Protocol (similar to ping(8)).  atalkd is typically started at boot time, out of /etc/rc. It
+       first reads from its configuration file, /usr/local/etc/netatalk/atalkd.conf. If there is no configuration file, atalkd will
+       attempt to configure all available interfaces and will create a configuration file. The file consists of a series of interfaces,
+       one per line. Lines with `#´ in the first column are ignored, as are blank lines. The syntax is
+
+       interface [ -seed ] [ -phase number ] [ -net net-range ] [ -addr address ] [ -zone zonename ] ...
+
+       Note that all fields except the interface are optional. The loopback interface is configured automatically. If -seed is
+       specified, all other fields must be present. Also, atalkd will exit during bootstrapping, if a router disagrees with its seed
+       information. If -seed is not given, all other information may be overriden during auto-configuration. If no -phase option is
+       given, the default phase as given on the command line is used (the default is 2). If -addr is given and -net is not, a net-range
+       of one is assumed.
+
+       The first -zone directive for each interface is the ``default´´ zone. Under Phase 1, there is only one zone. Under Phase 2, all
+       routers on the network are configured with the default zone and must agree.  atalkd maps ``*´´ to the default zone of the first
+       interface. Note: The default zone for a machine is determined by the configuration of the local routers; to appear in a
+       non-default zone, each service, e.g.  afpd, must individually specify the desired zone. See also nbp_name(3).
+
+ROUTING
+       If you are connecting a netatalk router to an existing AppleTalk internet, you should first contact your local network
+       administrators to obtain appropriate network addresses.
+
+       atalkd can provide routing between interfaces by configuring multiple interfaces. Each interface must be assigned a unique
+       net-range between 1 and 65279 (0 and 65535 are illegal, and addresses between 65280 and 65534 are reserved for startup). It is
+       best to choose the smallest useful net-range, i.e. if you have three machines on an Ethernet, don´t chose a net-range of
+       1000-2000. Each net-range may have an arbitrary list of zones associated with it.
+
+EXAMPLES
+       Below is an example configuration file for a sun4/40. The machine has two interfaces, ``le0´´ and ``le1´´. The ``le0´´ interface
+       is configured automatically from other routers on the network. The machine is the only router for the ``le1´´ interface.
+
+              le0
+              le1 -seed -net 9461-9471 -zone netatalk -zone Argus
+
+       atalkd automatically acts as a router if there is more than one interface.
+
+FILES
+       /usr/local/etc/netatalk/atalkd.conf configuration file
+
+BUGS
+       On some systems, atalkd can not be restarted.
+
+SEE ALSO
+       atalkd.conf(5)
+
+Netatalk 2.2                                                  06 Sep 2004                                                     ATALKD(8)

@@ -1,0 +1,152 @@
+AFPD(8)                                                       Netatalk 2.2                                                      AFPD(8)
+
+NAME
+       afpd - Apple Filing Protocol daemon
+
+SYNOPSIS
+       afpd [-duptDTI] [-f defaultvolumes] [-s systemvolumes] [-n nbpname] [-c maxconnections] [-g guest] [-P pidfile] [-S port]
+                [-L message] [-F configfile] [-U uams] [-m umask]
+                afpd -v | -V | -h
+
+DESCRIPTION
+       afpd provides an Apple Filing Protocol (AFP) interface to the Unix file system. It is normally started at boot time from
+       /etc/rc.
+
+       /usr/local/etc/netatalk/afpd.conf is the configuration file used by afpd to determine the behavior and configuration of the
+       different virtual file servers that it provides.
+
+       The list of volumes offered to the user is generated from /usr/local/etc/netatalk/AppleVolumes.system and one of
+       /usr/local/etc/netatalk/AppleVolumes.default, ~/AppleVolumes, ~/.AppleVolumes, ~/applevolumes, or ~/.applevolumes. The
+       AppleVolumes files is used to specify volumes to mount and file name extension mappings.
+
+OPTIONS
+       -d
+           Specifies that the daemon should not fork. If netatalk has been configured with --enable-debug1, a trace of all AFP commands
+           will be written to stdout.
+
+       -p
+           Prevents clients from saving their passwords. (Equivalent to -nosavepasswd in afpd.conf.)
+
+       -t
+           Allows clients to change their passwords. (Equivalent to -setpasswd in afpd.conf.)
+
+       -D
+           Use DDP (AppleTalk) as transport protocol. (Equivalent to -ddp in afpd.cond.)
+
+       -T
+           Use TCP/IP as transport protocol. (Equivalent to -tcp in afpd.conf.)
+
+       -v
+           Print version information and exit.
+
+       -V
+           Print verbose information and exit.
+
+       -h
+           Print help and exit.
+
+       -I
+           Use a platform specific icon. (Equivalent to -icon in afpd.conf.) (Recent Mac OS don´t display it.)
+
+       -f defaultvolumes
+           Specifies that defaultvolumes should be read for a list of default volumes to offer, instead of
+           /usr/local/etc/netatalk/AppleVolumes.default.
+
+       -s systemvolumes
+           Specifies that systemvolumes should be read for a list of volume that all users will be offered, instead of
+           /usr/local/etc/netatalk/AppleVolumes.system.
+
+       -u
+           Read the user´s AppleVolumes file first. This option causes volume names in the user´s AppleVolumes file to override volume
+           names in the system´s AppleVolumes file. The default is to read the system AppleVolumes file first. Note that this option
+           doesn´t effect the precendence of filename extension mappings: the user´s AppleVolumes file always has precedence.
+
+       -n nbpname
+           Specifies that nbpname should be used for NBP registration, instead of the first component of the hostname in the local
+           zone.
+
+       -c maxconnections
+           Specifies the maximum number of connections to allow for this afpd. The default is 20.
+
+       -g guest
+           Specifies the name of the guest account. The default is ´nobody´.
+
+       -P pidfile
+           Specifies the file in which afpd stores its process id.
+
+       -S port
+           Specifies the port to register with when doing AFPoverTCP. Defaults to 548. (Equivalent to -port in afpd.conf.)
+
+       -L message
+           Specifies the login message that will be sent to clients. (Equivalent to -loginmsg in afpd.conf.)
+
+       -F configfile
+           Specifies the configuration file to use. (Defaults to /usr/local/etc/netatalk/netatalk/afpd.conf.)
+
+       -U uams
+           Comma-separated list of UAMs to use for the authentication process. (Equivalent to -uamlist in afpd.conf.)
+
+       -m umask
+           Use this umask for the creation of folders in Netatalk.
+
+SIGNALS
+       To shut down a user´s afpd process it is recommended that SIGKILL (-9) NOT be used, except as a last resort, as this may leave
+       the CNID database in an inconsistent state. The safe way to terminate an afpd is to send it a SIGTERM (-15) signal and wait for
+       it to die on its own.
+
+       SIGTERM and SIGUSR1 signals that are sent to the main afpd process are propagated to the children, so all will be affected.
+
+       SIGTERM
+           Clean exit. Propagates from master to childs.
+
+       SIGQUIT
+           Send this to the master afpd, it will exit leaving all children running! Can be used to implement AFP service without
+           downtime.
+
+       SIGHUP
+           Sending a SIGHUP to afpd will cause it to reload its configuration files.
+
+       SIGINT
+           Sending a SIGINT to a child afpd enables max_debug logging for this process. The log is sent to fhe file
+           /tmp/afpd.PID.XXXXXX. Sending another SIGINT will revert to the original log settings.
+
+       SIGUSR1
+           The afpd process will send the message "The server is going down for maintenance." to the client and shut itself down in 5
+           minutes. New connections are not allowed. If this is sent to a child afpd, the other children are not affected. However, the
+           main process will still exit, disabling all new connections.
+
+       SIGUSR2
+           The afpd process will look in the message directory configured at build time for a file named message.pid. For each one
+           found, a the contents will be sent as a message to the associated AFP client. The file is removed after the message is sent.
+           This should only be sent to a child afpd.
+
+FILES
+       /usr/local/etc/netatalk/afpd.conf
+           configuration file used by afpd
+
+       /usr/local/etc/netatalk/AppleVolumes.default
+           list of default volumes to mount
+
+       /usr/local/etc/netatalk/AppleVolumes.system
+           list of volumes to offer all users
+
+       ~/AppleVolumes, ~/.AppleVolumes, ~/applevolumes, ~/.applevolumes
+           user´s list of volumes to mount
+
+       /usr/local/etc/netatalk/afp_signature.conf
+           list of server signature
+
+       /usr/local/etc/netatalk/afp_voluuid.conf
+           list of UUID for Time Machine volume
+
+       /usr/local/etc/netatalk/afp_ldap.conf
+           configuration file for LDAP and ACL support
+
+       /usr/local/etc/netatalk/msg/message.pid
+           contains messages to be sent to users.
+
+BUGS
+SEE ALSO
+       hosts_access(5), afpd.conf(5), AppleVolumes.default(5), afp_signature.conf(5), afp_voluuid.conf(5), afp_ldap.conf(5), dbd(1).
+
+Netatalk 2.2                                                  08 Mar 2011                                                       AFPD(8)

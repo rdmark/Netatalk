@@ -1,0 +1,100 @@
+DBD(1)                                                        Netatalk 2.2                                                       DBD(1)
+
+NAME
+       dbd - CNID database maintenance
+
+SYNOPSIS
+       dbd [-evx] {-d [-i]  | -s [-c|-n]  | -r [-c|-f]  | -u} volumepath
+
+DESCRIPTION
+       dbd can dump, scan, reindex and rebuild Netatalk dbd CNID databases. It must be run with appropiate permissions i.e. as root.
+       dbd -s|-r can be run on active volumes, but dbd -rf, which wipes the db before rebuilding it, checks and enforces that the
+       chosen volume is not in use.
+
+COMMANDS
+       -d
+           Dump CNID database. With -i dump indexes too.
+
+       -s
+           Scan volume:
+
+           •   Compare CNIDs in database with volume
+
+           •   Test if .AppleDouble directories exist
+
+           •   Test if AppleDouble files exist
+
+           •   Report orphaned AppleDouble files
+
+           •   Report directories inside .AppleDouble directories
+
+           •   Check name encoding by roundtripping, log on error
+
+           •   Check for orphaned CNIDs in database (requires -e)
+
+           •   Open and close adouble files
+
+               Options:
+                   -c Don´t check .AppleDouble stuff, only check orphaned.  -n Don´t open CNID database, skip CNID checks, only
+                   traverse filesystem
+
+           -r
+               Rebuild volume. With -f wipe database and rebuild from CNIIDs stored in AppleDouble files.
+
+               •   Sync CNIDSs from database with volume
+
+               •   Ensure .AppleDouble directories exist
+
+               •   Ensure AppleDouble files exist
+
+               •   Delete orphaned AppleDouble files
+
+               •   Report directories inside .AppleDouble directories
+
+               •   Check name encoding by roundtripping, log on error
+
+               •   Delete orphaned CNIDs in database (requires -e)
+
+               •   Open and close adouble files
+
+                   Options:
+                       -c Don´t create .AppleDouble stuff, only cleanup orphaned.
+
+                       -f Wipe database and rebuild from IDs stored in AppleDouble files, only available for volumes without
+                       nocnidcache option. Implies -e.
+
+               -u
+                   Upgrade:
+
+                   Opens the database which triggers any necessary upgrades, then closes and exits.
+
+OPTIONS
+       -e
+           Only work on inactive volumes and lock them (exclusive)
+
+       -x
+           Rebuild indexes (just for completeness, mostly useless!)
+
+       -v
+           verbose
+
+WARNING
+       In order to be able to run -rf reconstructing the CNIDs in the database from the AppleDouble files, make sure you´ve run a -r
+       rebuild sometimes before, where the CNIDs then would have been synched between database and AppleDouble files.
+
+       Also be careful about the option nocnidcache. Avoid this option if at all possible, because if prevents you from being able to
+       use -f.
+
+CNID BACKGROUND
+       The CNID backends maintains name to ID mappings. If you change a filename outside afpd(8) (shell, samba), the CNID db will not
+       know and not reflect that change. Netatalk tries to recover from such inconsistencies as gracefully as possible. The mechanisms
+       to resolve such inconsistencies may fail sometimes, though, as this is not an easy task to accomplish. E.g. if several names in
+       the path to the file or directory have changed, things may go wrong.
+
+       If you change a lot of filenames at once, chances are higher that the afpds fallback mechanisms fail, i.e. files will be
+       assigned new IDs, even though the file hasn´t changed.
+
+SEE ALSO
+       cnid_metad(8), cnid_dbd(8)
+
+Netatalk 2.2                                                  12 Oct 2010                                                        DBD(1)
