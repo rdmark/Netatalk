@@ -1,0 +1,37 @@
+NETATALK(8)                                                    3.1.14dev                                                    NETATALK(8)
+
+NAME
+       netatalk - Netatalk AFP server service controller daemon
+
+SYNOPSIS
+       netatalk [-F configfile]
+
+       netatalk -v | -V
+
+DESCRIPTION
+       netatalk is the service controller daemon responsible for starting and restarting the AFP daemon afpd and the CNID daemon
+       cnid_metad. It is normally started at boot time by init system (BSD-style init, SysV-sytle init, systemd, Upstart, OpenRC, SMF
+       and so on).
+
+OPTIONS
+       -v | -V
+           Print version information and exit.
+
+       -F configfile
+           Specifies the configuration file to use. (Defaults to @pkgconfdir@/afp.conf.)
+
+SIGNALS
+       SIGTERM
+           Stop Netatalk service, AFP and CNID daemons
+
+       SIGHUP
+           Sending a SIGHUP will cause the AFP daemon reload its configuration file.
+
+FILES
+       @pkgconfdir@/afp.conf
+           configuration file used by netatalk(8), afpd(8) and cnid_metad(8)
+
+SEE ALSO
+       afpd(8), cnid_metad(8), afp.conf(5).
+
+3.1.14dev                                                     13 Jun 2016                                                   NETATALK(8)

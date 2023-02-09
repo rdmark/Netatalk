@@ -1,0 +1,68 @@
+NETATALK.CONF(5)                                              Netatalk 2.2                                             NETATALK.CONF(5)
+
+NAME
+       netatalk.conf - Configuration file used by Netatalk to determine its general configuration
+
+SYNOPSIS
+       /usr/local/etc/netatalk/netatalk.conf
+                                                                           :DESTDIR:/etc/default/netatalk
+
+DESCRIPTION
+       /usr/local/etc/netatalk/netatalk.conf is the configuration file used by afpd to determine what portions of the file system will
+       be shared via AFP, as well as their behaviors.
+
+       If netatalk has been configured with --enable-debian, it is not /usr/local/etc/netatalk/netatalk.conf but
+       :DESTDIR:/etc/default/netatalk.
+
+       Any line not prefixed with # is interpreted. The configuration lines are composed like:
+
+       option = value
+
+       The possible options and their meanings are:
+
+       AFPD_GUEST
+           Sets the id of the guest user to a local user on the system.
+
+       AFPD_MAX_CLIENTS
+           Sets the maximum number of clients that can simultaneously connect to the server.
+
+       AFPD_RUN
+           Enables the afpd daemon if set to "yes". This should be enabled if you are planning on using netatalk as a file server.
+
+       AFPD_UAM_LIST
+           Sets the default UAMs for afpd (and papd, if printer authentication is compiled in) to use.
+
+           Example: AFPD_UAMLIST="-U uams_guest.so,uams_randnum.so"
+
+       CNID_METAD_RUN
+           Enables the cnid_metad daemon if set to "yes". This should be enabled if you are going to use the dbd CNID backend.
+
+       CNID_CONFIG
+           Configuration options for cnid_metad. See: cnid_metad(8)
+
+       ATALK_BGROUND
+           "yes" will set netatalk to initialize in the background, and "no" will cause normal initialization.
+
+       ATALK_NAME
+           Sets the machines´ Appletalk name.
+
+       ATALK_ZONE
+           Sets the machines´ Appletalk zone.
+
+       ATALKD_RUN
+           Enables the atalkd daemon if set to "yes". This should be enabled if you are planning on providing Appletalk services.
+
+       PAPD_RUN
+           Enables the papd daemon if set to "yes". This should be enabled if you are planning on using netatalk as a print server.
+
+       ATALK_MAC_CHARSET
+           Set the Mac client codepage, used by atalkd and papd to convert extended characters from the Unix to the Mac codepage.
+
+       ATALK_UNIX_CHARSET
+           Set the Unix codepage, used by atalkd and papd to convert extended characters from the Unix to the Mac codepage. Has to
+           match the codepage of the configuration files.
+
+SEE ALSO
+       afpd(8), afpd.conf(5), cnid_metad(8), atalkd(8), atalkd.conf(5)
+
+Netatalk 2.2                                                  30 Mar 2011                                              NETATALK.CONF(5)

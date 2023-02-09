@@ -1,0 +1,29 @@
+AFPLDAPTEST(1)                                                Netatalk 2.2                                               AFPLDAPTEST(1)
+
+NAME
+       afpldaptest - Syntactically check an afp_ldap.conf
+
+SYNOPSIS
+       afpldaptest {-u USER | -g GROUP | -i UUID}
+                              afpldaptest {-h | -? | -:}
+
+DESCRIPTION
+       afpldaptest is a simple command to syntactically check /usr/local/etc/netatalk/afp_ldap.conf.
+
+OPTIONS
+       -u USER
+           Show uuid for USER.
+
+       -g GROUP
+           Show uuid for GROUP.
+
+       -i UUID
+           Show user, group or local-uuid for UUID.
+
+       -h, -?, -:
+           Show the help and exit.
+
+SEE ALSO
+       afp_ldap.conf(5)
+
+Netatalk 2.2                                                  30 Mar 2011                                                AFPLDAPTEST(1)

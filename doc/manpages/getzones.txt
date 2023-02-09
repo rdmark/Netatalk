@@ -1,0 +1,26 @@
+GETZONES(1)                                                   Netatalk 2.2                                                  GETZONES(1)
+
+NAME
+       getzones - list AppleTalk zone names
+
+SYNOPSIS
+       getzones [-m | -l] [address]
+
+DESCRIPTION
+       Getzones is used to obtain a list of AppleTalk zone names using the Zone Information Protocol (ZIP). It sends a GetZoneList
+       request to an AppleTalk router. By default, it sends the request to the locally running atalkd(8).
+
+OPTIONS
+       -m
+           List the name of the local zone only; this is accomplished by sending a ZIP GetMyZone request.
+
+       -l
+           List the local zones; this is accomplished by sending a GetLocalZones request.
+
+       address
+           Contact the AppleTalk router at address.  address is parsed by atalk_aton(3).
+
+SEE ALSO
+       atalk_aton(3), atalkd(8).
+
+Netatalk 2.2                                                  17 Dec 1991                                                   GETZONES(1)

@@ -1,0 +1,53 @@
+AFPPASSWD(1)                                                  Netatalk 2.2                                                 AFPPASSWD(1)
+
+NAME
+       afppasswd - netatalk password maintenance utility
+
+SYNOPSIS
+       afppasswd [-acfn] [-p passwd file] [-u minimum uid]
+
+DESCRIPTION
+       afppasswd allows the maintenance of afppasswd files created by netatalk for use by the uams_randnum.so UAM (providing the
+       "Randnum exchange" and "2-Way Randnum exchange" User Authentication Modules).
+
+       afppasswd can either be called by root with parameters, or can be called by local system users with no parameters to change
+       their AFP passwords.
+
+           Note
+           With this utility you can only change the passwords used by two specific UAMs. As they provide only weak password
+           encryption, the use of the "Randnum exchange" and "2-Way Randnum exchange" UAMs is deprecated unless one has to support very
+           old AFP clients, that can not deal with the more secure "DHCAST128" and "DHX2" UAM instead. Please compare with the
+           Authentication chapter inside Netatalk´s documentation.
+
+EXAMPLE
+       Local user changing their own password:
+
+           example% afppasswd
+           Enter NEW AFP password: (hidden)
+           Enter NEW AFP password again: (hidden)
+           afppasswd: updated password.
+
+OPTIONS
+       -a
+           Add a new user to the afppasswd file.
+
+       -c
+           Create and/or initialize afppasswd file or specific user.
+
+       -f
+           Force the current action.
+
+       -p path
+           Path to afppasswd file.
+
+       -n
+           If cracklib support is built into netatalk this option will cause cracklib checking to be disabled, if the superuser does
+           not want to have the password run against the cracklib dictionary.
+
+       -u minimum uid
+           This is the minimum user id (uid) that afppasswd will use when creating users.
+
+SEE ALSO
+       afpd(8), atalkd(8).
+
+Netatalk 2.2                                                  31 May 2011                                                  AFPPASSWD(1)

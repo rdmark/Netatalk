@@ -1,0 +1,43 @@
+APPLE_DUMP(1)                                                 Netatalk 2.2                                                APPLE_DUMP(1)
+
+NAME
+       apple_dump - Dump AppleSingle/AppleDouble format file
+
+SYNOPSIS
+       apple_dump [-a] FILE | DIR
+                                                          apple_dump -f FILE
+                                                          apple_dump -d FILE
+                                                          apple_dump -h | -help | --help
+                                                          apple_dump -v | -version | --version
+
+DESCRIPTION
+       apple_dump dump AppleSingle/AppleDouble format file.
+
+OPTIONS
+       -a FILE|DIR
+           This is default. Dump a AppleSingle/AppleDouble file for FILE or DIR automatically. Extrapolate FinderInfo type from
+           absolute path. If FILE is not AppleSingle/AppleDouble format, look for .AppleDouble/FILE and ._FILE. If DIR, look for
+           DIR/.AppleDouble/.Parent and ._DIR.
+
+       -f FILE
+           Dump FILE. Assume FinderInfo to be FileInfo.
+
+       -d FILE
+           Dump FILE. Assume FinderInfo to be DirInfo.
+
+       -h, -help, --help
+           Display the help and exit
+
+       -v, -version, --version
+           Show version and exit
+
+NOTE
+       There is no way to detect whether FinderInfo is FileInfo or DirInfo. By default, apple_dump examins whether file or directory, a
+       parent directory is .AppleDouble, filename is ._*, filename is .Parent, and so on.
+
+       If setting option -f or -d, assume FinderInfo and doesn´t look for another file.
+
+SEE ALSO
+       ad(1)
+
+Netatalk 2.2                                                  02 Sep 2011                                                 APPLE_DUMP(1)

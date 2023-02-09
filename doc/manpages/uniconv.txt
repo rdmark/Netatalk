@@ -1,0 +1,99 @@
+UNICONV(1)                                                    Netatalk 2.2                                                   UNICONV(1)
+
+NAME
+       uniconv - convert Netatalk volume encoding
+
+SYNOPSIS
+       uniconv [-ndv] -c cnidbackend -f fromcode -t tocode [-m maccode] volumepath
+
+DESCRIPTION
+       uniconv converts the volume encoding of volumepath from the fromcode to the tocode encoding.
+
+OPTIONS
+       -c
+           CNID backend used on this volume, usually cdb or dbd. Should match the backend selected with afpd for this volume. If not
+           specified, the default CNID backend `dbd´ is used
+
+       -d
+           don´t CAP encode leading dots (:2e), equivalent to usedots in AppleVolumes.default(5)
+
+       -f
+           encoding to convert from, use ASCII for CAP encoded volumes
+
+       -h
+           display help
+
+       -m
+           Macintosh client codepage, required for CAP encoded volumes. Defaults to `MAC_ROMAN´
+
+       -n
+           `dry run´, don´t do any real changes
+
+       -t
+           volume encoding to convert to, e.g. UTF8
+
+       -v
+           verbose output, use twice for maximum logging.
+
+       -V
+           print version and exit
+
+WARNING
+       Setting the wrong options might render your data unusable!!! Make sure you know what you are doing. Always backup your data
+       first.
+
+       It is *strongly* recommended to do a `dry run´ first and to check the output for conversion errors.
+
+       afpd(8) should not be running while you change the volume encoding. Remember to change volcodepage in AppleVolumes.default(5) to
+       the new codepage, before restarting afpd.
+
+       In case of MacChineseTraditional, MacJapanese or MacKorean, uniconv cannot be used.
+
+       USE AT YOUR OWN RISK!!!
+
+SELECTABLE CHARSETS
+       Netatalk provides internal support for UTF-8 (pre- and decomposed) and CAP. If you want to use other charsets, they must be
+       provided by iconv(1)
+
+       uniconv also knows iso-8859.adapted, an old style 1.x NLS widely used. This is only intended for upgrading old volumes, afpd(8)
+       cannot handle iso-8859.adapted anymore.
+
+CNID BACKGROUND
+       The CNID backends maintains name to ID mappings. If you change a filename outside afpd(8) (shell, samba), the CNID db, i.e. the
+       DIDNAME index, gets inconsistent. Netatalk tries to recover from such inconsistencies as gracefully as possible. The mechanisms
+       to resolve such inconsistencies may fail sometimes, though, as this is not an easy task to accomplish. I.e. if several names in
+       the path to the file or directory have changed, things may go wrong.
+
+       If you change a lot of filenames at once, chances are higher that the afpds fallback mechanisms fail, i.e. files will be
+       assigned new IDs, even though the file hasn´t changed.  uniconv therefore updates the CNID entry for each file/directory
+       directly after it changes the name to avoid inconsistencies. The two supported backends for volumes, dbd and cdb, use the same
+       CNID db format. Therefore, you could use uniconv with cdb and afpd with dbd later.
+
+       Warning: There must not be two processes opening the CNID database using different backends at once! If a volume is still opened
+       with dbd (cnid_metad/cnid_dbd) and you start uniconv with cdb, the result will be a corrupted CNID database, as the two backends
+       use different locking schemes. You might run into additional problems, e.g. if dbd is compiled with transactions, cdb will not
+       update the transaction logs.
+
+       In general, it is recommended to use the same backend for uniconv you are using with afpd(8).
+
+EXAMPLES
+       convert 1.x CAP encoded volume to UTF-8, clients used MacRoman codepage, cnidscheme is dbd:
+
+           example% uniconv -c dbd -f ASCII -t UTF8 -m MAC_ROMAN /path/to/share
+
+       convert iso8859-1 volume to UTF-8, cnidscheme is cdb:
+
+           example% uniconv -c cdb -f ISO-8859-1 -t UTF8 -m MAC_ROMAN /path/to/share
+
+       convert 1.x volume using iso8859-1 adapted NLS to CAP encoding:
+
+           example% uniconv -f ISO-8859-ADAPTED -t ASCII -m MAC_ROMAN/path/to/share
+
+       convert UTF-8 volume to CAP, for MacCyrillic clients:
+
+           example% uniconv -f UTF8 -t ASCII -m MAC_CYRILLIC /path/to/share
+
+SEE ALSO
+       AppleVolumes.default(5),afpd(8),iconv(1),cnid_metad(8),cnid_dbd(8)
+
+Netatalk 2.2                                                  24 Jun 2004                                                    UNICONV(1)

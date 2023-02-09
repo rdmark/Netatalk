@@ -1,0 +1,72 @@
+CNID_METAD(8)                                                 Netatalk 2.2                                                CNID_METAD(8)
+
+NAME
+       cnid_metad - start cnid_dbd daemons on request
+
+SYNOPSIS
+       cnid_metad [-l loglevel [-f filename]] [-d] [-h hostname] [-p port] [-u user] [-g group] [-s cnid_dbdpathname]
+                            cnid_metad -v | -V
+
+DESCRIPTION
+       cnid_metad waits for requests from afpd to start up instances of the cnid_dbd daemon. It keeps track of the status of a cnid_dbd
+       instance once started and will restart it if necessary.  cnid_metad is normally started at boot time from /etc/rc or equivalent
+       and runs until shutdown.  afpd needs to be configured with the -cnidserver option in afpd.conf in order to access cnid_metad.
+       It is possible to run more than one instance of cnid_metad on the same machine if different values for the interface and/or port
+       are specified with the -h and -p options.
+
+OPTIONS
+       -l <loglevel> [-f <filename>]
+           Specify that any message of a loglevel up to the given loglevel should be logged to the given file. If the filename is
+           ommited the loglevel applies to messages passed to syslog. Default is logs to syslog with a default logging setup of
+           "log_note".
+
+           Note: cnid_metad passes this to cnid_dbd which will in turn use this for its logging setup.
+
+           loglevels: LOG_SEVERE, LOG_ERROR, LOG_WARN, LOG_NOTE, LOG_INFO, LOG_DEBUG, LOG_DEBUG6, LOG_DEBUG7, LOG_DEBUG8, LOG_DEBUG9,
+           LOG_MAXDEBUG
+
+           Example. Useful default config
+
+               -l log_info -f /var/log/afpd.log
+
+           Example. Debugging config
+
+               -l log_maxdebug -f /var/log/afpd.log
+
+       -d
+           cnid_metad will remain in the foreground and will also leave the standard input, standard output and standard error file
+           descriptors open. Useful for debugging.
+
+       -h hostname
+           Use hostname as the network interface for requests as opposed to the default localhost. The network address may be specified
+           either in dotted-decimal format for IPv4 or in hexadecimal format for IPv6.
+
+       -p port
+           Use port as the port number for reqests. Default is 4700.
+
+       -u user
+           Switch to the userid of user before serving requests. This userid will be inherited by all cnid_dbd daemon processes
+           started.
+
+       -g group
+           Switch to the groupid of group before serving requests. This groupid will be inherited by all cnid_dbd daemon processes
+           started. Both user and group must be specified as strings.
+
+       -s cnid_dbd pathname
+           Use cnid_dbd pathname as the pathname of the executeable of the cnid_dbd daemon. The default is /usr/local/sbin/cnid_dbd.
+
+       -v, -V
+           Show version and exit.
+
+CAVEATS
+       The number of cnid_dbd subprocecesses is currently limited to 512.
+
+       cnid_metad does not block or catch any signals apart from SIGPIPE. It will therefore exit on most signals received. This will
+       also cause all instances of cnid_dbd´s started by that cnid_metad to exit gracefully. Since state about and IPC access to the
+       subprocesses is only maintained in memory by cnid_metad this is desired behaviour. As soon as cnid_metad is restarted afpd
+       processes will transparently reconnect.
+
+SEE ALSO
+       cnid_dbd(8), afpd(8), dbd(1)
+
+Netatalk 2.2                                                  01 Jan 2012                                                 CNID_METAD(8)

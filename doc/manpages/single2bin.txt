@@ -1,0 +1,47 @@
+MEGATRON(1)                                                   Netatalk 2.2                                                  MEGATRON(1)
+
+NAME
+       megatron, unhex, unbin, unsingle, hqx2bin, single2bin, macbinary - Macintosh file format transformer
+
+SYNOPSIS
+       megatron [sourcefile...]
+                                                            unbin [sourcefile...]
+                                                            unhex [sourcefile...]
+                                                            unsingle [sourcefile...]
+                                                            hqx2bin [sourcefile...]
+                                                            single2bin [sourcefile...]
+                                                            macbinary [sourcefile...]
+
+DESCRIPTION
+       megatron is used to transform files from BinHex, MacBinary, AppleSingle, or netatalk style AppleDouble formats into MacBinary or
+       netatalk style AppleDouble formats. The netatalk style AppleDouble format is the file format used by afpd, the netatalk Apple
+       Filing Protocol (AppleShare) server. BinHex, MacBinary, and AppleSingle are commonly used formats for transferring Macintosh
+       files between machines via email or file transfer protocols.  megatron uses its name to determine what type of tranformation is
+       being asked of it.
+
+       If megatron is called as unhex , unbin or unsingle, it tries to convert file(s) from BinHex, MacBinary, or AppleSingle into
+       AppleDouble format. BinHex is the format most often used to send Macintosh files by e-mail. Usually these files have an
+       extension of ".hqx". MacBinary is the format most often used by terminal emulators "on the fly" when transferring Macintosh
+       files in binary mode. MacBinary files often have an extension of ".bin". Some Macintosh LAN-based email packages use uuencoded
+       AppleSingle format to "attach" or "enclose" files in email. AppleSingle files don´t have a standard filename extension.
+
+       If megatron is called as hqx2bin, single2bin, or macbinary, it will try to convert the file(s) from BinHex, AppleSingle, or
+       AppleDouble into MacBinary. This last translation may be useful in moving Macintosh files from your afpd server to some other
+       machine when you can´t copy them from the server using a Macintosh for some reason.
+
+       If megatron is called with any other name, it uses the default translation, namely unhex.
+
+       If no source file is given, or if sourcefile is `-´, and if the conversion is from a BinHex or MacBinary file, megatron will
+       read from standard input.
+
+       The filename used to store any output file is the filename that is encoded in the source file. MacBinary files are created with
+       a ".bin" extension. In the case of conflicts, the old file is overwritten!
+
+OPTIONS
+       -v, --version
+           Show version.
+
+SEE ALSO
+       afpd(8)
+
+Netatalk 2.2                                                  02 Sep 2011                                                   MEGATRON(1)

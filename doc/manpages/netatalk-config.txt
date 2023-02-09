@@ -1,0 +1,56 @@
+NETATALK-CONFIG(1)                                        The Netatalk Project                                       NETATALK-CONFIG(1)
+
+NAME
+       netatalk-config - script to get information about the installed version of netatalk
+
+SYNOPSIS
+       netatalk-config [--prefix [=DIR]] [--exec_prefix [=DIR]] [--help] [--version] [--libs] [--libs-dirs] [--libs-names] [--cflags]
+                       [--macros]
+
+DESCRIPTION
+       netatalk-config is a tool that is used to determine the compiler and linker flags that should be used to compile and link
+       programs that use the netatalk run-time libraries.
+
+OPTIONS
+       netatalk-config accepts the following options:
+
+       --help
+           Print a short help for this command and exit.
+
+       --version
+           Print the currently installed version of netatalk on the standard output.
+
+       --libs
+           Print the linker flags that are necessary to link against the netatalk run-time libraries.
+
+       --libs-dirs
+           Print only the -l/-R part of --libs.
+
+       --libs-names
+           Print only the -l part of --libs.
+
+       --cflags
+           Print the compiler flags that are necessary to compile a program linked against the netatalk run-time libraries.
+
+       --macros
+           Print the netatalk m4 directory.
+
+       --prefix=PREFIX
+           If specified, use PREFIX instead of the installation prefix that netatalk was built with when computing the output for the
+           --cflags and --libs options. This option is also used for the exec prefix if --exec-prefix was not specified. This option
+           must be specified before any --libs or --cflags options.
+
+       --exec\_prefix=PREFIX
+           If specified, use PREFIX instead of the installation exec prefix that netatalk was built with when computing the output for
+           the --cflags and --libs options. This option must be specified before any --libs or --cflags options.
+
+COPYRIGHT
+       Copyright © 1998 Owen Taylor
+
+       Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby
+       granted, provided that the above copyright notice appear in all copies and that both that copyright notice and this permission
+       notice appear in supporting documentation.
+
+       Man page adapted for netatalk-config by Sebastian Rittau in 2001.
+
+Netatalk 2.2                                                  09 June 2001                                           NETATALK-CONFIG(1)

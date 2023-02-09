@@ -1,0 +1,24 @@
+MACUSERS(1)                                                   Netatalk 2.2                                                  MACUSERS(1)
+
+NAME
+       macusers - List the users connecting via AFP
+
+SYNOPSIS
+       macusers
+
+       macusers -v | -version | --version | -h | -help | --help
+
+DESCRIPTION
+       macusers list the users connecting via AFP.
+
+OPTIONS
+       -v, -version, --version
+           Show version and exit
+
+       -h, -help, --help
+           Display the help and exit
+
+SEE ALSO
+       afpd(8)
+
+Netatalk 2.2                                                  13 Oct 2011                                                   MACUSERS(1)

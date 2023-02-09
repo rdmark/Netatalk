@@ -1,0 +1,405 @@
+APPLEVOLUMES.DEFAU(5)                                         Netatalk 3.0                                        APPLEVOLUMES.DEFAU(5)
+
+NAME
+       AppleVolumes.default, AppleVolumes.system, AppleVolumes - Configuration file used by afpd(8) to determine the shares made
+       available through AFP and specify file name extension mappings.
+
+SYNOPSIS
+       /usr/local/etc/netatalk/AppleVolumes.default
+                                                                                                                                                         /usr/local/etc/netatalk/AppleVolumes.system
+                                                                                                                                                         ~/AppleVolumes
+                                                                                                                                                         ~/.AppleVolumes
+                                                                                                                                                         ~/applevolumes
+                                                                                                                                                         ~/.applevolumes
+
+DESCRIPTION
+       /usr/local/etc/netatalk/AppleVolumes.system and one of /usr/local/etc/netatalk/AppleVolumes.default, ~/AppleVolumes,
+       ~/.AppleVolumes, ~/applevolumes, or ~/.applevolumes are the configuration files used by afpd to determine what portions of the
+       file system will be shared via Apple Filing Protocol, as well as their behaviour.
+
+       Any line not prefixed with # is interpreted. Newline escaping is supported. The configuration lines are composed like:
+
+       path [ volume name ] [ options ]
+
+       .extension [ type [ creator ] ]
+
+       The path name must be a fully qualified path name, or a path name using either the ~ shell shorthand or any of the substitution
+       variables, which are listed below.
+
+       The volume name is the name that appears in the Chooser ot the "connect to server" dialog on Macintoshes to represent the
+       appropriate share. If volumename is unspecified, the last component of pathname is used. No two volumes may have the same name.
+       If there are spaces in the name, it should be in quotes (i.e. "File Share"). The volume name cannot contain the ':' character.
+       The volume name is mangled if it is very long. Mac codepage volume name is limited to 27 characters. UTF8-MAC volume name is
+       limited to -volnamelen parameter in afpd.conf
+
+           Note
+           Each volume has to be configured on a single line. Though newline escaping is supported.
+
+       The leading-dot lines specify file name extension mappings. The extension '.' sets the default creator and type for otherwise
+       untyped Unix files.
+
+           Note
+           File name extension mapping is useful for Mac OS 9 and earlier. But it should not use for Mac OS X.
+
+       It is possible to specify default options for all volumes with a :DEFAULT: line preceeding these volume definitions:
+
+       Example. :DEFAULT: configuration line
+
+           :DEFAULT: options:upriv,usedots dbpath:/var/dbd/AppleDB/$v dperm:0775 fperm:0664
+
+       The possible options and their meanings are:
+
+       adouble:[v1|v2|osx]
+           Specify the format of the metadata files, which are used for saving Mac resource fork as well. Earlier versions used
+           AppleDouble V1, the new default format is V2. Starting with Netatalk 2.0, the scheme MacOS X 10.3.x uses, is also supported.
+
+               Note
+               adouble:osx cannot be treated normally any longer. Its only aim was to temporarely share eg. FAT32 formatted FireWire
+               harddrives written on a Macintosh with afpd. Apple's metadata scheme lacks several essential features, so using it on
+               the server's side will break both CNIDs and MacOS 9 compatibility. AppleDouble file of Mac OS X 10.6 is incompatible to
+               V1 and V2.
+
+       volsizelimit:size in MiB
+           Useful for TimeMachine: limits the reported volume size, thus preventing TM from using the whole real disk space for backup.
+           Example: "volsizelimit:1000" would limit the reported disk space to 1 GB.  IMPORTANT: This is an approximated calculation
+           taking into accout the contents of TM sparsebundle images. Therefor you MUST NOT use this volume to store other content when
+           using this option, because it would NOT be accounted. The calculation works by reading the band size from the Info.plist XML
+           file of the sparsebundle, reading the bands/ directory counting the number of band files, and then multiplying one with the
+           other.
+
+       allow:[users/groups]
+           The allow option allows the users and groups that access a share to be specified. Users and groups are specified, delimited
+           by commas. Groups are designated by a @ prefix. Example: allow:user1,user2,@group
+
+       deny:[users/groups]
+           The deny option specifies users and groups who are not allowed access to the share. It follows the same format as the allow
+           option.
+
+       allowed_hosts:[IP host address/IP netmask bits[, ... ]]
+           Only listed hosts and networks are allowed, all others are rejected. The network address may be specified either in
+           dotted-decimal format for IPv4 or in hexadecimal format for IPv6.
+
+           Example: allowed_hosts:10.1.0.0/16,10.2.1.100,2001:0db8:1234::/48
+
+       denied_hosts:[IP host address/IP netmask bits[, ...]]
+           Listed hosts and nets are rejected, all others are allowed.
+
+           Example: denied_hosts: 192.168.100/24,10.1.1.1,2001:db8::1428:57ab
+
+       cnidscheme:[backend]
+           set the CNID backend to be used for the volume, default is [dbd] available schemes: [dbd last tdb]
+
+       dbpath:[path]
+           Sets the database information to be stored in path. You have to specifiy a writable location, even if the volume is read
+           only.
+
+       cnidserver:[fqdn|IP[:port]]
+           Query this servername or IP address (default:localhost) and port (default: 4700) for CNIDs. Only used with CNID backend
+           "dbd". This option here overrides any setting from afpd.conf:cnidserver.
+
+       ea:[none|auto|sys|ad]
+           Specify how Extended Attributes are stored.  auto is the default.
+
+           auto
+               Try sys (by setting an EA on the shared directory itself), fallback to ad. Requires writeable volume for perfoming test.
+               options:ro overwrites auto with none. Use explicit ea:sys|ad for read-only volumes where appropiate.
+
+           sys
+               Use filesystem Extended Attributes.
+
+           ad
+               Use files in .AppleDouble directories.
+
+           none
+               No Extended Attributes support.
+
+       maccharset:[charset]
+           specifies the mac client codepage for this Volume, e.g. "MAC_ROMAN", "MAC_CYRILLIC". If not specified the setting from
+           afpd.conf is inherited. This setting is only required if you need volumes, where the mac codepage differs from the one
+           globally set in afpd.conf.
+
+       options:[option]
+           This allows multiple options to be specified in a comma delimited format. The available options are:
+
+           searchdb
+               Use fast CNID database namesearch instead of slow recursive filesystem search. Relies on a consistent CNID database, ie
+               Samba or local filesystem access lead to inaccurate or wrong results. Works only for "dbd" CNID db volumes.
+
+           tm
+               Enable Time Machine suport for this volume.
+
+           invisibledots
+               Use with usedots: make dot files invisible.
+
+           nonetids
+               Try to force ACL unawareness on the client.
+
+           limitsize
+               Limit disk size reporting to 2GB. This can be used for older Macintoshes using newer Appleshare clients.
+
+           preexec_close
+               a non-zero return code from preexec close the volume being immediately, preventing clients to mount/see the volume in
+               question.
+
+           ro
+               Specifies the share as being read only for all users. The .AppleDB directory has to be writeable, you can use the
+               -dbpath option to relocate it. Overwrites ea:auto with ea:none
+
+           root_preexec_close
+               a non-zero return code from root_preexec closes the volume immediately, preventing clients to mount/see the volume in
+               question.
+
+           upriv
+               use AFP3 unix privileges. This should be set for OS X clients. Starting with Netatalk 2.1 it's part of the default
+               config :DEFAULT: line. See also: perm|fperm|dperm.
+
+           usedots
+               Don't do :hex translation for dot files. note: when this option gets set, certain file names become illegal. These are
+               .Parent and anything that starts with .Apple. See also invisibledots.
+
+           followsymlinks
+               Follow symlinks on the server.
+
+       password:[password]
+           This option allows you to set a volume password, which can be a maximum of 8 characters long (using ASCII strongly
+           recommended at the time of this writing).
+
+       perm|fperm|dperm:[mode]
+           Add(or) with the client requested permissions: perm affects files and directories, fperm is for files only, dperm is for
+           directories only. Use with options:upriv.
+
+           Example. Volume for a collaborative workgroup
+
+               /path/to/volume "Workgroup" options:upriv dperm:0770 fperm:0660
+
+       umask:[mode]
+           set perm mask. Use with options:upriv.
+
+       preexec:[command]
+           command to be run when the volume is mounted, ignored for user defined volumes
+
+       postexec:[command]
+           command to be run when the volume is closed, ignored for user defined volumes
+
+       root_preexec:[command]
+           command to be run as root when the volume is mounted, ignored for user defined volumes
+
+       root_postexec:[command]
+           command to be run as root when the volume is closed, ignored for user defined volumes
+
+       rolist:[users/groups]
+           Allows certain users and groups to have read-only access to a share. This follows the allow option format.
+
+       rwlist:[users/groups]
+           Allows certain users and groups to have read/write access to a share. This follows the allow option format.
+
+       veto:[vetoed names]
+           hide files and directories,where the path matches one of the '/' delimited vetoed names. The veto string must always be
+           terminated with a '/', eg. "veto1/", "veto1/veto2/".
+
+       volcharset:[charset]
+           specifies the volume codepage, e.g. "UTF8", "UTF8-MAC", "ISO-8859-15". Defaults to "UTF8".
+
+VARIABLE SUBSTITUTIONS
+       You can use variables in both volume path and volume name.
+
+        1. if you specify an unknown variable, it will not get converted.
+
+        2. if you specify a known variable, but that variable doesn't have a value, it will get ignored.
+
+       The variables which can be used for substitutions are:
+
+       $b
+           basename
+
+       $c
+           client's ip or appletalk address
+
+       $d
+           volume pathname on server
+
+       $f
+           full name (contents of the gecos field in the passwd file)
+
+       $g
+           group name
+
+       $h
+           hostname
+
+       $i
+           client's ip, without port
+
+       $s
+           server name (this can be the hostname)
+
+       $u
+           user name (if guest, it is the user that guest is running as)
+
+       $v
+           volume name (either ADEID_NAME or basename of path)
+
+       $z
+           appletalk zone (may not exist)
+
+       $$
+           prints dollar sign ($)
+
+       Example. Using variable substitution when defining volumes
+
+           /home/groups/$g "Groupdir for $g"
+           ~ "$f is the best one"
+
+       We define "groupdirs" for each primary group and use a personalized server name for homedir shares.
+
+CNID BACKENDS
+       The AFP protocol mostly refers to files and directories by ID and not by name. Netatalk needs a way to store these ID's in a
+       persistent way, to achieve this several different CNID backends are available. The CNID Databases are by default located in the
+       .AppleDB folder in the volume root.
+
+       cdb
+           "Concurrent database", backend is based on Sleepycat's Berkely DB. With this backend several afpd deamons access the CNID
+           database directly. Berkeley DB locking is used to synchronize access, if more than one afpd process is active for a volume.
+           The drawback is, that the crash of a single afpd process might corrupt the database.
+
+       dbd
+           Access to the CNID database is restricted to the cnid_metad daemon process.  afpd processes communicate with the daemon for
+           database reads and updates. If built with Berkeley DB transactions the probability for database corruption is practically
+           zero, but performance can be slower than with cdb
+
+       last
+           This backend is an exception, in terms of ID persistency. ID's are only valid for the current session. This is basically
+           what afpd did in the 1.5 (and 1.6) versions. This backend is still available, as it is useful for e.g. sharing cdroms.
+
+           Warning: It is NOT recommended to use this backend for volumes anymore, as afpd now relies heavily on a persistent ID
+           database. Aliases will likely not work and filename mangling is not supported.
+
+       Even though ./configure --help might show that there are other CNID backends available, be warned those are likely broken or
+       mainly used for testing. Don't use them unless you know what you're doing, they may be removed without further notice from
+       future versions.
+
+CHARSET OPTIONS
+       With OS X Apple introduced the AFP3 protocol. One of the most important changes was that AFP3 uses unicode names encoded as
+       UTF-8 decomposed. Previous AFP/OS versions used codepages, like MacRoman, MacCentralEurope, etc.
+
+       afpd needs a way to preserve extended macintosh characters, or characters illegal in unix filenames, when saving files on a unix
+       filesystem. Earlier versions used the the so called CAP encoding. An extended character (>0x7F) would be converted to a :xx
+       sequence, e.g. the Apple Logo (MacRoman: 0XF0) was saved as :f0. Some special characters will be converted as to :xx notation as
+       well. '/' will be encoded to :2f, if usedots is not specified, a leading dot '.' will be encoded as :2e.
+
+       This version now uses UTF-8 as the default encoding for names. Special characters, like '/' and a leading '.' will still be CAP
+       style encoded .
+
+       The -volcharset option will allow you to select another volume encoding. E.g. for western users another useful setting could be
+       -volcharset ISO-8859-15.  apfd will accept any iconv(1) provided charset. If a character cannot be converted from the mac
+       codepage to the selected volcharset, afpd will save it as a CAP encoded character. For AFP3 clients, afpd will convert the UTF-8
+       character to -maccharset first. If this conversion fails, you'll receive a -50 error on the mac.
+
+       Note: Whenever you can, please stick with the default UTF-8 volume format.
+
+COMPATIBILITY WITH EARLIER VERSIONS
+       To use a volume created with an earlier afpd version, you'll have to specify the following options:
+
+       Example. use a 1.x style volume
+
+           /path/to/volume "Volname" adouble:v1 volcharset:ASCII
+
+       In case you used an NLS you could try using a compatible iconv charset for -volcharset.
+
+       Example. use a 1.x style volume, created with maccode.iso8859-1
+
+           /path/to/volume "Volname" adouble:v1 volcharset:ISO-8859-1
+
+       You should consider converting old style volumes to the new UTF-8/AD2 format. The safest way to do this, is to create a new
+       volume with the default options and copy the files between this volumes with a mac.
+
+       Note: Using above example options will allow you to downgrade to 1.x netatalk again.
+
+       Note: Some 1.x NLS files used non standard mappings, e.g.  maccode.iso8859-1.adapted. Three 1.x CAP double-byte maccharsets are
+       incompatible to netatalk 2.x; "MAC_CHINESE_TRAD", "MAC_JAPANESE" and "MAC_KOREAN". These are not supported anymore. You'll have
+       to copy the contents of those volumes files to a Mac and then back to the netatalk server, preferably to an UTF-8 volume.
+
+ADVANCED OPTIONS
+       The following options should only be used after serious consideration. Be sure you fully understood the, sometimes complex,
+       consequences, before using them.
+
+       casefold:[option]
+           The casefold option handles, if the case of filenames should be changed. The available options are:
+
+           tolower - Lowercases names in both directions.
+
+           toupper - Uppercases names in both directions.
+
+           xlatelower - Client sees lowercase, server sees uppercase.
+
+           xlateupper - Client sees uppercase, server sees lowercase.
+
+       options:[option]
+           This allows multiple options to be specified in a comma delimited format. The available options are:
+
+           caseinsensitive
+               The underlying filesystem is case insensitive (only tested with JFS in OS2 mode).
+
+           crlf
+               Enables crlf translation for TEXT files, automatically converting macintosh line breaks into Unix ones. Use of this
+               option might be dangerous since some older programs store binary data files as type "TEXT" when saving and switch the
+               filetype in a second step.  Afpd will potentially destroy such files when "erroneously" changing bytes in order to do
+               line break translation.
+
+           dropbox
+               Allows a volume to be declared as being a "dropbox." Note that netatalk must be compiled with dropkludge support for
+               this to function.  Warning: This option is deprecated and might not work as expected.
+
+           dropkludge
+               same as "dropbox".
+
+           mswindows
+               Forces filename restrictions imposed by MS WinXX.  Warning: This is NOT recommened for volumes mainly used by Macs.
+               Please make sure you fully understand this option before using it.
+
+                   Warning
+                   This option breaks direct saving to netatalk volumes from some applications, i.e. OfficeX.
+
+           noadouble
+               Forces afpd to not create .AppleDouble directories unless macintosh metadata needs to be written. This option is only
+               useful if you want to share files mostly used NOT by macs, causing afpd to not automatically create .AppleDouble subdirs
+               containing AD header files in every directory it enters (which will it do by default).
+
+               In case, you save or change files from mac clients, AD metadata files have to be written even in case you set this
+               option. So you can't avoid the creation of .AppleDouble directories and its contents when you give macs write access to
+               a share and they make use of it.
+
+               Try to avoid noadouble whenever possible.
+
+           nocnidcache
+               If set afpd doesn't store the ID information in AppleDouble V2 header files. As these IDs are used for caching and as a
+               database backup, this option normally shouldn't be set.
+
+           nodev
+               always use 0 for device number, helps when the device number is not constant across a reboot, cluster, ...
+
+           nofileid
+               don't advertise createfileid, resolveid, deleteid calls.
+
+           nohex
+               Disables :hex translations for anything except dot files. This option makes the '/' character illegal.
+
+           nostat
+               don't stat volume path when enumerating volumes list, useful for automounting or volumes created by a preexec script.
+
+           prodos
+               Provides compatibility with Apple II clients. (legacy)
+
+FILE NAME EXTENSION MAPPINGS
+       Example. Extension is jpg. Type is "JPEG". Creator is "ogle".
+
+           .jpg "JPEG" "ogle"
+
+       Example. Extension is lzh. Type is "LHA ". Creator is not defined.
+
+           .lzh "LHA "
+
+SEE ALSO
+       afpd.conf(5), afpd(8), cnid_metad(8)
+
+Netatalk 3.0                                                  27 Dez 2012                                         APPLEVOLUMES.DEFAU(5)

@@ -1,0 +1,374 @@
+AFPD.CONF(5)                                                  Netatalk 2.2                                                 AFPD.CONF(5)
+
+NAME
+       afpd.conf - Configuration file used by afpd(8) to determine the setup of its file sharing services
+
+DESCRIPTION
+       /usr/local/etc/netatalk/afpd.conf is the configuration file used by afpd to determine the behavior and configuration of the
+       different virtual file servers that it provides.
+
+       Any line not prefixed with # is interpreted. The configuration lines are composed like: server name [ options ] If a - is used
+       instead of a server name, the default server is specified. Server names must be quoted if they contain spaces. They must not
+       contain ":" or "@". The path name must be a fully qualified path name, or a path name using either the ~ shell shorthand or any
+       of the substitution variables, which are listed below.
+
+           Note
+           Each server has to be configured on a single line. Though, using "\" character, newline escaping is supported.
+       The possible options and their meanings are:
+
+APPLEVOLUMES FILES
+       -defaultvol [path]
+           Specifies path to AppleVolumes.default file (default is /usr/local/etc/netatalk/AppleVolumes.default).
+
+       -systemvol [path]
+           Specifies path to AppleVolumes.system file (default is /usr/local/etc/netatalk/AppleVolumes.system).
+
+       -[no]uservol
+           Enables or disables reading of the users´ individual volumes file entirely.
+
+       -[no]uservolfirst
+           Enables or disables reading of the users´ individual volumes file before processing the global AppleVolumes.default file.
+
+AUTHENTICATION METHODS
+       -uamlist [uams list]
+           Comma separated list of UAMs. (The default is uams_dhx.so,uams_dhx2.so).
+
+           The most commonly used UAMs are:
+
+           uams_guest.so
+               allows guest logins
+
+           uams_clrtxt.so
+               (uams_pam.so or uams_passwd.so) Allow logins with passwords transmitted in the clear. (legacy)
+
+           uams_randum.so
+               allows Random Number and Two-Way Random Number Exchange for authentication (requires a separate file containing the
+               passwords, either /usr/local/etc/netatalk/afppasswd file or the one specified via -passwdfile. See afppasswd(1) for
+               details. (legacy)
+
+           uams_dhx.so
+               (uams_dhx_pam.so or uams_dhx_passwd.so) Allow Diffie-Hellman eXchange (DHX) for authentication.
+
+           uams_dhx2.so
+               (uams_dhx2_pam.so or uams_dhx2_passwd.so) Allow Diffie-Hellman eXchange 2 (DHX2) for authentication.
+
+           uam_gss.so
+               Allow Kerberos V for authentication (optional)
+
+       -uampath [path]
+           Sets the default path for UAMs for this server (default is /usr/local/etc/netatalk/uams).
+
+       -k5keytab [path], -k5service [service], -k5realm [realm]
+           These are required if the server supports the Kerberos 5 authentication UAM.
+
+       -ntdomain, -ntseparator
+           Use for eg. winbind authentication, prepends both strings before the username from login and then tries to authenticate with
+           the result through the availabel and active UAM authentication modules.
+
+       -adminauthuser
+           Specifying eg -adminauthuser root whenever a normal user login fails, afpd will try to authenticate as the specified
+           adminauthuser. If this succeeds, a normal session is created for the original connecting user. Said differently: if you know
+           the password of adminauthuser, you can authenticate as any other user.
+
+CODEPAGE OPTIONS
+       With OS X Apple introduced the AFP3 protocol. One of the big changes was, that AFP3 uses Unicode names encoded as Decomposed
+       UTF-8 (UTF8-MAC). Previous AFP/OS versions used codepages like MacRoman, MacCentralEurope, etc.
+
+       To be able to serve AFP3 and older clients at the same time, afpd needs to be able to convert between UTF-8 and Mac codepages.
+       Even OS X clients partly still rely on codepages. As there´s no way, afpd can detect the codepage a pre AFP3 client uses, you
+       have to specify it using the -maccodepage option. The default is MacRoman, which should be fine for most western users.
+
+       As afpd needs to interact with unix operating system as well, it need´s to be able to convert from UTF8-MAC/MacCodepage to the
+       unix codepage. By default afpd uses the systems LOCALE, or ASCII if your system doesn´t support locales. You can set the unix
+       codepage using the -unixcodepage option. If you´re using extended characters in the configuration files for afpd, make sure your
+       terminal matches the -unixcodepage.
+
+       -unixcodepage [CODEPAGE]
+           Specifies the servers unix codepage, e.g. "ISO-8859-15" or "UTF8". This is used to convert strings to/from the systems
+           locale, e.g. for authenthication, server messages and volume names. Defaults to LOCALE if your system supports it, otherwise
+           ASCII will be used.
+
+       -maccodepage [CODEPAGE]
+           Specifies the mac clients codepage, e.g. "MAC_ROMAN". This is used to convert strings and filenames to the clients codepage
+           for OS9 and Classic, i.e. for authentication and AFP messages (SIGUSR2 messaging). This will also be the default for the
+           volumes maccharset. Defaults to MAC_ROMAN.
+
+PASSWORD OPTIONS
+       -loginmaxfail [number]
+           Sets the maximum number of failed logins, if supported by the UAM (currently none)
+
+       -passwdfile [path]
+           Sets the path to the Randnum UAM passwd file for this server (default is /usr/local/etc/netatalk/afppasswd).
+
+       -passwdminlen [number]
+           Sets the minimum password length, if supported by the UAM
+
+       -[no]savepassword
+           Enables or disables the ability of clients to save passwords locally
+
+       -[no]setpassword
+           Enables or disables the ability of clients to change their passwords via chooser or the "connect to server" dialog
+
+TRANSPORT PROTOCOLS
+       -[no]ddp
+           Enables or disables AFP-over-Appletalk. If -proxy is specified, you must instead use -uamlist "" to prevent DDP connections
+           from working. (default is -noddp)
+
+       -[no]tcp
+           Enables or disables AFP-over-TCP (default is -tcp)
+
+       -transall
+           Make both available
+
+TRANSPORT OPTIONS
+       -advertise_ssh
+           Allows Mac OS X clients (10.3.3-10.4) to automagically establish a tunneled AFP connection through SSH. If this option is
+           set, the server´s answers to client´s FPGetSrvrInfo requests contain an additional entry. It depends on both client´s
+           settings and a correctly configured and running sshd(8) on the server to let things work.
+
+               Note
+               Setting this option is not recommended since globally encrypting AFP connections via SSH will increase the server´s load
+               significantly. On the other hand, Apple´s client side implementation of this feature in MacOS X versions prior to 10.3.4
+               contained a security flaw.
+
+       -ddpaddr [ddp address]
+           Specifies the DDP address of the server. The default is to auto-assign an address (0.0). This is only useful if you are
+           running AppleTalk on more than one interface.
+
+       -fqdn [name:port]
+           Specifies a fully-qualified domain name, with an optional port. This is discarded if the server cannot resolve it. This
+           option is not honored by AppleShare clients <= 3.8.3. This option is disabled by default. Use with caution as this will
+           involve a second name resolution step on the client side. Also note that afpd will advertise this name:port combination but
+           not automatically listen to it.
+
+       -hostname [name]
+           Use this instead of the result from calling hostname for dertermening which IP address to advertise, therfore the hostname
+           is resolved to an IP which is the advertised. This is NOT used for listening and it is also overwritten by -ipaddr.
+
+       -ipaddr [ip address]
+           Specifies the IP address that the server should advertise and listens to. The default is advertise the first IP address of
+           the system, but to listen for any incoming request. The network address may be specified either in dotted-decimal format for
+           IPv4 or in hexadecimal format for IPv6. This option also allows to use one machine to advertise the AFP-over-TCP/IP settings
+           of another machine via NBP when used together with the -proxy option.
+
+           Example. afpd.conf onfiguration line
+
+                             fluxxus -hostname afp.example.org -ipaddr 192.168.0.1 -fqdn www.example.com
+
+           Result
+
+           (UTF8) Server name: fluxxus, Listening and advertised network address: 192.168.0.1, Advertised network address:
+           www.example.com, hostname is not used.
+
+       -port [port number]
+           Allows a different TCP port to be used for AFP-over-TCP. The default is 548.
+
+       -proxy
+           Runs an AppleTalk proxy server for the specified AFP-over-TCP server. If the address and port aren´t given, then the first
+           IP address of the system and port 548 will be used. If you don´t want the proxy server to act as a DDP server as well, set
+           -uamlist "".
+
+       -server_quantum [number]
+           This specifies the DSI server quantum. The default value is 303840. The maximum value is 0xFFFFFFFFF, the minimum is 32000.
+           If you specify a value that is out of range, the default value will be set. Do not change this value unless you´re
+           absolutely sure, what you´re doing
+
+       -dsireadbuf [number]
+           Scale factor that determines the size of the DSI/TCP readahead buffer, default is 12. This is multiplies with the DSI server
+           quantum (default ~300k) to give the size of the buffer. Increasing this value might increase throughput in fast local
+           networks for volume to volume copies.  Note: This buffer is allocated per afpd child process, so specifying large values
+           will eat up large amount of memory (buffer size * number of clients).
+
+       -tcprcvbuf [number]
+           Try to set TCP receive buffer using setsockpt(). Often OSes impose restrictions on the applications ability to set this
+           value.
+
+       -tcpsndbuf [number]
+           Try to set TCP send buffer using setsockpt(). Often OSes impose restrictions on the applications ability to set this value.
+
+       -nozeroconf
+           Disable automatic Zeroconf service registration if support was compiled in.
+
+       -slp
+           Register this server using the Service Location Protocol (if SLP support was compiled in).
+
+MISCELLANEOUS OPTIONS
+       -admingroup [group]
+           Allows users of a certain group to be seen as the superuser when they log in. This option is disabled by default.
+
+       -authprintdir [path]
+           Specifies the path to be used (per server) to store the files required to do CAP-style print authentication which papd will
+           examine to determine if a print job should be allowed. These files are created at login and if they are to be properly
+           removed, this directory probably needs to be umode 1777.
+
+               Note
+               -authprintdir will only work for clients connecting via DDP. Almost all modern Clients will use TCP.
+
+       -client_polling
+           With this switch enabled, afpd won´t advertise that it is capable of server notifications, so that connected clients poll
+           the server every 10 seconds to detect changes in opened server windows.  Note: Depending on the number of simultaneously
+           connected clients and the network´s speed, this can lead to a significant higher load on your network!
+
+               Note
+               Do not use this option any longer as Netatalk 2.x correctly supports server notifications, allowing connected clients to
+               update folder listings in case another client changed the contents.
+
+       -closevol
+           Immediately unmount volumes removed from AppleVolumes files on SIGHUP sent to the afp master process.
+
+       -cnidserver [ipaddress:port]
+           Specifies the IP address and port of a cnid_metad server, required for CNID dbd backend. Defaults to localhost:4700. The
+           network address may be specified either in dotted-decimal format for IPv4 or in hexadecimal format for IPv6.-
+
+       -dircachesize entries
+           Maximum possible entries in the directory cache. The cache stores directories and files. It is used to cache the full path
+           to directories and CNIDs which considerably speeds up directory enumeration.
+
+           Default size is 8192, maximum size is 131072. Given value is rounded up to nearest power of 2. Each entry takes about 100
+           bytes, which is not much, but remember that every afpd child process for every connected user has its cache.
+
+       -fcelistener host[:port]
+           Enables sending FCE events to the specified host, default port is 12250 if not specified. Specifying mutliple listeners is
+           done by having this option once for each of them.
+
+       -fceevents fmod,fdel,ddel,fcre,dcre,tmsz
+           Speficies which FCE events are active, default is fmod,fdel,ddel,fcre,dcre.
+
+       -fcecoalesce all|delete|create
+           Coalesce FCE events.
+
+       -fceholdfmod seconds
+           This determines the time delay in seconds which is always waited if another file modification for the same file is done by a
+           client before sending an FCE file modification event (fmod). For example saving a file in Photoshop would generate multiple
+           events by itself because the application is opening, modifying and closing a file mutliple times for every "save". Defautl:
+           60 seconds.
+
+       -guestname [name]
+           Specifies the user that guests should use (default is "nobody"). The name should be quoted.
+
+       -[no]icon
+           [Don´t] Use the platform-specific icon. Recent Mac OS don´t display it any longer.
+
+       -keepsessions
+           Enable "Continuous AFP Service". This means the ability to stop the master afpd process with a SIGQUIT signal, possibly
+           install an afpd update and start the afpd process. Existing AFP sessions afpd processes will remain unaffected. Technically
+           they will be notified of the master afpd shutdown, sleep 15-20 seconds and then try to reconnect their IPC channel to the
+           master afpd process. If this reconnect fails, the sessions are in an undefined state. Therefor it´s absolutely critical to
+           restart the master process in time!
+
+       -loginmesg [message]
+           Sets a message to be displayed when clients logon to the server. The message should be in unixcodepage and should be quoted.
+           Extended characters are allowed.
+
+       -mimicmodel model
+           Specifies the icon model that appears on clients. Defaults to off. Examples: RackMac (same as Xserve), PowerBook, PowerMac,
+           Macmini, iMac, MacBook, MacBookPro, MacBookAir, MacPro, AppleTV1,1, AirPort.
+
+       -noacl2maccess
+           Don´t map filesystem ACLs to effective permissions.
+
+       -nodebug
+           Disables debugging.
+
+       -sleep [number]
+           AFP 3.x waits number hours before disconnecting clients in sleep mode. Default is 10 hours.
+
+       -signature { user:<text> | auto }
+           Specify a server signature. This option is useful while running multiple independent instances of afpd on one machine (eg.
+           in clustered environments, to provide fault isolation etc.). Default is "auto". "auto" signature type allows afpd generating
+           signature and saving it to /usr/local/etc/netatalk/afp_signature.conf automatically (based on random number). "host"
+           signature type switches back to "auto" because it is obsoleted. "user" signature type allows administrator to set up a
+           signature string manually. The maximum length is 16 characters.
+
+           Example. Three server definitions using 2 different server signatures
+
+               first -signature user:USERS
+               second -signature user:USERS
+               third -signature user:ADMINS
+
+           First two servers will appear as one logical AFP service to the clients - if user logs in to first one and then connects to
+           second one, session will be automatically redirected to the first one. But if client connects to first and then to third,
+           will be asked for password twice and will see resources of both servers. Traditional method of signature generation causes
+           two independent afpd instances to have the same signature and thus cause clients to be redirected automatically to server
+           (s)he logged in first.
+
+       -volnamelen [number]
+           Max length of UTF8-MAC volume name for Mac OS X. Note that Hangul is especially sensitive to this.
+
+               73:  limit of Mac OS X 10.1
+               80:  limit for Mac OS X 10.4/10.5 (default)
+               255: limit of spec
+
+           Mac OS 9 and earlier are not influenced by this, because Maccharset volume name is always limitted to 27 bytes.
+
+LOGGING OPTIONS
+       -setuplog "<logtype> <loglevel> [<filename>]"
+           Specify that any message of a loglevel up to the given loglevel should be logged to the given file. If the filename is
+           ommited the loglevel applies to messages passed to syslog.
+
+           By default afpd logs to syslog with a default logging setup equivalent to "-setuplog default log_note".
+
+           logtypes: Default, AFPDaemon, Logger, UAMSDaemon
+
+           loglevels: LOG_SEVERE, LOG_ERROR, LOG_WARN, LOG_NOTE, LOG_INFO, LOG_DEBUG, LOG_DEBUG6, LOG_DEBUG7, LOG_DEBUG8, LOG_DEBUG9,
+           LOG_MAXDEBUG
+
+               Note
+               The config is case-ignoring
+
+           Example. Useful default config
+
+               - -setuplog "default log_info /var/log/afpd.log"
+
+           Example. Debugging config
+
+               - -setuplog "default log_maxdebug /var/log/afpd.log"
+
+           Example. afpd logging to different files
+
+               - -setuplog "default log_info /var/log/afpd.log" \
+               -setuplog "UAMSDaemon log_maxdebug /var/log/uams.log"
+
+       -unsetuplog "<logtype> [<filename>]"
+           Note that for unsetuplog specifying any string as filename is sufficient for the config parser to distinguish between
+           requests to disable syslog logging or file-logging.
+
+           Example. Disable afpd logging set at build-time from configure
+
+               - -unsetuplog "default -"
+
+DEBUG OPTIONS
+       These options are useful for debugging only.
+
+       -tickleval [number]
+           Sets the tickle timeout interval (in seconds). Defaults to 30.  A value of 0 disables session tickles.
+
+       -timeout [number]
+           Specify the number of tickles to send before timing out a connection. The default is 4, therefore a connection will timeout
+           after 2 minutes.
+
+EXAMPLES
+       Example. afpd.conf default configuration
+
+           - -tcp -noddp -uamlist uams_dhx.so,uams_dhx2.so -nosavepassword
+
+       Example. afpd.conf MacCyrillic setup / UTF8 unix locale
+
+           - -maccodepage mac_cyrillic -unixcodepage utf8
+
+       Example. afpd.conf setup for Kerberos V auth with newline escaping
+
+           - -uamlist uams_dhx.so,uams_dhx2.so,uams_guest.so,uams_gss.so \
+           -k5service afpserver -k5keytab /path/to/afpserver.keytab \
+           -k5realm YOUR.REALM -fqdn your.fqdn.namel:548
+
+       Example. afpd.conf letting afpd appear as three servers on the net
+
+           "Guest Server" -uamlist uams_guest.so -loginmesg "Welcome guest!"
+           "User Server" -uamlist uams_dhx2.so -port 12000
+           "special" -ddp -notcp -defaultvol <path> -systemvol <path>
+
+SEE ALSO
+       afpd(8), afppasswd(1), AppleVolumes.default(5), afp_signature.conf(5), cnid_metad(8)
+
+Netatalk 2.2                                                  15 Aug 2011                                                  AFPD.CONF(5)
