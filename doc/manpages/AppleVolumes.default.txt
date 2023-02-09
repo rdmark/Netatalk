@@ -1,4 +1,4 @@
-APPLEVOLUMES.DEFAU(5)                                         Netatalk 3.0                                        APPLEVOLUMES.DEFAU(5)
+APPLEVOLUMES.DEFAU(5)                                         Netatalk 2.2                                        APPLEVOLUMES.DEFAU(5)
 
 NAME
        AppleVolumes.default, AppleVolumes.system, AppleVolumes - Configuration file used by afpd(8) to determine the shares made
@@ -6,11 +6,11 @@ NAME
 
 SYNOPSIS
        /usr/local/etc/netatalk/AppleVolumes.default
-                                                                                                                                                         /usr/local/etc/netatalk/AppleVolumes.system
-                                                                                                                                                         ~/AppleVolumes
-                                                                                                                                                         ~/.AppleVolumes
-                                                                                                                                                         ~/applevolumes
-                                                                                                                                                         ~/.applevolumes
+              /usr/local/etc/netatalk/AppleVolumes.system
+              ~/AppleVolumes
+              ~/.AppleVolumes
+              ~/applevolumes
+              ~/.applevolumes
 
 DESCRIPTION
        /usr/local/etc/netatalk/AppleVolumes.system and one of /usr/local/etc/netatalk/AppleVolumes.default, ~/AppleVolumes,
@@ -87,7 +87,7 @@ DESCRIPTION
            Example: denied_hosts: 192.168.100/24,10.1.1.1,2001:db8::1428:57ab
 
        cnidscheme:[backend]
-           set the CNID backend to be used for the volume, default is [dbd] available schemes: [dbd last tdb]
+           set the CNID backend to be used for the volume, default is [dbd] available schemes: [dbd last]
 
        dbpath:[path]
            Sets the database information to be stored in path. You have to specifiy a writable location, even if the volume is read
@@ -257,15 +257,10 @@ CNID BACKENDS
        persistent way, to achieve this several different CNID backends are available. The CNID Databases are by default located in the
        .AppleDB folder in the volume root.
 
-       cdb
-           "Concurrent database", backend is based on Sleepycat's Berkely DB. With this backend several afpd deamons access the CNID
-           database directly. Berkeley DB locking is used to synchronize access, if more than one afpd process is active for a volume.
-           The drawback is, that the crash of a single afpd process might corrupt the database.
-
        dbd
            Access to the CNID database is restricted to the cnid_metad daemon process.  afpd processes communicate with the daemon for
            database reads and updates. If built with Berkeley DB transactions the probability for database corruption is practically
-           zero, but performance can be slower than with cdb
+           zero.
 
        last
            This backend is an exception, in terms of ID persistency. ID's are only valid for the current session. This is basically
@@ -346,13 +341,6 @@ ADVANCED OPTIONS
                filetype in a second step.  Afpd will potentially destroy such files when "erroneously" changing bytes in order to do
                line break translation.
 
-           dropbox
-               Allows a volume to be declared as being a "dropbox." Note that netatalk must be compiled with dropkludge support for
-               this to function.  Warning: This option is deprecated and might not work as expected.
-
-           dropkludge
-               same as "dropbox".
-
            mswindows
                Forces filename restrictions imposed by MS WinXX.  Warning: This is NOT recommened for volumes mainly used by Macs.
                Please make sure you fully understand this option before using it.
@@ -402,4 +390,4 @@ FILE NAME EXTENSION MAPPINGS
 SEE ALSO
        afpd.conf(5), afpd(8), cnid_metad(8)
 
-Netatalk 3.0                                                  27 Dez 2012                                         APPLEVOLUMES.DEFAU(5)
+Netatalk 2.2                                                  23 Feb 2022                                         APPLEVOLUMES.DEFAU(5)

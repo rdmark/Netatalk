@@ -52,14 +52,8 @@ AUTHENTICATION METHODS
            uams_dhx2.so
                (uams_dhx2_pam.so or uams_dhx2_passwd.so) Allow Diffie-Hellman eXchange 2 (DHX2) for authentication.
 
-           uam_gss.so
-               Allow Kerberos V for authentication (optional)
-
        -uampath [path]
            Sets the default path for UAMs for this server (default is /usr/local/etc/netatalk/uams).
-
-       -k5keytab [path], -k5service [service], -k5realm [realm]
-           These are required if the server supports the Kerberos 5 authentication UAM.
 
        -ntdomain, -ntseparator
            Use for eg. winbind authentication, prepends both strings before the username from login and then tries to authenticate with
@@ -227,22 +221,6 @@ MISCELLANEOUS OPTIONS
            Default size is 8192, maximum size is 131072. Given value is rounded up to nearest power of 2. Each entry takes about 100
            bytes, which is not much, but remember that every afpd child process for every connected user has its cache.
 
-       -fcelistener host[:port]
-           Enables sending FCE events to the specified host, default port is 12250 if not specified. Specifying mutliple listeners is
-           done by having this option once for each of them.
-
-       -fceevents fmod,fdel,ddel,fcre,dcre,tmsz
-           Speficies which FCE events are active, default is fmod,fdel,ddel,fcre,dcre.
-
-       -fcecoalesce all|delete|create
-           Coalesce FCE events.
-
-       -fceholdfmod seconds
-           This determines the time delay in seconds which is always waited if another file modification for the same file is done by a
-           client before sending an FCE file modification event (fmod). For example saving a file in Photoshop would generate multiple
-           events by itself because the application is opening, modifying and closing a file mutliple times for every "save". Defautl:
-           60 seconds.
-
        -guestname [name]
            Specifies the user that guests should use (default is "nobody"). The name should be quoted.
 
@@ -263,9 +241,6 @@ MISCELLANEOUS OPTIONS
        -mimicmodel model
            Specifies the icon model that appears on clients. Defaults to off. Examples: RackMac (same as Xserve), PowerBook, PowerMac,
            Macmini, iMac, MacBook, MacBookPro, MacBookAir, MacPro, AppleTV1,1, AirPort.
-
-       -noacl2maccess
-           Don´t map filesystem ACLs to effective permissions.
 
        -nodebug
            Disables debugging.
@@ -356,12 +331,6 @@ EXAMPLES
 
            - -maccodepage mac_cyrillic -unixcodepage utf8
 
-       Example. afpd.conf setup for Kerberos V auth with newline escaping
-
-           - -uamlist uams_dhx.so,uams_dhx2.so,uams_guest.so,uams_gss.so \
-           -k5service afpserver -k5keytab /path/to/afpserver.keytab \
-           -k5realm YOUR.REALM -fqdn your.fqdn.namel:548
-
        Example. afpd.conf letting afpd appear as three servers on the net
 
            "Guest Server" -uamlist uams_guest.so -loginmesg "Welcome guest!"
@@ -371,4 +340,4 @@ EXAMPLES
 SEE ALSO
        afpd(8), afppasswd(1), AppleVolumes.default(5), afp_signature.conf(5), cnid_metad(8)
 
-Netatalk 2.2                                                  15 Aug 2011                                                  AFPD.CONF(5)
+Netatalk 2.2                                                  23 Feb 2022                                                  AFPD.CONF(5)

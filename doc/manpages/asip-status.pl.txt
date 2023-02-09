@@ -95,4 +95,4 @@ EXAMPLES
 REPORTING BUGS
        Report bugs to the Netatalk-devel list <netatalk-devel@lists.sourceforge.net>.
 
-Netatalk 2.2                                                  02 Sep 2011                                             ASIP-STATUS.PL(1)
+Netatalk 2.2                                                  13 Jan 2023                                             ASIP-STATUS.PL(1)
