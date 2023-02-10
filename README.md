@@ -81,7 +81,7 @@ $ pkg install git libtool automake gcc7 bdb
 ```
 
 ## Bootstrap
-**Note:** For systems running legacy versions of autotools, you may need to replace the first few lines of ```configure.a```c with the commented out legacy syntax before running the ```bootstrap``` script. Has been confirmed on f.e. Ubuntu 18.04 and earlier, and Illumos (Tribblix 0m28).
+**Note:** For systems running legacy versions of autotools, you may need to replace the first few lines of ```configure.ac``` with the commented out legacy syntax before running the ```bootstrap``` script. Has been confirmed on f.e. Ubuntu 18.04 and earlier, and Illumos (Tribblix 0m28).
 
 First of all, it is worth noting that unlike upstream Netatalk 2, DDP (AppleTalk), papd, timelord, and a2boot are all configured and compiled by default.
 
@@ -97,7 +97,7 @@ Mac OS X 10.0 and 10.1, however, uses SLP (Service Location Protocol) rather tha
 
 On Debian f.e., the SLP library package is called `libslp-dev`.
 
-Configure with `--enable-srvloc --disable-zeroconf`.
+After installing the package, configure Netatalk with `--enable-srvloc --disable-zeroconf`.
 
 ### OmniOSce
 You need to point to the location where the Berkely DB libraries and headers are installed, e.g. for OmniOSce:
