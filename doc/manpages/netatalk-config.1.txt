@@ -1,4 +1,4 @@
-NETATALK-CONFIG(1)                                        The Netatalk Project                                       NETATALK-CONFIG(1)
+NETATALK-CONFIG(1)                                            Netatalk 2.2                                           NETATALK-CONFIG(1)
 
 NAME
        netatalk-config - script to get information about the installed version of netatalk

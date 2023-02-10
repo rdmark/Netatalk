@@ -1,10 +1,9 @@
-TIMELORD(8)                                               The Netatalk Project                                              TIMELORD(8)
+TIMELORD(8)                                                   Netatalk 2.2                                                  TIMELORD(8)
 
 NAME
        timelord - Macintosh time server daemon
 
 SYNOPSIS
-SYNTAX
        timelord [-d] [-l] [-n filename]
 
 DESCRIPTION

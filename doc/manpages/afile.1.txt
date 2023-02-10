@@ -1,4 +1,4 @@
-AFILE(1)                                                      Netatalk 2.1                                                     AFILE(1)
+AFILE(1)                                                      Netatalk 2.2                                                     AFILE(1)
 
 NAME
        afile - display type and creator of Apple Macintosh files (netatalk format)
@@ -42,4 +42,4 @@ DIAGNOSTICS
 SEE ALSO
        achfile(1), afpd(8)
 
-Netatalk 2.1                                                  26 Feb 1998                                                      AFILE(1)
+Netatalk 2.2                                                  26 Feb 1998                                                      AFILE(1)
