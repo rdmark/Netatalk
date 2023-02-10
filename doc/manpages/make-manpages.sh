@@ -13,8 +13,8 @@ function makeManPages() {
 	cd "$manDir$1"
 	for file in *."$1"; do
 		if [ -f "$file" ]; then
-			man -l "$file" > "$baseDir/${file::-2}.txt"
-			echo "Processed $file"
+			man -l "$file" > "$baseDir/$file.txt"
+			echo "Generated $file.txt"
 		fi
 	done
 }
