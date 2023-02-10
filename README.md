@@ -80,8 +80,8 @@ $ apt install libgcrypt20-dev
 $ dnf install openssl-devel libgcrypt-devel libdb-devel automake libtool avahi-devel cups-devel
 ```
 
-### OmniOS
-**Note:** These packages may apply also to other OpenSolaris descendents, such as OpenIndiana, or even to Solaris proper.
+### OmniOSce
+**Note:** These instructions may apply also to other OpenSolaris / Illumos distros, or even to Solaris proper.
 
 ```
 $ pkg install git libtool automake gcc7 bdb
@@ -106,8 +106,8 @@ On Debian f.e., the SLP library package is called `libslp-dev`.
 
 Configure with `--enable-srvloc --disable-zeroconf`.
 
-### OmniOS
-You need to point to the location where the Berkely DB libraries and headers are installed, e.g.:
+### OmniOSce
+You need to point to the location where the Berkely DB libraries and headers are installed, e.g. for OmniOSce:
 
 ```
 ./configure --with-bdb=/opt/ooce
@@ -275,6 +275,10 @@ This section will not describe the entire process, but rather follow the steps i
 * If the module isn't automatically loaded, add a line to /etc/modules
     * appletalk
 
+## Solaris
+
+Netatalk distributes code for an AppleTalk module for Solaris / Illumos, located under `sys/solaris`. It is presently configured for the SPARC architecture only.
+
 # Connect to AppleShare from a Mac client
 This section provides some pointers to how to connect to the AppleShare server provided by Netatalk.
 
@@ -303,4 +307,4 @@ In Basilisk II, make sure you configure the emulator with the slirp network inte
 * [Netatalk 2.2 Manual](http://netatalk.sourceforge.net/2.2/htmldocs/)
 * [Classic Mac Networking](http://www.applefool.com/se30/) guide by Mk.558
 * [Netatalk-Classic](https://github.com/christopherkobayashi/netatalk-classic), an AppleTalk-only fork of Netatalk
-* [Netatalk integration with RaSCSI](https://github.com/akuker/RASCSI/wiki/AFP-File-Sharing)
+* [Netatalk integration with PiSCSI](https://github.com/PiSCSI/piscsi/wiki/AFP-File-Sharing)
