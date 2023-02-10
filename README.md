@@ -80,7 +80,7 @@ $ dnf install openssl-devel libgcrypt-devel libdb-devel automake libtool avahi-d
 $ pkg install git libtool automake gcc7 bdb
 ```
 
-## Feature Configuration Examples
+## Bootstrap
 **Note:** For systems running legacy versions of autotools, you may need to replace the first few lines of ```configure.a```c with the commented out legacy syntax before running the ```bootstrap``` script. Has been confirmed on f.e. Ubuntu 18.04 and earlier, and Illumos (Tribblix 0m28).
 
 First of all, it is worth noting that unlike upstream Netatalk 2, DDP (AppleTalk), papd, timelord, and a2boot are all configured and compiled by default.
@@ -106,7 +106,7 @@ You need to point to the location where the Berkely DB libraries and headers are
 ./configure --with-bdb=/opt/ooce
 ```
 
-## Suggested Settings
+## Example Configuration
 Netatalk is an incredibly versatile piece of software, with over 30 years worth of accumulated functionality. Up until the time Apple deprecated AFP, it was deployed in enterprise and educational environments, so part of the feature set is geared towards operation at scale. As such, choosing the right settings for your needs and environment as a hobbyist can be daunting.
 
 Here follows a configuration example that the author of this fork has found to be the most simple and universally useful, allowing System 6 and macOS Monterey clients to share one and the same file server. It uses a single shared directory, and authentication with a single user's credentials, as well as a single routerless AppleTalk network without Zones.
