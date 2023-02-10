@@ -36,19 +36,12 @@ the Unix file system.  Refer to the appropriate man pages for
 operational information.
 
 # Netatalk 2.x
-Netatalk 2.x is a fork of the Netatalk 2.2 codebase, which aims to be clean and easy to set up on modern systems. It has taken in all community patches that emerged since upstream Netatalk 2.2 stopped being actively developed, for ultimate performance, compatibility and usability. It has also aggressively deprecated broken or long outdated features, as well as backported a select few security patches from upstream.
+Netatalk 2.x is a fork of the Netatalk 2.2 codebase, which aims to be clean and easy to set up on modern systems. It has taken in all community patches that emerged since upstream Netatalk 2.2 stopped being actively developed, for ultimate performance, compatibility and usability. It has also aggressively deprecated broken or long outdated features, as well as backported applicable security patches from upstream.
 
-Actively supported platforms are Linux, NetBSD and Solaris.
-
-# Background
-Netatalk is an open source implementation of AFP, Apple's legacy file sharing protocol, originally standing for AppleTalk Filing Protocol. This is what classic Mac OS as well as earlier versions of Mac OS X (until 10.8) uses for file sharing, when Apple deprecated AFP in favor of Samba.
-
-As of Netatalk 3.0, support for Apple's legacy AppleTalk (DDP) protocol was dropped. AppleTalk is required for Macs running System 6.0 through Mac OS 7.6, as well as Apple IIe and IIgs computers, to be able to connect to an AppleShare server out of the box. Additionally, AppleTalk support brings the convenience of a printer server (**papd**) which can act as a two-way bridge for using modern printers on old Macs, and vice versa, as well as a time server (**timelord**) plus an Apple II netboot server (**a2boot**.)
-
-One major motivation for keeping Netatalk 2.2 alive, is the ability to understand both AppleTalk (DDP) and TCP/IP (DSI) which allows it to serve as a bridge between very old Apple II and Mac systems, and modern macOS and other systems that understand AFP.
+Actively supported platforms are Debian Linux, NetBSD and Solaris.
 
 # Installation
-Follow the [installation steps in the official Netatalk 2.2 documentation](https://github.com/rdmark/Netatalk-2.x/wiki/Chapter-2.-Installation) to configure and install Netatalk.
+Follow the [installation instructions in the wiki](https://github.com/rdmark/Netatalk-2.x/wiki/Chapter-2.-Installation) to configure and install Netatalk.
 
 The general installation flow follows that of most traditional *NIX software: Run the ```bootstrap``` script to generate the Makefiles, then run the ```configure``` script to configure the feature set, then finally run ```make``` and ```make install``` to compile and install the software.
 
@@ -146,165 +139,9 @@ Append:
 ```
 Note: This line enables both DDP and DSI, the guest UAM for anonymous read-only access, the clrtxt UAM for Classic Mac OS authentication, and DHX2 UAM for Mac OS X / macOS authentication.
 
-The author have personally not found a use for any of the other UAMs, but there may be particular narrow usecases not covered here. Read the [Netatalk 2.2 manual's entry on authentication](https://netatalk.sourceforge.io/2.2/htmldocs/configuration.html#authentication) for a thorough description of and compatibility matrix for each UAM.
+The author have personally not found a use for any of the other UAMs, but there may be particular narrow usecases not covered here. Read the [Netatalk 2.2 manual's entry on authentication](https://github.com/rdmark/Netatalk-2.x/wiki/Chapter-3.-Setting-up-Netatalk#authentication) for a thorough description of and compatibility matrix for each UAM.
 
 ### atalkd.conf
 In most scenarios, atalkd will successfully autodetect the AppleTalk network settings, so you should not have to edit this file.
 
-If AppleTalk does not work out of the box, please refer to the [manual entry on AppleTalk](https://netatalk.sourceforge.io/2.2/htmldocs/configuration.html#id1207348).
-
-## Print Server
-Netatalk provides an AppleTalk compatible printer server daemon called papd. It can leverage the CUPS backend to share modern printers with vintage Macs.
-
-In order to use it, install the CUPS backend on your system before configuring Netatalk.
-
-```
-$ sudo apt install cups
-```
-
-This guide will not cover all scenarios for setting up CUPS, since [CUPS's own documentation](http://www.cups.org/doc/admin.html) should serve this purpose. However, we will cover some key steps and caveats that are specific to the Netatalk setup.
-
-Once you have installed CUPS packages and started the daemons, or enabled the systemd services for CUPS (including the cups-browser web interface, for convenience), you will want to add yourself to the CUPS admin group, and set a few options to make remote administration possible. Skip these steps if you want a more secure setup.
-
-```
-$ sudo usermod -a -G lpadmin $USER
-$ cupsctl --remote-admin WebInterface=yes
-```
-
-You may want to tweak the settings in ```/etc/cups/cupsd.conf``` to suite your environment, and tastes. Two recommended tweaks are to enable log rotation, and to disable the indefinite storing of print jobs, to avoid continuous increase in disk space taken up.
-
-```
-MaxLogSize 1000
-PreserveJobHistory No
-```
-
-Note: In the author's environment TCP port 631 (CUPS Web Interface default) was not open, so you may have to either edit ```/etc/cups/cupsd.conf``` or open the port in your firewall if you want to use the CUPS Web Interface.
-
-Once you have configured everything to your satisfaction, just start or restart the cups service. If the package installer didn't enable the services for you, you may need to use systemctl to reload daemons and enable new services first. 
-
-### Sharing a modern printer over AppleTalk
-
-Note that for this to work, your printer must be CUPS (Apple AirPrint) compatible. At the time of writing, the majority of modern printers are compatible. You can test this by after going through the steps above pipe some text to lp. First, list the printers that CUPS can see, then configure the default printer (HP Tango in my case), finally pipe a stream to lp for printing.
-
-```
-$ lpstat -p -d
-printer HP_Tango_333AB4_ is idle.  enabled since Fri 07 Jan 2022 06:47:09 PST
-system default destination: HP_Tango_333AB4_
-$ lpoptions -d HP_Tango_333AB4_
-device-uri=ipps://HP%20Tango%20%5B333AB4%5D._ipps._tcp.local/ printer-info='HP Tango [333AB4]' printer-location printer-make-and-model='HP Tango' printer-type=16781324
-$ echo "TESTING" | lp
-request id is HP_Tango_333AB4_-3 (0 file(s))
-```
-
-The next step is to configure papd. Edit ```/etc/netatalk/papd.conf``` and add the following line to the bottom of the file:
-
-```
-cupsautoadd:op=root:
-```
-
-Save, exit, and restart papd.
-
-At this stage, you want to test that the CUPS printer is shared over AppleTalk. This can be done using this command:
-
-```
-$ nbplkup
-```
-
-The output should look something like this:
-
-```
-                     rascsi3b:ProDOS16 Image                     65280.205:3
-             HP Tango 333AB4 :LaserWriter                        65280.205:130
-                     rascsi3b:Apple //e Boot                     65280.205:3
-                     rascsi3b:AFPServer                          65280.205:131
-                     rascsi3b:TimeLord                           65280.205:129
-                     rascsi3b:Apple //gs                         65280.205:3
-```
-
-If you see your printer here, the only thing left is to configure the printer on your vintage Mac in the Chooser. This part may vary depending on AppleTalk version, printer drivers on your system, and model and make of printer. The author has tested their HP Tango printer with LaserWriter 7 on System 7.1.1, and LaserWriter 8 on Mac OS 8.6:
-
-1. Pick the LaserWriter driver in the Chooser. Your printer should appear in the list of PostScript printers.
-    1. If using LaserWriter 7 or earlier, just selecting the printer should be enough.
-    2. If using LaserWriter 8, click Setup.
-2. When given the option to pick PPD (printer description file) choose plain LaserWriter from the list.
-3. Print!
-
-### Troubleshooting
-If the LaserWriter driver fails to properly spool the print job to the printer, you may want to try to configure is differently through CUPS. Here it is helpful to have the web interface ready. Go to the Administration page, Add Printer, then pick the printer you want to share from the list of detected ones. Note that one printer may expose several interfaces, so choose the one that seems the most likely to work with LaserWriter spool queues. Afterwards, check with the nbplkup command which printers are available over AppleTalk, and have a look in the Chooser if a different printer has been detected now.
-
-You may also experiment with different PPD files in the Chooser and see it that makes a difference. 
-
-## Time Server
-Netatalk also comes bundled with a [Timelord](https://web.archive.org/web/20010303220117/http://www.cs.mu.oz.au/appletalk/readmes/TMLD.README.html) compatible daemon that can be used to continuously synchronize vintage Macs' system clocks, enabling you to operate them without a PRAM battery, for instance.
-
-Once the timelord daemon is running, you'd want to install the [Tardis Chooser extension](https://macintoshgarden.org/apps/tardis-and-timelord) on your Mac and reboot. Now you should have a 'tardis' option in the Chooser, from where you can choose available time servers to sync with. The extension will automatically sync the system clock on bootup against the chosen server.
-
-## Apple II Netboot
-Netatalk comes with the a2boot daemon for netbooting Apple IIe and IIGS computers. It provides shared ProDOS volumes where you can install system files for booting an Apple II over a LocalTalk network.
-
-The [A2SERVER](http://ivanx.com/a2server/) project has comprehensive information on a2boot. 
-
-# AppleTalk Kernel Module
-Netatalk relies on AppleTalk support in the kernel to make use of the DDP layer. The ```atalkd``` daemon will attempt to dynamically load the kernel module if not detected, and error out if all attempts fail. You can still use the DSI layer (TCP/IP) without an AppleTalk kernel module.
-
-At the time of writing, Linux, NetBSD and Solaris are known to have maintained AppleTalk kernel modules. At one point in history, Netatalk had an embedded kernel module in its codebase, but this was deprecated long ago.
-
-## Linux
-
-To check if your kernel has AppleTalk support, first start the ```atalkd``` daemon, then issue this command and inspect the output:
-
-```
-$ lsmod | grep appletalk
-```
-
-If no ```appletalk``` module is detected, you may have to compile support into the kernel. This section describes the modular approach, but it should also be possible to compile the AppleTalk module directly into the kernel for a slight performance boost.
-
-This section will not describe the entire process, but rather follow the steps in the [Raspberry Pi documentation](https://www.raspberrypi.com/documentation/computers/linux_kernel.html). Do the steps in the documentation in this order:
-
-* [Building the Kernel Locally](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#building-the-kernel-locally)
-* [Apply the Default Configuration](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#default_configuration)
-* [Preparing to Configure](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#preparing-to-configure)
-* [Using menuconfig](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#using-menuconfig)
-* Networking support ---> Networking options ---> Appletalk protocol support
-    * Press M to select this
-    * Select ''Appletalk interfaces support'' and press M again
-    * Save and exit menuconfig
-* [Building the Kernel](https://www.raspberrypi.com/documentation/computers/linux_kernel.html#building-the-kernel)
-* Reboot the system once the process is completed (compilation may take an hour or longer on slower systems)
-* Check that the ''appletalk'' kernel module has been loaded, as per the above
-* If the module isn't automatically loaded, add a line to /etc/modules
-    * appletalk
-
-## Solaris
-
-Netatalk distributes code for an AppleTalk module for Solaris / Illumos, located under `sys/solaris`. It is presently configured for the SPARC architecture only.
-
-# Connect to AppleShare from a Mac client
-This section provides some pointers to how to connect to the AppleShare server provided by Netatalk.
-
-## AppleTalk
-AppleTalk is compatible with the oldest version of the Macintosh System Software that supported networking, as well as network enabled Apple II and Lisa systems, up until Mac OS X 10.8.
-
-AFP over classic AppleTalk (DDP) is plug and play, with available servers detected automatically if the ```atalkd``` daemon is running and has registered the AFP server.
-
-On System 6.0.x and later, open up Chooser and select AppleTalk. The file server should be detected automatically.
-
-On Mac OS X 10.8 or earlier, open the Finder and select Network from the left drawer. The file server should be detected automatically. 
-
-## TCP/IP
-AFP over TCP (DSI) can be used on Mac OS 7.1 and later. Mac OS 8.1 and later supports AFP over TCP out of the box, but on older versions you need to install [AppleShare Client 3.7.4](https://macintoshgarden.org/apps/appleshare-client-372) (or later.) You may also need to install [Open Transport 1.3](https://macintoshgarden.org/apps/open-transport-13-gold-master) if a compatible version of OT is not already installed.
-
-Mac OS X 10.0 onwards supports service discovery for AFP over TCP, but in Classic Mac OS you have to enter the IP address to the AFP file server manually in the Chooser.
-
-Note that the AppleShare Client 3.7.4 installer will refuse to install on a 7.1 System, so you will have to copy the AppleShare extension over manually.
-
-## Mac Emulators
-The AFP server can be accessed also from within a Mac emulator with a network bridge, such as Basilisk II.
-
-In Basilisk II, make sure you configure the emulator with the slirp network interface, and install the AppleShare Client / Open Transport software on the emulated system as instructed above. In the TCP/IP control panel, configure DHCP and make sure you can ping the host with OTTool or similar utility. At this point, you should be able to reach the shared drive through TCP, or even AppleTalk if your emulator's network bridge supports it.
-
-# See Also
-* [Netatalk 2.2 Manual](http://netatalk.sourceforge.net/2.2/htmldocs/)
-* [Classic Mac Networking](http://www.applefool.com/se30/) guide by Mk.558
-* [Netatalk-Classic](https://github.com/christopherkobayashi/netatalk-classic), an AppleTalk-only fork of Netatalk
-* [Netatalk integration with PiSCSI](https://github.com/PiSCSI/piscsi/wiki/AFP-File-Sharing)
+If AppleTalk does not work out of the box, please refer to the [manual entry on AppleTalk](https://github.com/rdmark/Netatalk-2.x/wiki/Chapter-3.-Setting-up-Netatalk#appletalk).
