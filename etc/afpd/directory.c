@@ -1021,7 +1021,7 @@ struct path *cname(struct vol *vol, struct dir *dir, char **cpath)
 	int size = 0;
 	int toUTF8 = 0;
 
-	LOG(log_maxdebug, logtype_afpd, "came('%s'): {start}",
+	LOG(log_maxdebug, logtype_afpd, "cname('%s'): {start}",
 	    cfrombstr(dir->d_fullpath));
 
 	data = *cpath;
