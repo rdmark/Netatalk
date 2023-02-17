@@ -237,7 +237,7 @@ static int parse_options (char *buf, int *flags, const vol_opt_name_t *options)
             
 
 
-static int parseline ( char *buf, struct volinfo *vol)
+static int vol_parseline ( char *buf, struct volinfo *vol)
 {
     char *value;
     size_t len;
@@ -395,7 +395,7 @@ int loadvolinfo (char *path, struct volinfo *vol)
 
     /* read the file */
     while (NULL != fgets(buf, sizeof(buf), fp)) {
-        parseline(buf, vol);
+        vol_parseline(buf, vol);
     }
 
     /* unlock file */
