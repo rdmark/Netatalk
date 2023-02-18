@@ -157,7 +157,7 @@ static int ad_conv_v22ea_rf(const char *path, const struct stat *sp, const struc
         EC_ZERO_LOG( ad_open(&adea, path, ADFLAGS_RF|ADFLAGS_RDWR|ADFLAGS_CREATE|ADFLAGS_SETSHRMD, 0666) );
 
         EC_ZERO_LOG( copy_fork(ADEID_RFORK, &adea, &adv2,
-			       vol->v_obj->dsi->commands,
+                     (char *)vol->v_obj->dsi->commands,
 			       vol->v_obj->dsi->server_quantum) );
 
         adea.ad_rlen = adv2.ad_rlen;
