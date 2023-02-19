@@ -86,7 +86,7 @@ static unsigned long fce_ev_enabled =
 static uint8_t fce_ev_info;    /* flags of additional info to send in events */
 
 #define MAXIOBUF 4096
-static unsigned char iobuf[MAXIOBUF];
+static char iobuf[MAXIOBUF];
 static const char **skip_files;
 static const char **skip_directories;
 static struct fce_close_event last_close_event;
