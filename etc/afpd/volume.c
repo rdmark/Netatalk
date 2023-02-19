@@ -583,7 +583,7 @@ int afp_getsrvrparms(AFPObj *obj, char *ibuf _U_, size_t ibuflen _U_, char *rbuf
             break;
 
         /* set password bit if there's a volume password */
-        *data = (volume->v_password) ? AFPSRVR_PASSWD : 0;
+        *data = (volume->v_password) ? (char)AFPSRVR_PASSWD : 0;
 
         *data++ |= 0; /* UNIX PRIVS BIT ..., OSX doesn't seem to use it, so we don't either */
         *data++ = len;
