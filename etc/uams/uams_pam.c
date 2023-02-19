@@ -124,7 +124,7 @@ pam_fail_conv:
 }
 
 static struct pam_conv PAM_conversation = {
-  &PAM_conv,
+        (int (*)(int, const struct pam_message **, struct pam_response **, void *)) &PAM_conv,
   NULL
 };
 
