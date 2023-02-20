@@ -141,9 +141,6 @@ AC_NETATALK_LIBEVENT
 # Check whether bundled tdb shall be used
 AC_NETATALK_TDB
 
-# libatalk API checks
-AC_DEVELOPER
-
 # Check for dbus-glib, for AFP stats on dbus
 AC_NETATALK_DBUS_GLIB
 
