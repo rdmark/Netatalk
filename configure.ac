@@ -259,7 +259,6 @@ AC_CONFIG_FILES([
   libatalk/adouble/Makefile
   libatalk/bstring/Makefile
   libatalk/cnid/Makefile
-  libatalk/cnid/cdb/Makefile
   libatalk/cnid/last/Makefile
   libatalk/cnid/dbd/Makefile
   libatalk/cnid/tdb/Makefile
