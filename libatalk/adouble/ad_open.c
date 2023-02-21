@@ -1132,7 +1132,9 @@ static int ad_open_hf_v2(const char *path, int adflags, mode_t mode, struct adou
                 admode = mode;
             admode = ad_hf_mode(admode);
             if (errno == ENOENT) {
+                become_root();
                 EC_NEG1_LOG( ad->ad_ops->ad_mkrf(ad_p) );
+                unbecome_root();
                 admode = mode;
                 st_invalid = ad_mode_st(ad_p, &admode, &st_dir);
                 if ((ad->ad_options & ADVOL_UNIXPRIV))
