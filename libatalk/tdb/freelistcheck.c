@@ -35,75 +35,73 @@
 
 static int seen_insert(struct tdb_context *mem_tdb, tdb_off_t rec_ptr)
 {
-	TDB_DATA key, data;
+    TDB_DATA key;
 
-	memset(&data, '\0', sizeof(data));
-	key.dptr = (unsigned char *)&rec_ptr;
-	key.dsize = sizeof(rec_ptr);
-	return tdb_store(mem_tdb, key, data, TDB_INSERT);
+    key.dptr = (unsigned char *)&rec_ptr;
+    key.dsize = sizeof(rec_ptr);
+    return tdb_store(mem_tdb, key, tdb_null, TDB_INSERT);
 }
 
-int tdb_validate_freelist(struct tdb_context *tdb, int *pnum_entries)
+_PUBLIC_ int tdb_validate_freelist(struct tdb_context *tdb, int *pnum_entries)
 {
-	struct tdb_context *mem_tdb = NULL;
-	struct tdb_record rec;
-	tdb_off_t rec_ptr, last_ptr;
-	int ret = -1;
+    struct tdb_context *mem_tdb = NULL;
+    struct tdb_record rec;
+    tdb_off_t rec_ptr, last_ptr;
+    int ret = -1;
 
-	*pnum_entries = 0;
+    *pnum_entries = 0;
 
-	mem_tdb = tdb_open("flval", tdb->header.hash_size,
-				TDB_INTERNAL, O_RDWR, 0600);
-	if (!mem_tdb) {
-		return -1;
-	}
+    mem_tdb = tdb_open("flval", tdb->hash_size,
+                       TDB_INTERNAL, O_RDWR, 0600);
+    if (!mem_tdb) {
+        return -1;
+    }
 
-	if (tdb_lock(tdb, -1, F_WRLCK) == -1) {
-		tdb_close(mem_tdb);
-		return 0;
-	}
+    if (tdb_lock(tdb, -1, F_WRLCK) == -1) {
+        tdb_close(mem_tdb);
+        return 0;
+    }
 
-	last_ptr = FREELIST_TOP;
+    last_ptr = FREELIST_TOP;
 
-	/* Store the FREELIST_TOP record. */
-	if (seen_insert(mem_tdb, last_ptr) == -1) {
-		tdb->ecode = TDB_ERR_CORRUPT;
-		ret = -1;
-		goto fail;
-	}
+    /* Store the FREELIST_TOP record. */
+    if (seen_insert(mem_tdb, last_ptr) == -1) {
+        tdb->ecode = TDB_ERR_CORRUPT;
+        ret = -1;
+        goto fail;
+    }
 
-	/* read in the freelist top */
-	if (tdb_ofs_read(tdb, FREELIST_TOP, &rec_ptr) == -1) {
-		goto fail;
-	}
+    /* read in the freelist top */
+    if (tdb_ofs_read(tdb, FREELIST_TOP, &rec_ptr) == -1) {
+        goto fail;
+    }
 
-	while (rec_ptr) {
+    while (rec_ptr) {
 
-		/* If we can't store this record (we've seen it
-		   before) then the free list has a loop and must
-		   be corrupt. */
+        /* If we can't store this record (we've seen it
+           before) then the free list has a loop and must
+           be corrupt. */
 
-		if (seen_insert(mem_tdb, rec_ptr)) {
-			tdb->ecode = TDB_ERR_CORRUPT;
-			ret = -1;
-			goto fail;
-		}
+        if (seen_insert(mem_tdb, rec_ptr)) {
+            tdb->ecode = TDB_ERR_CORRUPT;
+            ret = -1;
+            goto fail;
+        }
 
-		if (tdb_rec_free_read(tdb, rec_ptr, &rec) == -1) {
-			goto fail;
-		}
+        if (tdb_rec_free_read(tdb, rec_ptr, &rec) == -1) {
+            goto fail;
+        }
 
-		/* move to the next record */
-		last_ptr = rec_ptr;
-		rec_ptr = rec.next;
-		*pnum_entries += 1;
-	}
+        /* move to the next record */
+        rec_ptr = rec.next;
+        *pnum_entries += 1;
+    }
 
-	ret = 0;
+    ret = 0;
 
-  fail:
+fail:
 
-	tdb_close(mem_tdb);
-	tdb_unlock(tdb, -1, F_WRLCK);
-	return ret;
+    tdb_close(mem_tdb);
+    tdb_unlock(tdb, -1, F_WRLCK);
+    return ret;
 }

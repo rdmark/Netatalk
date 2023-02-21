@@ -1,4 +1,3 @@
-
 #include "config.h"
 
 #ifdef CNID_BACKEND_TDB

@@ -7,49 +7,66 @@
 #include "config.h"
 
 #ifdef CNID_BACKEND_TDB
-#include "cnid_tdb.h"
-#include <atalk/util.h>
+
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include <atalk/logger.h>
+#include <atalk/util.h>
+
+#include "cnid_tdb.h"
 
 static void make_devino_data(unsigned char *buf, dev_t dev, ino_t ino)
 {
-    buf[CNID_DEV_LEN - 1] = dev; dev >>= 8;
-    buf[CNID_DEV_LEN - 2] = dev; dev >>= 8;
-    buf[CNID_DEV_LEN - 3] = dev; dev >>= 8;
-    buf[CNID_DEV_LEN - 4] = dev; dev >>= 8;
-    buf[CNID_DEV_LEN - 5] = dev; dev >>= 8;
-    buf[CNID_DEV_LEN - 6] = dev; dev >>= 8;
-    buf[CNID_DEV_LEN - 7] = dev; dev >>= 8;
+    buf[CNID_DEV_LEN - 1] = dev;
+    dev >>= 8;
+    buf[CNID_DEV_LEN - 2] = dev;
+    dev >>= 8;
+    buf[CNID_DEV_LEN - 3] = dev;
+    dev >>= 8;
+    buf[CNID_DEV_LEN - 4] = dev;
+    dev >>= 8;
+    buf[CNID_DEV_LEN - 5] = dev;
+    dev >>= 8;
+    buf[CNID_DEV_LEN - 6] = dev;
+    dev >>= 8;
+    buf[CNID_DEV_LEN - 7] = dev;
+    dev >>= 8;
     buf[CNID_DEV_LEN - 8] = dev;
 
-    buf[CNID_DEV_LEN + CNID_INO_LEN - 1] = ino; ino >>= 8;
-    buf[CNID_DEV_LEN + CNID_INO_LEN - 2] = ino; ino >>= 8;
-    buf[CNID_DEV_LEN + CNID_INO_LEN - 3] = ino; ino >>= 8;
-    buf[CNID_DEV_LEN + CNID_INO_LEN - 4] = ino; ino >>= 8;
-    buf[CNID_DEV_LEN + CNID_INO_LEN - 5] = ino; ino >>= 8;
-    buf[CNID_DEV_LEN + CNID_INO_LEN - 6] = ino; ino >>= 8;
-    buf[CNID_DEV_LEN + CNID_INO_LEN - 7] = ino; ino >>= 8;
+    buf[CNID_DEV_LEN + CNID_INO_LEN - 1] = ino;
+    ino >>= 8;
+    buf[CNID_DEV_LEN + CNID_INO_LEN - 2] = ino;
+    ino >>= 8;
+    buf[CNID_DEV_LEN + CNID_INO_LEN - 3] = ino;
+    ino >>= 8;
+    buf[CNID_DEV_LEN + CNID_INO_LEN - 4] = ino;
+    ino >>= 8;
+    buf[CNID_DEV_LEN + CNID_INO_LEN - 5] = ino;
+    ino >>= 8;
+    buf[CNID_DEV_LEN + CNID_INO_LEN - 6] = ino;
+    ino >>= 8;
+    buf[CNID_DEV_LEN + CNID_INO_LEN - 7] = ino;
+    ino >>= 8;
     buf[CNID_DEV_LEN + CNID_INO_LEN - 8] = ino;
 }
 
-unsigned char *make_tdb_data(uint32_t flags, const struct stat *st,const cnid_t did,
-                     const char *name, const size_t len)
+unsigned char *make_tdb_data(uint32_t flags, const struct stat *st, const cnid_t did,
+                             const char *name, const size_t len)
 {
     static unsigned char start[CNID_HEADER_LEN + MAXPATHLEN + 1];
-    unsigned char *buf = start  +CNID_LEN;
+    unsigned char *buf = start + CNID_LEN;
     uint32_t i;
 
     if (len > MAXPATHLEN)
         return NULL;
 
-    make_devino_data(buf, !(flags & CNID_FLAG_NODEV)?st->st_dev:0, st->st_ino);
+    make_devino_data(buf, !(flags & CNID_FLAG_NODEV) ? st->st_dev : 0, st->st_ino);
     buf += CNID_DEVINO_LEN;
 
-    i = S_ISDIR(st->st_mode)?1:0;
+    i = S_ISDIR(st->st_mode) ? 1 : 0;
     i = htonl(i);
     memcpy(buf, &i, sizeof(i));
     buf += sizeof(i);
@@ -69,7 +86,8 @@ unsigned char *make_tdb_data(uint32_t flags, const struct stat *st,const cnid_t 
  * key:   cnid
  * data:
  */
-static int add_cnid (struct _cnid_tdb_private *db, TDB_DATA *key, TDB_DATA *data) {
+static int add_cnid(struct _cnid_tdb_private *db, TDB_DATA *key, TDB_DATA *data)
+{
     TDB_DATA altkey, altdata;
 
     memset(&altkey, 0, sizeof(altkey));
@@ -82,7 +100,7 @@ static int add_cnid (struct _cnid_tdb_private *db, TDB_DATA *key, TDB_DATA *data
     }
 
     /* dev/ino database */
-    altkey.dptr = data->dptr +CNID_DEVINO_OFS;
+    altkey.dptr = data->dptr + CNID_DEVINO_OFS;
     altkey.dsize = CNID_DEVINO_LEN;
     altdata.dptr = key->dptr;
     altdata.dsize = key->dsize;
@@ -91,8 +109,8 @@ static int add_cnid (struct _cnid_tdb_private *db, TDB_DATA *key, TDB_DATA *data
     }
 
     /* did/name database */
-    altkey.dptr = data->dptr +CNID_DID_OFS;
-    altkey.dsize = data->dsize -CNID_DID_OFS;
+    altkey.dptr = data->dptr + CNID_DID_OFS;
+    altkey.dsize = data->dsize - CNID_DID_OFS;
     if (tdb_store(db->tdb_didname, altkey, altdata, TDB_REPLACE)) {
         goto abort;
     }
@@ -106,7 +124,7 @@ abort:
 static cnid_t get_cnid(struct _cnid_tdb_private *db)
 {
     TDB_DATA rootinfo_key, data;
-    cnid_t hint,id;
+    cnid_t hint, id;
 
     memset(&rootinfo_key, 0, sizeof(rootinfo_key));
     memset(&data, 0, sizeof(data));
@@ -115,8 +133,7 @@ static cnid_t get_cnid(struct _cnid_tdb_private *db)
 
     tdb_chainlock(db->tdb_didname, rootinfo_key);
     data = tdb_fetch(db->tdb_didname, rootinfo_key);
-    if (data.dptr)
-    {
+    if (data.dptr) {
         memcpy(&hint, data.dptr, sizeof(cnid_t));
         free(data.dptr);
         id = ntohl(hint);
@@ -128,8 +145,7 @@ static cnid_t get_cnid(struct _cnid_tdb_private *db)
             goto cleanup;
         }
         hint = htonl(id);
-    }
-    else {
+    } else {
         hint = htonl(CNID_START);
     }
 
@@ -140,7 +156,7 @@ static cnid_t get_cnid(struct _cnid_tdb_private *db)
         goto cleanup;
     }
 
-    tdb_chainunlock(db->tdb_didname, rootinfo_key );
+    tdb_chainunlock(db->tdb_didname, rootinfo_key);
     return hint;
 cleanup:
     tdb_chainunlock(db->tdb_didname, rootinfo_key);

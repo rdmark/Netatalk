@@ -7,28 +7,29 @@
 #include "config.h"
 
 #ifdef CNID_BACKEND_TDB
+#include <stdlib.h>
 #include <sys/param.h>
 
-#include "cnid_tdb.h"
 #include <atalk/logger.h>
 #include <atalk/volume.h>
 
-#include <stdlib.h>
-#define DBHOME       ".AppleDB"
-#define DBHOMELEN    9                  /* strlen(DBHOME) +1 for / */
-#define DBLEN        12
-#define DBCNID       "cnid2.tdb"
+#include "cnid_tdb.h"
 
-#define DBVERSION_KEY    "\0\0\0\0Version"
+#define DBHOME ".AppleDB"
+#define DBHOMELEN 9 /* strlen(DBHOME) +1 for / */
+#define DBLEN 12
+#define DBCNID "cnid2.tdb"
+
+#define DBVERSION_KEY "\0\0\0\0Version"
 #define DBVERSION_KEYLEN (sizeof(DBVERSION_KEY))
-#define DBVERSION2       0x00000002U
-#define DBVERSION        DBVERSION2
+#define DBVERSION2 0x00000002U
+#define DBVERSION DBVERSION2
 
 static struct _cnid_db *cnid_tdb_new(struct vol *vol)
 {
     struct _cnid_db *cdb;
 
-    if ((cdb = (struct _cnid_db *) calloc(1, sizeof(struct _cnid_db))) == NULL)
+    if ((cdb = (struct _cnid_db *)calloc(1, sizeof(struct _cnid_db))) == NULL)
         return NULL;
 
     cdb->cnid_db_vol = vol;
@@ -45,7 +46,7 @@ static struct _cnid_db *cnid_tdb_new(struct vol *vol)
     cdb->cnid_delete = cnid_tdb_delete;
     cdb->cnid_get = cnid_tdb_get;
     cdb->cnid_lookup = cnid_tdb_lookup;
-    cdb->cnid_nextid = NULL;    /*cnid_tdb_nextid;*/
+    cdb->cnid_nextid = NULL; /*cnid_tdb_nextid;*/
     cdb->cnid_resolve = cnid_tdb_resolve;
     cdb->cnid_update = cnid_tdb_update;
     cdb->cnid_close = cnid_tdb_close;
@@ -57,15 +58,15 @@ static struct _cnid_db *cnid_tdb_new(struct vol *vol)
 /* ---------------------------- */
 struct _cnid_db *cnid_tdb_open(struct cnid_open_args *args)
 {
-    struct stat               st;
-    struct _cnid_db           *cdb;
+    struct stat st;
+    struct _cnid_db *cdb;
     struct _cnid_tdb_private *db;
-    size_t                    len;
-    char                      path[MAXPATHLEN + 1];
-    TDB_DATA                  key, data;
-    int 		      hash_size = 131071;
-    int                       tdb_flags = 0;
-    struct vol               *vol = args->cnid_args_vol;
+    size_t len;
+    char path[MAXPATHLEN + 1];
+    TDB_DATA key, data;
+    int hash_size = 131071;
+    int tdb_flags = 0;
+    struct vol *vol = args->cnid_args_vol;
 
     if ((cdb = cnid_tdb_new(vol)) == NULL) {
         LOG(log_error, logtype_default, "tdb_open: Unable to allocate memory for tdb");
@@ -89,8 +90,7 @@ struct _cnid_db *cnid_tdb_open(struct cnid_open_args *args)
             LOG(log_error, logtype_default, "tdb_open: DBHOME mkdir failed for %s", path);
             goto fail;
         }
-    }
-    else {
+    } else {
         hash_size = 0;
         tdb_flags = TDB_INTERNAL;
     }
@@ -101,7 +101,7 @@ struct _cnid_db *cnid_tdb_open(struct cnid_open_args *args)
     path[len + DBHOMELEN] = '\0';
     strcat(path, DBCNID);
 
-    db->tdb_cnid = tdb_open(path, hash_size, tdb_flags , O_RDWR | O_CREAT, 0666 & ~vol->v_umask);
+    db->tdb_cnid = tdb_open(path, hash_size, tdb_flags, O_RDWR | O_CREAT, 0666 & ~vol->v_umask);
     if (!db->tdb_cnid) {
         LOG(log_error, logtype_default, "tdb_open: unable to open tdb", path);
         goto fail;
@@ -127,8 +127,7 @@ struct _cnid_db *cnid_tdb_open(struct cnid_open_args *args)
             LOG(log_error, logtype_default, "tdb_open: Error putting new version");
             goto fail;
         }
-    }
-    else {
+    } else {
         free(data.dptr);
     }
 
@@ -145,8 +144,7 @@ struct _cnid_module cnid_tdb_module = {
     "tdb",
     {NULL, NULL},
     cnid_tdb_open,
-    CNID_FLAG_SETUID | CNID_FLAG_BLOCK
-};
+    CNID_FLAG_SETUID | CNID_FLAG_BLOCK};
 
 
 #endif
