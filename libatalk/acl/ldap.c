@@ -33,6 +33,12 @@
 #include <atalk/ldapconfig.h>   /* For struct ldap_pref */
 #include <atalk/errchk.h>
 
+#if defined(__has_warning)
+#if __has_warning("-Wdeprecated-declarations")
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+#endif
+
 typedef enum {
     KEEPALIVE = 1
 } ldapcon_t;
