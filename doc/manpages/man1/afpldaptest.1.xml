@@ -6,7 +6,7 @@
     <refmiscinfo class="date">22 Mar 2012</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP Fileserver Manual</refmiscinfo>
-    <refmiscinfo class="source">3.1.13</refmiscinfo>
+    <refmiscinfo class="source">3.1.14</refmiscinfo>
   </refmeta>
   <refnamediv id="name">
     <refname>afpldaptest</refname>

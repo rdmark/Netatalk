@@ -1,5 +1,5 @@
 project('netatalk', 'c',
-  version : '3.1.13',
+  version : '3.1.14',
   license : 'GPLv2',
   default_options : ['warning_level=3', 'c_std=c11', 'prefix=/usr/local'],
   meson_version : '>=0.61.0'
@@ -57,7 +57,7 @@ cdata.set('DEFAULT_CNID_SCHEME', '"dbd"')
 cdata.set('EA_MODULES', '"ad | sys"')
 cdata.set('ICONV_CONST', '')
 cdata.set('PATH_NETATALK_LOCK', '"/var/run/netatalk.pid"')
-cdata.set('VERSION', '"3.1.13"')
+cdata.set('VERSION', '"3.1.14"')
 
 configure_file(input : 'config.h.meson',
   output : 'config.h',

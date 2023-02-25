@@ -6,7 +6,7 @@
     <refmiscinfo class="date">27 June 2016</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP Fileserver Manual</refmiscinfo>
-    <refmiscinfo class="source">3.1.13</refmiscinfo>
+    <refmiscinfo class="source">3.1.14</refmiscinfo>
   </refmeta>
   <refnamediv>
     <refname>afp_voluuid.conf</refname>

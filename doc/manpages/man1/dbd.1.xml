@@ -6,7 +6,7 @@
     <refmiscinfo class="date">12 Nov 2015</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP Fileserver Manual</refmiscinfo>
-    <refmiscinfo class="version">3.1.13</refmiscinfo>
+    <refmiscinfo class="version">3.1.14</refmiscinfo>
   </refmeta>
   <refnamediv>
     <refname>dbd</refname>
