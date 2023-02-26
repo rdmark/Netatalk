@@ -6,8 +6,8 @@ test_sources = [
 
 deps = [kerberos, libgcrypt, mysqlclient]
 
-selftest = executable(
-  'afpd-self-test', test_sources,
+afpdtest = executable(
+  'afpdtest', test_sources,
   include_directories : inc,
   dependencies : deps,
   c_args : ['-DAPPLCNAME',
@@ -16,4 +16,8 @@ selftest = executable(
             '-D_PATH_CONFDIR="/usr/local/etc/"',
             '-D_PATH_STATEDIR="/usr/local/var/netatalk/"'],
   link_with : libatalk)
-test('afpd-self-test', selftest)
+
+test_sh =find_program('test.sh')
+
+test('test1', test_sh)
+test('test2', afpdtest)
