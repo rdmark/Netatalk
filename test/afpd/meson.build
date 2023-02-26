@@ -4,7 +4,7 @@ test_sources = [
   'subtests.c',
   'afpfunc_helpers.c']
 
-deps = [gssapi, kerberos, libgcrypt, mysqlclient]
+deps = [kerberos, libgcrypt, mysqlclient]
 
 selftest = executable(
   'afpd-self-test', test_sources,
