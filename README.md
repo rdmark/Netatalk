@@ -36,7 +36,7 @@ the Unix file system.  Refer to the appropriate man pages for
 operational information.
 
 # Netatalk 2.x
-Netatalk 2.x is a fork of the Netatalk 2.2 codebase, which aims to be clean and easy to set up on modern systems. It has taken in all community patches that emerged since upstream Netatalk 2.2 stopped being actively developed, for ultimate performance, compatibility and usability. It has also aggressively deprecated broken or long outdated features, as well as backported applicable security patches from upstream.
+Netatalk 2.x is a fork of the Netatalk 2.2 codebase which aims to be clean, safe and easy to set up on modern systems. It has also aggressively deprecated broken or long outdated features.
 
 Actively supported platforms are Debian Linux, NetBSD and Solaris.
 
