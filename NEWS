@@ -1,5 +1,31 @@
 Changes in 2.x v230201
 ======================
+* NEW: Generate man page plain text renderings in /doc/manpages
+       https://github.com/rdmark/netatalk-2.x/pull/26
+* UPD: Update contents and fix syntax errors in man pages.
+* UPD: afpd: Make '-transall' the default behavior (DDP and TCP)
+* UPD: debian_install.sh: Introduced many new options.
+       - atalkd interface
+       - sysconf dir
+       - bypass apt packages
+       - bypass make clean
+       - bypass systemd start
+       - non-interactive mode
+* FIX: afpd: reading from file may fail
+       SF Bug #619 (Netatalk 3.1 backport)
+* FIX: Resolve all clang 11 compiler warnings.
+       https://github.com/rdmark/netatalk-2.x/pull/22
+* FIX: Port netatalk-classic patches Feb 2022 to Jan 2023.
+       https://github.com/rdmark/netatalk-2.x/pull/23
+* FIX: Compatibility improvements for OmniOS.
+       https://github.com/rdmark/netatalk-2.x/pull/24
+* FIX: Deprecate legacy init scripts for platforms that come with systemd.
+       https://github.com/rdmark/netatalk-2.x/pull/25
+* FIX: Several minor refactorings and code quality improvements.
+* FIX: Moved most README.md contents into wiki.
+
+Changes in 2.x v230201
+======================
 * FIX: Create EA file system compat check temp files in /tmp rather than /
        then explicitly delete them afterwards.
        https://github.com/Netatalk/Netatalk/issues/188
