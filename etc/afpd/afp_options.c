@@ -163,10 +163,10 @@ void afp_options_init(struct afp_options *options)
 	options->sigconffile = _PATH_AFPDSIGCONF;
 	options->uuidconf = _PATH_AFPDUUIDCONF;
 	options->uampath = _PATH_AFPDUAMPATH;
-	options->uamlist = "uams_dhx.so,uams_dhx2.so";
+	options->uamlist = "uams_clrtxt.so,uams_dhx2.so";
 	options->guest = "nobody";
 	options->loginmesg = "";
-	options->transports = AFPTRANS_TCP;	/*  TCP only */
+	options->transports = AFPTRANS_ALL;	/*  TCP and DDP */
 	options->passwdfile = _PATH_AFPDPWFILE;
 	options->tickleval = 30;
 	options->timeout = 4;	/* 4 tickles = 2 minutes */

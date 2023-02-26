@@ -317,7 +317,7 @@ AC_ARG_ENABLE(systemd,
 	]
 )
 
-dnl ----- timelord compilation (disabled by default)
+dnl ----- timelord compilation (enabled by default)
 AC_MSG_CHECKING([whether timelord should be compiled])
 compile_timelord=yes
 AC_ARG_ENABLE(timelord,
