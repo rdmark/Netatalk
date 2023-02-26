@@ -1,4 +1,4 @@
-Changes in 2.x v230201
+Changes in 2.x v230202
 ======================
 * NEW: Generate man page plain text renderings in /doc/manpages
        https://github.com/rdmark/netatalk-2.x/pull/26
