@@ -8,7 +8,7 @@
 # By Daniel Markstedt
 # Based on RsSCSI easyinstall.sh by sonique6784
 # BSD 3-Clause License
-# Copyright (c) 2022, Daniel Markstedt
+# Copyright (c) 2022, 2023, Daniel Markstedt
 # Copyright (c) 2020, sonique6784
 
 set -e
@@ -16,9 +16,8 @@ set -e
 USER=$(whoami)
 BASE=$(dirname "$(readlink -f "${0}")")
 CORES=$(nproc)
-AFP_SHARE_NAME="Netatalk File Server"
-AFP_SHARE_PATH="$HOME/afpshare"
 SYSCONFDIR="/etc"
+NETATALK_CONFDIR="$SYSCONFDIR/netatalk"
 INSTALL_PACKAGES=1
 MAKE_CLEAN=1
 START_SERVICES=1
@@ -31,8 +30,14 @@ function initialChecks() {
         exit 1
     fi
     echo "Netatalk install script for Debian Linux."
-    echo "It attempts to set up a universally compatible single-user AFP server:"
+    echo "It attempts to set up a universally compatible AFP server:"
+
+    if [[ "$AFP_SHARE_PATH" ]]; then
     echo " - One shared volume named '$AFP_SHARE_NAME' ($AFP_SHARE_PATH)"
+    else
+    echo " - Shared volume is the home directory of the authenticated user"
+    fi
+
     echo " - Classic AppleTalk (DDP) support enabled"
     echo " - TCP/IP (DSI) support and service discovery with Zeroconf / Bonjour enabled"
     echo " - Cleartxt UAM to authenticate Classic Mac OS clients"
@@ -46,7 +51,7 @@ function initialChecks() {
     echo " - Create a directory in the current user's home directory where shared files will be stored"
     echo " - Install binaries to /usr/local/sbin"
     echo " - Install manpages to /usr/local/share/man"
-    echo " - Install configuration files to /etc"
+    echo " - Install configuration files to $SYSCONFDIR"
     echo " - Install the CUPS printing system and modify its configuration"
     echo ""
     echo "Input your password to allow this script to make the above changes."
@@ -83,13 +88,15 @@ function installNetatalk() {
         echo "Removed Netatalk from /etc/rc.local -- use systemctl to control Netatalk from now on."
     fi
 
-    if [ -d "$AFP_SHARE_PATH" ]; then
-        echo "Found a $AFP_SHARE_PATH directory; will use it for file sharing."
-    else
-        echo "Creating the $AFP_SHARE_PATH directory and granting read/write permissions to all users..."
-        sudo mkdir -p "$AFP_SHARE_PATH"
-        sudo chown -R "$USER:$USER" "$AFP_SHARE_PATH"
-        chmod -R 2775 "$AFP_SHARE_PATH"
+    if [[ "$AFP_SHARE_PATH" ]]; then
+        if [ -d "$AFP_SHARE_PATH" ]; then
+            echo "Found a $AFP_SHARE_PATH directory; will use it for file sharing."
+        else
+            echo "Creating the $AFP_SHARE_PATH directory and granting read/write permissions to all users..."
+            sudo mkdir -p "$AFP_SHARE_PATH"
+            sudo chown -R "$USER:$USER" "$AFP_SHARE_PATH"
+            chmod -R 2775 "$AFP_SHARE_PATH"
+        fi
     fi
 
     if [ $INSTALL_PACKAGES ]; then
@@ -124,17 +131,27 @@ function installNetatalk() {
 
     echo ""
     echo "Modifying service configurations..."
-    echo "AppleVolumes.default:"
-    sudo sed -i /^~/d "$SYSCONFDIR/netatalk/AppleVolumes.default"
-    echo "$AFP_SHARE_PATH \"$AFP_SHARE_NAME\"" | sudo tee -a "$SYSCONFDIR/netatalk/AppleVolumes.default"
-    echo "afpd.conf:"
-    echo "- -transall -uamlist uams_guest.so,uams_clrtxt.so,uams_dhx2.so -nosavepassword -icon" | sudo tee -a "$SYSCONFDIR/netatalk/afpd.conf"
-    echo "papd.conf:"
-    echo "cupsautoadd:op=root:" | sudo tee -a "$SYSCONFDIR/netatalk/papd.conf"
+
+    if [[ "$AFP_SHARE_PATH" ]]; then
+        echo "$NETATALK_CONFDIR/AppleVolumes.default:"
+        sudo sed -i /^~/d "$NETATALK_CONFDIR/AppleVolumes.default"
+        echo "$AFP_SHARE_PATH \"$AFP_SHARE_NAME\"" | sudo tee -a "$NETATALK_CONFDIR/AppleVolumes.default"
+    fi
+
+    echo "$NETATALK_CONFDIR/afpd.conf:"
+    echo "- -transall -uamlist uams_guest.so,uams_clrtxt.so,uams_dhx2.so -nosavepassword -icon" | sudo tee -a "$NETATALK_CONFDIR/afpd.conf"
+
+    if [[ "$APPLETALK_INTERFACE" ]]; then
+        echo "$NETATALK_CONFDIR/atalkd.conf:"
+        echo "$APPLETALK_INTERFACE" | sudo tee -a "$NETATALK_CONFDIR/atalkd.conf"
+    fi
+
+    echo "$NETATALK_CONFDIR/papd.conf:"
+    echo "cupsautoadd:op=root:" | sudo tee -a "$NETATALK_CONFDIR/papd.conf"
     sudo usermod -a -G lpadmin $USER
     sudo cupsctl --remote-admin WebInterface=yes
     if [[ `sudo grep -c "PreserveJobHistory" /etc/cups/cupsd.conf` -eq 0 ]]; then
-        echo "cupsd.conf:"
+        echo "/etc/cups/cupsd.conf:"
         sudo sed -i "/MaxLogSize/a PreserveJobHistory\ No" /etc/cups/cupsd.conf
     fi
 
@@ -148,7 +165,7 @@ function installNetatalk() {
         echo "Netatalk daemons are now installed and running, and should be discoverable by your Macs."
         echo "To authenticate with the file server, use the current username ("$USER") and password."
         echo ""
-        echo "For more information on how to use the various Netatalk features, see README.md"
+        echo "To learn more about Netatalk and its capabilities, visit https://netatalk.sourceforge.io"
         echo "Enjoy Netatalk!"
         echo ""
     fi
@@ -197,11 +214,17 @@ while [ "$1" != "" ]; do
         -j | --cores)
             CORES=$VALUE
             ;;
+        -d | --sysconf-dir)
+            SYSCONFDIR=$VALUE
+            ;;
         -n | --share-name)
             AFP_SHARE_NAME=$VALUE
             ;;
         -p | --share-path)
             AFP_SHARE_PATH=$VALUE
+            ;;
+        -t | --appletalk-interface)
+            APPLETALK_INTERFACE=$VALUE
             ;;
         -a | --no-packages)
             INSTALL_PACKAGES=
