@@ -29,13 +29,14 @@ function initialChecks() {
         echo "Do not run this script as $USER or with 'sudo'."
         exit 1
     fi
+
     echo "Netatalk install script for Debian Linux."
     echo "It attempts to set up a universally compatible AFP server:"
 
     if [[ "$AFP_SHARE_PATH" ]]; then
-    echo " - One shared volume named '$AFP_SHARE_NAME' ($AFP_SHARE_PATH)"
+        echo " - One shared volume named '$AFP_SHARE_NAME' ($AFP_SHARE_PATH)"
     else
-    echo " - Shared volume is the home directory of the authenticated user"
+        echo " - Shared volume is the home directory of the authenticated user"
     fi
 
     echo " - Classic AppleTalk (DDP) support enabled"
@@ -43,7 +44,7 @@ function initialChecks() {
     echo " - Cleartxt UAM to authenticate Classic Mac OS clients"
     echo " - DHX2 UAM to authenticate Mac OS X / macOS clients"
     echo " - Additional AppleTalk daemons papd (printer server), timelord (time server), and a2boot (Apple II netboot server)"
-    echo ""
+    echo
     echo "The following changes will be made to your system:"
     echo " - Modify user groups and permissions"
     echo " - Install packages with apt-get"
@@ -53,11 +54,11 @@ function initialChecks() {
     echo " - Install manpages to /usr/local/share/man"
     echo " - Install configuration files to $SYSCONFDIR"
     echo " - Install the CUPS printing system and modify its configuration"
-    echo ""
+    echo
     echo "Input your password to allow this script to make the above changes."
     sudo -v
 
-    echo ""
+    echo
     echo "IMPORTANT: "$USER" needs to have a password of 8 chars or less due to Classic Mac OS limitations."
     echo "Do you want to change your password now? [y/N]"
     read -r REPLY
@@ -67,12 +68,11 @@ function initialChecks() {
 }
 
 function installNetatalk() {
-    echo ""
     echo "Checking for previous versions of Netatalk..."
     sudo systemctl stop atalkd afpd || true
 
     if [ -f /etc/init.d/netatalk ]; then
-        echo ""
+        echo
         echo "WARNING: Legacy init scripts for a previous version of Netatalk was detected on your system. It is recommended to back up you configuration files and shared files before proceeding. Press CTRL-C to exit, or any other key to proceed."
         read
         sudo /etc/init.d/netatalk stop || true
@@ -100,36 +100,46 @@ function installNetatalk() {
     fi
 
     if [ $INSTALL_PACKAGES ]; then
-        echo ""
+        echo
         echo "Installing dependencies..."
         sudo apt-get update || true
         sudo apt-get install libssl-dev libdb-dev libcups2-dev cups libavahi-client-dev autotools-dev automake libtool libgcrypt20-dev pkg-config --assume-yes --no-install-recommends </dev/null
     fi
 
-    echo ""
-    echo "Bootstrapping and configuring Netatalk..."
     cd "$BASE/../.." || exit 1
-    ./bootstrap </dev/null
+
+    if [[ ! -f configure ]]; then
+        echo
+        echo "Bootstrapping Netatalk..."
+        ./bootstrap </dev/null
+    fi
+
+    echo
+    echo "Configuring Netatalk..."
     ./configure --enable-systemd --enable-overwrite --sysconfdir="$SYSCONFDIR" --with-uams-path=/usr/lib/netatalk </dev/null
 
-    echo ""
+    echo
     echo "Compiling Netatalk with ${CORES} simultaneous core(s)..."
+
     if [ $MAKE_CLEAN ]; then
         make clean </dev/null
     fi
+
     make all -j "${CORES}" </dev/null
 
+    echo
+    echo "Installing Netatalk..."
     sudo make install </dev/null
 
     if [[ `lsmod | grep -c appletalk` -eq 0 ]]; then
-        echo ""
+        echo
         echo "Your system may not have support for AppleTalk networking."
         echo "You can still use Netatalk with Macs that support AppleTalk over TCP/IP (DSI)."
         echo "In the Chooser, input the IP address of the network interface that is connected to the rest of your network:"
         echo `ip -4 addr show scope global | grep -oP '(?<=inet\s)\d+(\.\d+){3}'`
     fi
 
-    echo ""
+    echo
     echo "Modifying service configurations..."
 
     if [[ "$AFP_SHARE_PATH" ]]; then
@@ -156,18 +166,18 @@ function installNetatalk() {
     fi
 
     if [ $START_SERVICES ]; then
-        echo ""
+        echo
         echo "Starting systemd services... (this may take a while)"
         sudo systemctl enable afpd atalkd papd timelord a2boot cups
         sudo systemctl start afpd atalkd papd timelord a2boot cups
 
-        echo ""
+        echo
         echo "Netatalk daemons are now installed and running, and should be discoverable by your Macs."
         echo "To authenticate with the file server, use the current username ("$USER") and password."
-        echo ""
+        echo
         echo "To learn more about Netatalk and its capabilities, visit https://netatalk.sourceforge.io"
         echo "Enjoy Netatalk!"
-        echo ""
+        echo
     fi
 }
 
