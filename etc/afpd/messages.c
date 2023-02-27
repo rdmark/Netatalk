@@ -22,8 +22,6 @@
 
 #include "misc.h"
 
-extern int debug;
-
 #define MAXMESGSIZE 199
 
 /* this is only used by afpd children, so it's okay. */
@@ -62,10 +60,6 @@ void readmessage(AFPObj * obj)
 	}
 
 	sprintf(filename, "%s/message.%d", SERVERTEXT, getpid());
-
-	if (debug)
-		LOG(log_debug9, logtype_afpd, "Reading file %s ",
-		    filename);
 
 	message = fopen(filename, "r");
 	if (message == NULL) {
@@ -115,17 +109,6 @@ void readmessage(AFPObj * obj)
 			    "Error deleting %s: %s", filename,
 			    strerror(rc));
 		}
-
-		else {
-			if (debug)
-				LOG(log_debug9, logtype_afpd, "Deleted %s",
-				    filename);
-		}
-
-		if (debug)
-			LOG(log_debug9, logtype_afpd,
-			    "Set server message to \"%s\"", servermesg);
-
 	}
 	free(filename);
 #endif				/* SERVERTEXT */

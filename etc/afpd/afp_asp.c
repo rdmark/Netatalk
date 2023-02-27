@@ -38,7 +38,6 @@
 #include "fork.h"
 #include "dircache.h"
 
-extern int debug;
 static AFPObj *child;
 
 static void afp_authprint_remove(AFPObj *);
@@ -341,23 +340,11 @@ void afp_over_asp(AFPObj * obj)
 			afp_asp_close(obj);
 			LOG(log_info, logtype_afpd, "done");
 
-			if (debug)
-				if (obj->options.flags & OPTION_DEBUG) {
-					printf("done\n");
-				}
-
 			return;
 			break;
 
 		case ASPFUNC_CMD:
 			func = (u_int8_t) asp->commands[0];
-			if (debug)
-				if (obj->options.flags & OPTION_DEBUG) {
-					printf("command: %d (%s)\n", func,
-					       AfpNum2name(func));
-					bprint(asp->commands, asp->cmdlen);
-				}
-
 			if (afp_switch[func] != NULL) {
 				/*
 				 * The function called from afp_switch is expected to
@@ -379,13 +366,6 @@ void afp_over_asp(AFPObj * obj)
 				reply = AFPERR_NOOP;
 			}
 
-			if (debug)
-				if (obj->options.flags & OPTION_DEBUG) {
-					printf("reply: %d, %d\n", reply,
-					       ccnt++);
-					bprint(asp->data, asp->datalen);
-				}
-
 			if (asp_cmdreply(asp, reply) < 0) {
 				LOG(log_error, logtype_afpd,
 				    "asp_cmdreply: %s", strerror(errno));
@@ -395,13 +375,6 @@ void afp_over_asp(AFPObj * obj)
 
 		case ASPFUNC_WRITE:
 			func = (u_int8_t) asp->commands[0];
-
-			if (debug)
-				if (obj->options.flags & OPTION_DEBUG) {
-					printf("(write) command: %d\n",
-					       func);
-					bprint(asp->commands, asp->cmdlen);
-				}
 
 			if (afp_switch[func] != NULL) {
 				asp->datalen = ASP_DATASIZ;
@@ -417,14 +390,6 @@ void afp_over_asp(AFPObj * obj)
 				asp->datalen = 0;
 				reply = AFPERR_NOOP;
 			}
-
-			if (debug)
-				if (obj->options.flags & OPTION_DEBUG) {
-					printf
-					    ("(write) reply code: %d, %d\n",
-					     reply, ccnt++);
-					bprint(asp->data, asp->datalen);
-				}
 
 			if (asp_wrtreply(asp, reply) < 0) {
 				LOG(log_error, logtype_afpd,
