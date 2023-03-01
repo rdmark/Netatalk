@@ -1,7 +1,6 @@
 Makefile
 Makefile.in
 afpd.8
-afp_acls.8
 atalkd.8
 cnid_dbd.8
 cnid_metad.8
