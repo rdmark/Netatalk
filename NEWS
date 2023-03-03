@@ -5,6 +5,7 @@ Changes in 2.x v230301
 * FIX: Make all systemd services depend on network-online.
        Helps with consistent startup on wifi only devices.
        https://github.com/Netatalk/netatalk/issues/232
+* FIX: afpd: typos in log messages.
 
 Changes in 2.x v230202
 ======================
