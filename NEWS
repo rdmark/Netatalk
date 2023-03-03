@@ -1,6 +1,6 @@
 Changes in 2.x v230301
 ======================
-* NEW: man page for a2boot
+* NEW: created man page for a2boot
 * UPD: improved man page for timelord
 * FIX: Make all systemd services depend on network-online.
        Helps with consistent startup on wifi only devices.
