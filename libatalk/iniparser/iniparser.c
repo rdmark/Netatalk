@@ -602,7 +602,8 @@ static line_status atalk_iniparser_line(
             value[0] = 0;
         }
         sta = LINE_VALUE;
-    } else if (sscanf(line, "%[^=] = %[;#]", key, value) == 2 || sscanf(line, "%[^=] %[=]", key, value) == 2) {
+    } else if (sscanf(line, "%[^=] = %[;#]", key, value) == 2
+            || sscanf(line, "%[^=] %[=]",    key, value) == 2) {
         /*
          * Special cases:
          * key=
