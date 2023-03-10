@@ -20,14 +20,9 @@
 
 #include "config.h"
 
-#if __GNUC__
-# define alloca __builtin_alloca
-#else
-#  include <alloca.h>
-#endif
-
+#include <alloca.h>
+#include <assert.h>
 #include <dirent.h>
-#define NAMLEN(dirent) strlen ((dirent)->d_name)
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -40,12 +35,13 @@
 
 #include <atalk/ftw.h>
 
+#define NAMLEN(dirent) strlen((dirent)->d_name)
+
 #ifndef HAVE_MEMPCPY
 #define mempcpy(D, S, N) ((void *) ((char *) memcpy (D, S, N) + (N)))
 #endif
 
 #define NDEBUG 1
-#include <assert.h>
 
 #ifndef _LIBC
 # undef __chdir

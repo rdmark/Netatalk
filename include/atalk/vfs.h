@@ -1,16 +1,16 @@
 /*
    Copyright (c) 2004 Didier Gautheron
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
- 
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -80,7 +80,7 @@
 
 /*
  * Forward declaration. We need it because of the circular inclusion of
- * of vfs.h <-> volume.h. 
+ * of vfs.h <-> volume.h.
  */
 struct vol;
 
@@ -96,12 +96,6 @@ struct vfs_ops {
     int (*vfs_deletefile)    (VFS_FUNC_ARGS_DELETEFILE);
     int (*vfs_renamefile)    (VFS_FUNC_ARGS_RENAMEFILE);
     int (*vfs_copyfile)      (VFS_FUNC_ARGS_COPYFILE);
-
-#ifdef HAVE_ACLS
-    /* ACLs */
-    int (*vfs_acl)           (VFS_FUNC_ARGS_ACL);
-    int (*vfs_remove_acl)    (VFS_FUNC_ARGS_REMOVE_ACL);
-#endif
 
     /* Extended Attributes */
     int (*vfs_ea_getsize)    (VFS_FUNC_ARGS_EA_GETSIZE);

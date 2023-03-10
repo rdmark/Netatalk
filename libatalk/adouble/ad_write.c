@@ -58,11 +58,7 @@ ssize_t ad_write(struct adouble *ad, uint32_t eid, off_t off, int end, const cha
             off = st.st_size - off - ad_getentryoff(ad, eid);
         }
         if (ad->ad_vers == AD_VERSION_EA) {
-#ifdef HAVE_EAFD
-            r_off = off;
-#else
             r_off = ADEDOFF_RFORK_OSX + off;
-#endif
         } else {
             r_off = ad_getentryoff(ad, eid) + off;
         }
@@ -86,9 +82,6 @@ ssize_t ad_write(struct adouble *ad, uint32_t eid, off_t off, int end, const cha
 int sys_ftruncate(int fd, off_t length)
 {
 
-#ifndef  HAVE_PWRITE
-off_t           curpos;
-#endif
 int             err;
 struct stat	st;
 char            c = 0;
@@ -98,14 +91,6 @@ char            c = 0;
     }
     /* maybe ftruncate doesn't work if we try to extend the size */
     err = errno;
-
-#ifndef  HAVE_PWRITE
-    /* we only care about file pointer if we don't use pwrite */
-    if ((off_t)-1 == (curpos = lseek(fd, 0, SEEK_CUR)) ) {
-        errno = err;
-        return -1;
-    }
-#endif
 
     if ( fstat( fd, &st ) < 0 ) {
         errno = err;
@@ -126,13 +111,6 @@ char            c = 0;
         /* return the write errno */
         return -1;
     }
-
-#ifndef  HAVE_PWRITE
-    if (curpos != lseek(fd, curpos,  SEEK_SET)) {
-        errno = err;
-        return -1;
-    }
-#endif
 
     return 0;
 }

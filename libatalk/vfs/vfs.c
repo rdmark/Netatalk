@@ -354,83 +354,6 @@ EC_CLEANUP:
     EC_EXIT;
 }
 
-#ifdef HAVE_NFSV4_ACLS
-static int RF_solaris_acl(VFS_FUNC_ARGS_ACL)
-{
-    static char buf[ MAXPATHLEN + 1];
-    struct stat st;
-    int len;
-
-    if ((stat(path, &st)) != 0) {
-        if (errno == ENOENT)
-            return AFP_OK;
-        return AFPERR_MISC;
-    }
-    if (!S_ISDIR(st.st_mode)) {
-        /* set ACL on ressource fork */
-        if ((acl(vol->ad_path(path, ADFLAGS_HF), cmd, count, aces)) != 0)
-            return AFPERR_MISC;
-    }
-    return AFP_OK;
-}
-
-static int RF_solaris_remove_acl(VFS_FUNC_ARGS_REMOVE_ACL)
-{
-    int ret;
-    static char buf[ MAXPATHLEN + 1];
-    int len;
-
-    if (dir)
-        return AFP_OK;
-
-    /* remove ACL from ressource fork */
-    if ((ret = remove_acl_vfs(vol->ad_path(path, ADFLAGS_HF))) != AFP_OK) {
-        if (errno == ENOENT)
-            return AFP_OK;
-        return ret;
-    }
-
-    return AFP_OK;
-}
-#endif
-
-#ifdef HAVE_POSIX_ACLS
-static int RF_posix_acl(VFS_FUNC_ARGS_ACL)
-{
-    EC_INIT;
-    struct stat st;
-
-    if (stat(path, &st) == -1)
-        EC_FAIL;
-
-    if (!S_ISDIR(st.st_mode)) {
-        /* set ACL on ressource fork */
-        EC_ZERO_ERR( acl_set_file(vol->ad_path(path, ADFLAGS_HF), type, acl), AFPERR_MISC );
-    }
-
-EC_CLEANUP:
-    if (errno == ENOENT)
-        EC_STATUS(AFP_OK);
-    EC_EXIT;
-}
-
-static int RF_posix_remove_acl(VFS_FUNC_ARGS_REMOVE_ACL)
-{
-    EC_INIT;
-
-    if (dir)
-        EC_EXIT_STATUS(AFP_OK);
-
-    /* remove ACL from ressource fork */
-    EC_ZERO_ERR( remove_acl_vfs(vol->ad_path(path, ADFLAGS_HF)), AFPERR_MISC );
-
-EC_CLEANUP:
-    if (errno == ENOENT)
-        EC_STATUS(AFP_OK);
-    EC_EXIT;
-}
-#endif
-
 /*************************************************************************
  * EA adouble format
  ************************************************************************/
@@ -439,19 +362,15 @@ static int validupath_ea(VFS_FUNC_ARGS_VALIDUPATH)
     if (name[0] != '.')
         return 1;
 
-#ifndef HAVE_EAFD
     if (name[1] == '_')
         return ad_valid_header_osx(name);
-#endif
     return netatalk_name(name);
 }
 
 /* ----------------- */
 static int RF_chown_ea(VFS_FUNC_ARGS_CHOWN)
 {
-#ifndef HAVE_EAFD
-    return chown(vol->ad_path(path, ADFLAGS_HF ), uid, gid);
-#endif
+    return chown(vol->ad_path(path, ADFLAGS_HF), uid, gid);
     return 0;
 }
 
@@ -480,7 +399,6 @@ static int deletecurdir_ea_osx_loop(const struct vol *vol _U_, struct dirent *de
 /* ---------------- */
 static int RF_deletecurdir_ea(VFS_FUNC_ARGS_DELETECURDIR)
 {
-#ifndef HAVE_EAFD
     int err;
     /* delete stray ._AppleDouble files */
     if ((err = for_each_adouble("deletecurdir_ea_osx", ".",
@@ -488,56 +406,40 @@ static int RF_deletecurdir_ea(VFS_FUNC_ARGS_DELETECURDIR)
                                 vol, NULL, 0)) != 0)
         return err;
 
-#endif
     return 0;
 }
 
 /* ---------------- */
 static int RF_setdirunixmode_ea(VFS_FUNC_ARGS_SETDIRUNIXMODE)
 {
-#ifndef HAVE_EAFD
-#endif
     return 0;
 }
 
 static int RF_setfilmode_ea(VFS_FUNC_ARGS_SETFILEMODE)
 {
-#ifndef HAVE_EAFD
-    return adouble_setfilmode(vol, vol->ad_path(name, ADFLAGS_HF ), mode, st);
-#endif
+    return adouble_setfilmode(vol, vol->ad_path(name, ADFLAGS_HF), mode, st);
     return 0;
 }
 
 /* ---------------- */
 static int RF_setdirmode_ea(VFS_FUNC_ARGS_SETDIRMODE)
 {
-#ifndef HAVE_EAFD
-#endif
     return 0;
 }
 
 /* ---------------- */
 static int RF_setdirowner_ea(VFS_FUNC_ARGS_SETDIROWNER)
 {
-#ifndef HAVE_EAFD
-#endif
-	return 0;
+    return 0;
 }
 
 static int RF_deletefile_ea(VFS_FUNC_ARGS_DELETEFILE)
 {
-#ifndef HAVE_EAFD
-	return netatalk_unlinkat(dirfd, vol->ad_path(file, ADFLAGS_HF));
-#endif
+    return netatalk_unlinkat(dirfd, vol->ad_path(file, ADFLAGS_HF));
     return 0;
 }
 static int RF_copyfile_ea(VFS_FUNC_ARGS_COPYFILE)
 {
-#ifdef HAVE_EAFD
-    /* the EA VFS module does this all for us */
-    return 0;
-#endif
-
     EC_INIT;
     bstring s = NULL, d = NULL;
     char *dup1 = NULL;
@@ -594,9 +496,8 @@ EC_CLEANUP:
 /* ---------------- */
 static int RF_renamefile_ea(VFS_FUNC_ARGS_RENAMEFILE)
 {
-#ifndef HAVE_EAFD
-    char  adsrc[ MAXPATHLEN + 1];
-    int   err = 0;
+    char adsrc[MAXPATHLEN + 1];
+    int err = 0;
 
     strcpy( adsrc, vol->ad_path(src, 0 ));
 
@@ -609,8 +510,7 @@ static int RF_renamefile_ea(VFS_FUNC_ARGS_RENAMEFILE)
         errno = err;
         return -1;
     }
-    return 0;
-#endif
+
     return 0;
 }
 
@@ -787,11 +687,7 @@ void initvol_vfs(struct vol *vol)
         vol->ad_path = ad_path;
     } else {
         vol->vfs_modules[0] = &netatalk_adouble_ea;
-#ifdef HAVE_EAFD
-        vol->ad_path = ad_path_ea;
-#else
         vol->ad_path = ad_path_osx;
-#endif
     }
 
     /* Extended Attributes */

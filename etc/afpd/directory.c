@@ -2056,14 +2056,12 @@ setprivdone:
 
 int afp_syncdir(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
 {
-#ifdef HAVE_DIRFD
-    DIR                  *dp;
-#endif
-    int                  dfd;
-    struct vol           *vol;
-    struct dir           *dir;
-    uint32_t            did;
-    uint16_t            vid;
+    DIR *dp;
+    int dfd;
+    struct vol *vol;
+    struct dir *dir;
+    uint32_t did;
+    uint16_t vid;
 
     *rbuflen = 0;
     ibuf += 2;
@@ -2100,15 +2098,14 @@ int afp_syncdir(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,
          * in order to flush metadata e.g. Linux.
          */
 
-#ifdef HAVE_DIRFD
-        if (NULL == ( dp = opendir( "." )) ) {
-            switch( errno ) {
-            case ENOENT :
-                return( AFPERR_NOOBJ );
-            case EACCES :
-                return( AFPERR_ACCESS );
-            default :
-                return( AFPERR_PARAM );
+        if (NULL == (dp = opendir("."))) {
+            switch (errno) {
+                case ENOENT:
+                    return (AFPERR_NOOBJ);
+                case EACCES:
+                    return (AFPERR_ACCESS);
+                default:
+                    return (AFPERR_PARAM);
             }
         }
 
@@ -2119,7 +2116,6 @@ int afp_syncdir(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,
             LOG(log_error, logtype_afpd, "afp_syncdir(%s):  %s",
                 dir->d_u_name, strerror(errno) );
         closedir(dp); /* closes dfd too */
-#endif
 
         if ( -1 == (dfd = open(vol->ad_path(".", ADFLAGS_DIR), O_RDWR))) {
             switch( errno ) {

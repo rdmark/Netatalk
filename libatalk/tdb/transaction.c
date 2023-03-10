@@ -578,7 +578,6 @@ static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset _U_, tdb_l
         TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction: fsync failed\n"));
         return -1;
     }
-#ifdef HAVE_MMAP
     if (tdb->map_ptr) {
         tdb_off_t moffset = offset & ~(tdb->page_size - 1);
         if (msync(moffset + (char *)tdb->map_ptr,
@@ -589,7 +588,6 @@ static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset _U_, tdb_l
             return -1;
         }
     }
-#endif
     return 0;
 }
 
@@ -1202,9 +1200,7 @@ _PUBLIC_ int tdb_transaction_commit(struct tdb_context *tdb)
        not be backed up (as tdb rounding to block sizes means that
        file size changes are quite rare too). The following forces
        mtime changes when a transaction completes */
-#ifdef HAVE_UTIME
     utime(tdb->name, NULL);
-#endif
 
     /* use a transaction cancel to free memory and remove the
        transaction locks */

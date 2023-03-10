@@ -6,9 +6,7 @@
 #ifndef ATALK_RPC_H
 #define ATALK_RPC_H
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include <inttypes.h>
 #include <sys/types.h>

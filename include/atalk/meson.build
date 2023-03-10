@@ -12,7 +12,6 @@ headers = [
   'list.h',
   'logger.h',
   'netatalk_conf.h',
-  'paths.h',
   'standards.h',
   'uam.h',
   'unicode.h',

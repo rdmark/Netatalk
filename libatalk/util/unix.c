@@ -290,13 +290,9 @@ int ochmod(char *path, mode_t mode, const struct stat *st, int options)
  */
 int ostatat(int dirfd _U_, const char *path, struct stat *st, int options)
 {
-#ifdef HAVE_ATFUNCS
     if (dirfd == -1)
         dirfd = AT_FDCWD;
     return fstatat(dirfd, path, st, (options & O_NOFOLLOW) ? AT_SYMLINK_NOFOLLOW : 0);
-#else
-    return ostat(path, st, options);
-#endif
 
     /* DEADC0DE */
     return -1;

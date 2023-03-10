@@ -851,17 +851,6 @@ static int setfile(const struct stat *fs, int fd)
             rval = 1;
         }
 
-#ifdef HAVE_ST_FLAGS
-    if (!gotstat || fs->st_flags != ts.st_flags)
-        if (fdval ?
-            fchflags(fd, fs->st_flags) :
-            (islink ? lchflags(to.p_path, fs->st_flags) :
-             chflags(to.p_path, fs->st_flags))) {
-            SLOG("chflags: %s: %s", to.p_path, strerror(errno));
-            rval = 1;
-        }
-#endif
-
     return (rval);
 }
 

@@ -356,9 +356,6 @@ static int ad_flush_rf(struct adouble *ad)
     ssize_t len;
     char    adbuf[AD_DATASZ_OSX];
 
-#ifdef HAVE_EAFD
-    return 0;
-#endif
     if (ad->ad_vers != AD_VERSION_EA)
         return 0;
 

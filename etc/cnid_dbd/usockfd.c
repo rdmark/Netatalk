@@ -22,7 +22,7 @@
  */
 int tsockfd_create(char *host, char *port, int backlog)
 {
-    int sockfd, flag, ret;
+    int sockfd, flag _U_, ret;
     struct addrinfo hints, *servinfo, *p;
 
     /* Prepare hint for getaddrinfo */
@@ -42,24 +42,6 @@ int tsockfd_create(char *host, char *port, int backlog)
             LOG(log_info, logtype_cnid, "tsockfd_create: socket: %s", strerror(errno));
             continue;
         }
-
-        /*
-         * Set some socket options:
-         * SO_REUSEADDR deals w/ quick close/opens
-         * TCP_NODELAY diables Nagle
-         */
-#ifdef SO_REUSEADDR
-        flag = 1;
-        setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
-#endif
-
-#ifdef USE_TCP_NODELAY
-#ifndef SOL_TCP
-#define SOL_TCP IPPROTO_TCP
-#endif
-        flag = 1;
-        setsockopt(sockfd, SOL_TCP, TCP_NODELAY, &flag, sizeof(flag));
-#endif /* USE_TCP_NODELAY */
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);

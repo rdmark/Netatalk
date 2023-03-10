@@ -75,13 +75,7 @@ static int getifaces(const int sockfd, char ***list)
 	new = (char **) malloc((ifc.ifc_len/sizeof(struct ifreq) + 1) * sizeof(char *));
     for ( ifr = ifc.ifc_req; ifc.ifc_len >= (int) sizeof( struct ifreq );
 	    ifc.ifc_len -= ifrsize, ifr = nextifr ) {
-#ifdef BSD4_4
- 	ifrsize = sizeof(ifr->ifr_name) +
-	  (ifr->ifr_addr.sa_len > sizeof(struct sockaddr)
-	   ? ifr->ifr_addr.sa_len : sizeof(struct sockaddr));
-#else /* !BSD4_4 */
 	ifrsize = sizeof( struct ifreq );
-#endif /* BSD4_4 */
 	nextifr = (struct ifreq *)((caddr_t)ifr + ifrsize );
 
 	/* just bail if there's a problem */

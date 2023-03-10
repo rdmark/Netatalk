@@ -88,11 +88,8 @@ typedef struct DSI {
     char     *start;            /* current buffer head */
     char     *eof;              /* end of currently used buffer */
     char     *end;
-
-#ifdef USE_ZEROCONF
-    char *bonjourname;      /* server name as UTF8 maxlen MAXINSTANCENAMELEN */
+    char *bonjourname; /* server name as UTF8 maxlen MAXINSTANCENAMELEN */
     int zeroconf_registered;
-#endif
 
     /* protocol specific open/close, send/receive
      * send/receive fill in the header and use dsi->commands.
