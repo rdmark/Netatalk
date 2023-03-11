@@ -563,17 +563,13 @@ _PUBLIC_ int tdb_transaction_start_nonblock(struct tdb_context *tdb)
 /*
   sync to disk
 */
-static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset _U_, tdb_len_t length _U_)
+static int transaction_sync(struct tdb_context *tdb, tdb_off_t offset, tdb_len_t length)
 {
     if (tdb->flags & TDB_NOSYNC) {
         return 0;
     }
 
-#ifdef HAVE_FDATASYNC
     if (fdatasync(tdb->fd) != 0) {
-#else
-    if (fsync(tdb->fd) != 0) {
-#endif
         tdb->ecode = TDB_ERR_IO;
         TDB_LOG((tdb, TDB_DEBUG_FATAL, "tdb_transaction: fsync failed\n"));
         return -1;

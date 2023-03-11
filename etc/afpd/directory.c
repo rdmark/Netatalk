@@ -2094,7 +2094,7 @@ int afp_syncdir(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,
             return ( AFPERR_NOOBJ );
 
         /*
-         * Assuming only OSens that have dirfd also may require fsyncing directories
+         * Assuming only OSes that have dirfd also may require fsyncing directories
          * in order to flush metadata e.g. Linux.
          */
 

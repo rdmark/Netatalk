@@ -26,6 +26,7 @@
 #include <unistd.h>
 
 #include <atalk/logger.h>
+#include <atalk/util.h>
 
 #ifndef SIGNAL_CAST
 #define SIGNAL_CAST (void (*)(int))
@@ -46,7 +47,6 @@ static void (*cont_fn)(void *);
 
 static void (*CatchSignal(int signum,void (*handler)(int )))(int)
 {
-#ifdef HAVE_SIGACTION
 	struct sigaction act;
 	struct sigaction oldact;
 
@@ -64,10 +64,6 @@ static void (*CatchSignal(int signum,void (*handler)(int )))(int)
 	sigaddset(&act.sa_mask,signum);
 	sigaction(signum,&act,&oldact);
 	return oldact.sa_handler;
-#else /* !HAVE_SIGACTION */
-	/* FIXME: need to handle sigvec and systems with broken signal() */
-	return signal(signum, handler);
-#endif
 }
 
 /*******************************************************************

@@ -81,11 +81,6 @@
 #define __location__ __FILE__ ":" __LINESTR__
 #endif
 
-/* #define TDB_TRACE 1 */
-#ifndef HAVE_GETPAGESIZE
-#define getpagesize() 0x2000
-#endif
-
 typedef uint32_t tdb_len_t;
 typedef uint32_t tdb_off_t;
 

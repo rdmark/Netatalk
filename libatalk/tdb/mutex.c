@@ -735,7 +735,6 @@ static pid_t tdb_robust_mutex_pid = -1;
 static bool tdb_robust_mutex_setup_sigchild(void (*handler)(int),
                                             void (**p_old_handler)(int))
 {
-#ifdef HAVE_SIGACTION
     struct sigaction act;
     struct sigaction oldact;
 
@@ -752,9 +751,6 @@ static bool tdb_robust_mutex_setup_sigchild(void (*handler)(int),
         *p_old_handler = oldact.sa_handler;
     }
     return true;
-#else /* !HAVE_SIGACTION */
-    return false;
-#endif
 }
 
 static void tdb_robust_mutex_handler(int sig)

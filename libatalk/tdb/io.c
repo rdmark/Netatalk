@@ -96,24 +96,6 @@ static int tdb_ftruncate(struct tdb_context *tdb, off_t length)
     return ret;
 }
 
-#ifdef HAVE_POSIX_FALLOCATE
-static int tdb_posix_fallocate(struct tdb_context *tdb, off_t offset,
-                               off_t len)
-{
-    ssize_t ret;
-
-    if (!tdb_adjust_offset(tdb, &offset)) {
-        return -1;
-    }
-
-    do {
-        ret = posix_fallocate(tdb->fd, offset, len);
-    } while ((ret == -1) && (errno == EINTR));
-
-    return ret;
-}
-#endif
-
 static int tdb_fstat(struct tdb_context *tdb, struct stat *buf)
 {
     int ret;
@@ -227,10 +209,6 @@ static int tdb_write(struct tdb_context *tdb, tdb_off_t off,
     if (tdb->map_ptr) {
         memcpy(off + (char *)tdb->map_ptr, buf, len);
     } else {
-#ifdef HAVE_INCOHERENT_MMAP
-        tdb->ecode = TDB_ERR_IO;
-        return -1;
-#else
         ssize_t written;
 
         written = tdb_pwrite(tdb, buf, len, off);
@@ -258,7 +236,6 @@ static int tdb_write(struct tdb_context *tdb, tdb_off_t off,
                      len, off));
             return -1;
         }
-#endif
     }
     return 0;
 }
@@ -284,10 +261,6 @@ static int tdb_read(struct tdb_context *tdb, tdb_off_t off, void *buf,
     if (tdb->map_ptr) {
         memcpy(buf, off + (char *)tdb->map_ptr, len);
     } else {
-#ifdef HAVE_INCOHERENT_MMAP
-        tdb->ecode = TDB_ERR_IO;
-        return -1;
-#else
         ssize_t ret;
 
         ret = tdb_pread(tdb, buf, len, off);
@@ -300,7 +273,6 @@ static int tdb_read(struct tdb_context *tdb, tdb_off_t off, void *buf,
                      tdb->map_size));
             return -1;
         }
-#endif
     }
     if (cv) {
         tdb_convert(buf, len);
@@ -339,7 +311,6 @@ int tdb_munmap(struct tdb_context *tdb)
     if (tdb->flags & TDB_INTERNAL)
         return 0;
 
-#ifdef HAVE_MMAP
     if (tdb->map_ptr) {
         int ret;
 
@@ -347,9 +318,14 @@ int tdb_munmap(struct tdb_context *tdb)
         if (ret != 0)
             return ret;
     }
-#endif
     tdb->map_ptr = NULL;
     return 0;
+}
+
+/* If mmap isn't coherent, *everyone* must always mmap. */
+static bool should_mmap(const struct tdb_context *tdb)
+{
+    return !(tdb->flags & TDB_NOMMAP);
 }
 
 int tdb_mmap(struct tdb_context *tdb)
@@ -357,7 +333,6 @@ int tdb_mmap(struct tdb_context *tdb)
     if (tdb->flags & TDB_INTERNAL)
         return 0;
 
-#ifdef HAVE_MMAP
     if (should_mmap(tdb)) {
         tdb->map_ptr = mmap(NULL, tdb->map_size,
                             PROT_READ | (tdb->read_only ? 0 : PROT_WRITE),
@@ -372,17 +347,11 @@ int tdb_mmap(struct tdb_context *tdb)
             tdb->map_ptr = NULL;
             TDB_LOG((tdb, TDB_DEBUG_WARNING, "tdb_mmap failed for size %u (%s)\n",
                      tdb->map_size, strerror(errno)));
-#ifdef HAVE_INCOHERENT_MMAP
-            tdb->ecode = TDB_ERR_IO;
-            return -1;
-#endif
         }
     } else {
         tdb->map_ptr = NULL;
     }
-#else
-    tdb->map_ptr = NULL;
-#endif
+
     return 0;
 }
 
@@ -407,34 +376,6 @@ static int tdb_expand_file(struct tdb_context *tdb, tdb_off_t size, tdb_off_t ad
         errno = ENOSPC;
         return -1;
     }
-
-#ifdef HAVE_POSIX_FALLOCATE
-    ret = tdb_posix_fallocate(tdb, size, addition);
-    if (ret == 0) {
-        return 0;
-    }
-    if (ret == ENOSPC) {
-        /*
-         * The Linux glibc (at least as of 2.24) fallback if
-         * the file system does not support fallocate does not
-         * reset the file size back to where it was. Also, to
-         * me it is unclear from the posix spec of
-         * posix_fallocate whether this is allowed or
-         * not. Better be safe than sorry and "goto fail" but
-         * "return -1" here, leaving the EOF pointer too
-         * large.
-         */
-        goto fail;
-    }
-
-    /*
-     * Retry the "old" way. Possibly unnecessary, but looking at
-     * our configure script there seem to be weird failure modes
-     * for posix_fallocate. See commit 3264a98ff16de, which
-     * probably refers to
-     * https://sourceware.org/bugzilla/show_bug.cgi?id=1083.
-     */
-#endif
 
     ret = tdb_ftruncate(tdb, new_size);
     if (ret == -1) {
