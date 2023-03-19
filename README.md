@@ -2,10 +2,10 @@
 This is a fork of the 3.1 branch of the Netatalk repo on SourceForge. It has been patched for clean compilation and use on current versions of macOS only, and enables AFP2 and AFP3 file sharing between modern macs and classic PPC macs running Mac OS 9.2.2 to Mac OS X 10.5.8 (Leopard). It has been tested on macOS 10.14 (Mojave) to macOS 13.2.1 (Ventura). All code unused in macOS has been removed so this version of Netatalk will only run on modern Intel or Apple Silicon macs.
 #### Credits:
 
-[The Netatalk open-source AFP filesever project](http://netatalk.sourceforge.net) -
+[The Netatalk open-source AFP filesever project](https://github.com/Netatalk/netatalk) -
 all developers past and present.
 
-**@mabam**, **@rdmark**, **@Synology-andychen**, **@mikeboss** and **@christopherkobayashi** for various recent patches
+**@cmeh**, **@mabam**, **@rdmark**, **@Synology-andychen**, **@mikeboss** and **@christopherkobayashi** for various recent patches
 
 #### Quick how-to:
 
