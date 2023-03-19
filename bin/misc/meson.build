@@ -31,11 +31,11 @@ executable('fce',
             link_with : libatalk,
             dependencies : mysqlclient,
             install : false)
-            
+
 executable('afpldaptest',
             afpldaptest_sources,
             include_directories : inc,
             link_with : libatalk,
             dependencies : [mysqlclient, ldap],
-            c_args : '-D_PATH_CONFDIR="/usr/local/etc"',
+            c_args : '-D_PATH_CONFDIR="/usr/local/etc/"',
             install : true)
