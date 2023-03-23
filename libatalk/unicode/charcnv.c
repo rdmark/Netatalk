@@ -669,7 +669,7 @@ char * debug_out ( char * seq, size_t len)
 
     for ( i = 0; i<=(len-1); i++)
     {
-        sprintf(q, "%2.2x.", *p);
+        snprintf(q, sizeof(q), "%2.2x.", *p);
         q += 3;
         p++;
     }

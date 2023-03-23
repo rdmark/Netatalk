@@ -40,7 +40,7 @@ static void hexdump(void *m, size_t l) {
     char *bufp = buf;
 
     while (l--) {
-        len = sprintf(bufp, "%02x ", *p++);
+        len = snprintf(bufp, sizeof(bufp), "%02x ", *p++);
         bufp += len;
         count++;
 

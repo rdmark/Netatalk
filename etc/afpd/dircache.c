@@ -625,7 +625,7 @@ void dircache_dump(void)
 
     LOG(log_warning, logtype_afpd, "Dumping directory cache...");
 
-    sprintf(tmpnam, "/tmp/dircache.%u", getpid());
+    snprintf(tmpnam, sizeof(tmpnam), "/tmp/dircache.%u", getpid());
     if ((dump = fopen(tmpnam, "w+")) == NULL) {
         LOG(log_error, logtype_afpd, "dircache_dump: %s", strerror(errno));
         return;

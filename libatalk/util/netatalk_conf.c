@@ -369,7 +369,7 @@ static char *volxlate(const AFPObj *obj,
         } else if (IS_VAR(p, "$c")) {
             if (IS_AFP_SESSION(obj)) {
                 DSI *dsi = obj->dsi;
-                len = sprintf(dest, "%s:%u",
+                len = snprintf(dest, sizeof(dest), "%s:%u",
                               getip_string((struct sockaddr *)&dsi->client),
                               getip_port((struct sockaddr *)&dsi->client));
                 dest += len;

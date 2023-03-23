@@ -553,7 +553,7 @@ void afp_over_dsi(AFPObj *obj)
             } else {
                 char logstr[50];
                 debugging = 1;
-                sprintf(logstr, "/tmp/afpd.%u.XXXXXX", getpid());
+                snprintf(logstr, sizeof(logstr), "/tmp/afpd.%u.XXXXXX", getpid());
                 setuplog("default:maxdebug", logstr);
             }
         }

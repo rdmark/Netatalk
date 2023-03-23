@@ -30,6 +30,8 @@
 
 char *uuidtype[] = {"", "USER", "GROUP", "LOCAL"};
 
+#define UUID_SIZE 64
+
 /********************************************************
  * Public helper function
  ********************************************************/
@@ -100,8 +102,9 @@ void uuid_string2bin( const char *uuidstring, unsigned char *uuid) {
  * Use defined or default ascii mask for dash placement
  * Returns pointer to static buffer.
  */
-const char *uuid_bin2string(const unsigned char *uuid) {
-    static char uuidstring[64];
+const char *uuid_bin2string(const unsigned char *uuid)
+{
+    static char uuidstring[UUID_SIZE];
     const char *uuidmask;
     unsigned int i = 0;
     unsigned char c;
@@ -116,7 +119,7 @@ const char *uuid_bin2string(const unsigned char *uuid) {
     while (i < strlen(uuidmask)) {
         c = *uuid;
         uuid++;
-        sprintf(uuidstring + i, "%02X", c);
+        snprintf(uuidstring + i, sizeof (UUID_SIZE + i), "%02X", c);
         i += 2;
         if (uuidmask[i] == '-')
             uuidstring[i++] = '-';

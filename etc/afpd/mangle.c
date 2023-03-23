@@ -261,7 +261,7 @@ mangle(const struct vol *vol, char *filename, size_t filenamelen, char *uname, c
     /* First, attempt to locate a file extension. */
     ext_len = mangle_extension(vol, uname, ext, (flags & 2) ? CH_UTF8_MAC : vol->v_maccharset);
     m = mfilename;
-    k = sprintf(mangle_suffix, "%c%X", MANGLE_CHAR, ntohl(id));
+    k = snprintf(mangle_suffix, sizeof(mangle_suffix), "%c%X", MANGLE_CHAR, ntohl(id));
 
     if (filenamelen + k + ext_len > maxlen) {
       uint16_t opt = CONV_FORCE | CONV_UNESCAPEHEX;
