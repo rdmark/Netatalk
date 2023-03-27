@@ -25,7 +25,9 @@ all developers past and present.
 
    meson setup build
 
-   sudo ninja -C build install
+   meson compile -C build
+
+   sudo meson install -C build
 
 5. Set up your afp.conf file and specify AFP shares as needed.
 
