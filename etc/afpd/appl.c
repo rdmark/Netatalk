@@ -381,6 +381,10 @@ int afp_getappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 		memcpy(&len, p, sizeof(len));
 		len = ntohs(len);
 		p += sizeof(u_int16_t);
+		if (len > sizeof(obj->oldtmp) - (p - buf)) {
+			*rbuflen = 0;
+			return(AFPERR_NOITEM);
+		}
 		if ((cc = read(sa.sdt_fd, p, len)) < len) {
 			break;
 		}
@@ -404,11 +408,16 @@ int afp_getappl(AFPObj * obj, char *ibuf, size_t ibuflen _U_, char *rbuf,
 
 #define hextoint( c )	( isdigit( c ) ? c - '0' : c + 10 - 'a' )
 #define islxdigit(x)	(!isupper(x)&&isxdigit(x))
+	if (len > sizeof(utomname)) {
+		*rbuflen = 0;
+		return(AFPERR_NOITEM);
+	}
+
 	u = p;
 	m = utomname;
 	i = len;
 	while (i) {
-		if (*u == ':' && *(u + 1) != '\0' && islxdigit(*(u + 1)) &&
+		if (i >= 3 && i + 2 < len && *u == ':' && *(u + 1) != '\0' && islxdigit(*(u + 1)) &&
 		    *(u + 2) != '\0' && islxdigit(*(u + 2))) {
 			++u, --i;
 			h = hextoint(*u) << 4;
