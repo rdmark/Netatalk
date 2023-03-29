@@ -1,3 +1,8 @@
+Changes in 2.x v230302
+======================
+* FIX: CVE-2022-45188: fixes the heap-based buffer overflow in afp_getappl()
+* FIX: Modernize systemd service configurations
+
 Changes in 2.x v230301
 ======================
 * NEW: created man page for a2boot
