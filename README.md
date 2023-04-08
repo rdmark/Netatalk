@@ -2,7 +2,7 @@
 
 ![Build Status](https://github.com/dgsga/netatalk/actions/workflows/macos.yml/badge.svg)
 
-This is a fork of the 3.1 branch of the Netatalk repo on GitHub. It has been patched for clean compilation and use on recent versions of macOS only, and enables AFP 2.2 and AFP 3.0 - 3.4 file sharing between modern macs and vintage macs running classic Mac OS. It has been tested on macOS 10.14 (Mojave) to macOS 13.2.1 (Ventura). All code unused in macOS has been removed so this version of Netatalk will only run on modern Intel or Apple Silicon macs. This fork is rebased against the upstream master as needed to keep it up to date.
+This is a fork of the 3.1 branch of the Netatalk repo on GitHub. It has been patched for clean compilation and use on recent versions of macOS only, and enables AFP 2.2 and AFP 3.0 - 3.4 file sharing between modern macs and vintage macs running classic Mac OS. It has been tested on macOS 10.14 (Mojave) to macOS 13.3 (Ventura). All code unused in macOS has been removed so this version of Netatalk will only run on modern Intel or Apple Silicon macs. New commits in the upstream master are cherry-picked as required to keep this fork up to date.
 #### Credits:
 
 [The Netatalk open-source AFP filesever project](https://github.com/Netatalk/netatalk) -
