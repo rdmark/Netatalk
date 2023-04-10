@@ -6,7 +6,7 @@
     <refmiscinfo class="date">23 Mar 2012</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP Fileserver Manual</refmiscinfo>
-    <refmiscinfo class="version">3.1.14</refmiscinfo>
+    <refmiscinfo class="version">3.1.15</refmiscinfo>
   </refmeta>
   <refnamediv>
     <refname>afp_signature.conf</refname>

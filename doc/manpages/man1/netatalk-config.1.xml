@@ -6,7 +6,7 @@
     <refmiscinfo class="date">10 Nov 2015</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP Fileserver Manual</refmiscinfo>
-    <refmiscinfo class="version">3.1.14</refmiscinfo>
+    <refmiscinfo class="version">3.1.15</refmiscinfo>
   </refmeta>
   <refnamediv>
     <refname>netatalk-config</refname>

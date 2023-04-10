@@ -20,7 +20,7 @@ build_args = [
   '-DSERVERTEXT="/usr/local/var/netatalk/msg/"',
   '-D_PATH_AFPDUAMPATH="/usr/local/lib/netatalk/"',
   '-D_PATH_STATEDIR="/usr/local/var/netatalk/"',
-  '-DVERSION="3.1.14"']
+  '-DVERSION="3.1.15"']
 
 libutil = static_library('util',
                           util_sources,

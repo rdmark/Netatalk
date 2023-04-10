@@ -6,7 +6,7 @@
     <refmiscinfo class="date">19 Jan 2013</refmiscinfo>
     <refmiscinfo class="source">Netatalk</refmiscinfo>
     <refmiscinfo class="manual">Netatalk AFP Fileserver Manual</refmiscinfo>
-    <refmiscinfo class="version">3.1.14</refmiscinfo>
+    <refmiscinfo class="version">3.1.15</refmiscinfo>
   </refmeta>
   <refnamediv>
     <refname>extmap.conf</refname>
