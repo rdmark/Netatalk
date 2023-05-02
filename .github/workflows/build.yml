@@ -1,0 +1,34 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - main
+      - branch-*
+    paths-ignore:
+      - 'config/**'
+      - 'distrib/**'
+      - 'doc/**'
+      - 'man/**'
+      - 'NEWS'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  APT_PACKAGES: libtool libtool-bin automake autoconf libssl-dev libgcrypt-dev libkrb5-dev libpam0g-dev libdb-dev libtdb-dev libmysqlclient-dev libavahi-client-dev libacl1-dev libcrack2-dev tcpd
+
+jobs:
+  build:
+    name: Linux
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: sudo apt-get install --assume-yes --no-install-recommends ${{ env.APT_PACKAGES }}
+      - name: Bootstrap
+        run: ./bootstrap
+      - name: Configure
+        run: ./configure
+      - name: Make
+        run: make -j $(nproc)
+      - name: Run tests
+        run: make check
