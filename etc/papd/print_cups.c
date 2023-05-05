@@ -149,6 +149,7 @@ cups_printername_ok(char *name)         /* I - Name of printer */
 		    "Unable to connect to destination \"%s\": %s", dest->name, cupsLastErrorString());
 		return (0);
 	}
+	cupsFreeDests(1, dest);
 
        /*
         * Build an IPP_GET_PRINTER_ATTRS request, which requires the following
@@ -273,6 +274,7 @@ int cups_get_printer_status(struct printer *pr)
 		    "Unable to connect to destination \"%s\": %s", dest->name, cupsLastErrorString());
 		return (0);
 	}
+	cupsFreeDests(1, dest);
 
 	/*
 	 * Generate the printer URI...
