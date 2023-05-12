@@ -209,16 +209,17 @@ const char *cups_get_printer_ppd(char *name)
   	cups_file_t	*fp;		/* PPD file */
     	static char	buffer[1024];	/* I - Filename buffer */
     	size_t		bufsize;	/* I - Size of filename buffer */
-  	char			make[256],	/* Make and model */
-				*model;
+  	char		make[256],	/* Make and model */
+			*model;
 
 
 	cupsSetPasswordCB(cups_passwd_cb);
 
 	/*
-	We have to go this roundabout way to correctly get the make and model of DNS-SD discovered
-	printers. Otherwise we get the name of the CUPS temporary queue, which we don't want.
-	*/
+	 *We have to go this roundabout way to correctly get the make and 
+	 *model of DNS-SD discovered printers. Otherwise we get the name of 
+	 *the CUPS temporary queue, which we don't want.
+	 */
 
 	int num_dests = cupsGetDests2(CUPS_HTTP_DEFAULT, &dests);
 	dest = cupsGetDest(name, NULL, num_dests, dests);
@@ -237,6 +238,10 @@ const char *cups_get_printer_ppd(char *name)
 		cupsFreeDests(num_dests,dests);
 		return (0);
 	}
+	
+	/*
+	 * Generate the printer URI...
+	 */
 
 	sprintf(uri, "ipp://localhost/printers/%s", name);
 
@@ -296,8 +301,8 @@ const char *cups_get_printer_ppd(char *name)
         }
 
 	/*
-	* Range check input...
-	*/
+	 * Range check input...
+	 */
 	
 	bufsize = sizeof(buffer);
 	if (buffer)
@@ -323,8 +328,8 @@ const char *cups_get_printer_ppd(char *name)
 	}
 
 	/*
-	* Open a temporary file for the PPD...
-	*/
+	 * Open a temporary file for the PPD...
+	 */
 
 	if ((fp = cupsTempFile2(buffer, (int)bufsize)) == NULL)
 	{
@@ -336,7 +341,7 @@ const char *cups_get_printer_ppd(char *name)
 	}
 
 	/*
-	 * Standard stuff for PPD file...
+	 * Write the header and some hard coded defaults for the PPD file...
 	 */
 
 	cupsFilePuts(fp, "*PPD-Adobe: \"4.3\"\n");
@@ -378,8 +383,8 @@ const char *cups_get_printer_ppd(char *name)
 	cupsFilePuts(fp, "*?Resolution: 600dpi\n");
 
 	/*
-	Clean up.
-	*/
+	 *Clean up.
+	 */
 	
 	httpClose(http);
 	ippDelete(response);
