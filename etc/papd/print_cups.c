@@ -200,7 +200,7 @@ const char *cups_get_printer_ppd(char *name)
 			*response;      /* IPP Response */
 	cups_lang_t	*language;      /* Default language */
 	char		uri[HTTP_MAX_URI]; /* printer-uri attribute */
-        static const char *pattrs[] =   /* Requested printer attributes */
+        const char	*pattrs[] =   /* Requested printer attributes */
                         {
                           "printer-make-and-model",
                           "color-supported"
