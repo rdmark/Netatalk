@@ -52,10 +52,6 @@
 #define MAXCHOOSERLEN 31
 #define HTTP_MAX_URI 1024
 
-/* Deal with post-1.7 deprecated httpConnect() */
-#define httpConnect(host, port)		httpConnect2(host, port, NULL, AF_UNSPEC, HTTP_ENCRYPTION_IF_REQUESTED, 1, 1000, NULL)
-
-
 static const char *cups_status_msg[] = {
 	"status: busy; info: \"%s\" is rejecting jobs; ",
 	"status: idle; info: \"%s\" is stopped, accepting jobs ;",
