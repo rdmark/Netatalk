@@ -237,12 +237,14 @@ const char *cups_get_printer_ppd(char *name)
 	if (!dest)
 	{
 		LOG(log_error, logtype_papd, "testdest: Unable to get destination \"%s\": %s\n", name, cupsLastErrorString());
+		cupsFreeDests(num_dests,dests);
 		return (0);
 	}
 
 	if ((http = cupsConnectDest(dest, CUPS_DEST_FLAGS_NONE, 30000, NULL, NULL, 0, NULL, NULL)) == NULL)
 	{
 		LOG(log_error, logtype_papd, "testdest: Unable to connect to destination \"%s\": %s\n", dest->name, cupsLastErrorString());
+		cupsFreeDests(num_dests,dests);
 		return (0);
 	}
 
@@ -289,6 +291,7 @@ const char *cups_get_printer_ppd(char *name)
                  LOG(log_error, logtype_papd,  "Unable to get printer attribs for %s - %s", name,
                          ippErrorString(cupsLastError()));
                 httpClose(http);
+		cupsFreeDests(num_dests,dests);
                 return (0);
         }
 
@@ -298,6 +301,7 @@ const char *cups_get_printer_ppd(char *name)
                          ippErrorString(ippGetStatusCode(response)));
                 ippDelete(response);
                 httpClose(http);
+		cupsFreeDests(num_dests,dests);
                 return (0);
         }
 
@@ -313,13 +317,19 @@ const char *cups_get_printer_ppd(char *name)
 	{
 		LOG(log_error, logtype_papd, "Check buffer failed!\n");
 		LOG(log_error, logtype_papd, strerror(EINVAL));
+                ippDelete(response);
+                httpClose(http);
+		cupsFreeDests(num_dests,dests);
 		return (0);
 	}
 
 	if (!response)
 	{
-	LOG(log_error, logtype_papd, "No IPP attributes.\n");
-	return (0);
+		LOG(log_error, logtype_papd, "No IPP attributes.\n");
+                ippDelete(response);
+                httpClose(http);
+		cupsFreeDests(num_dests,dests);
+		return (0);
 	}
 
 	/*
@@ -329,6 +339,9 @@ const char *cups_get_printer_ppd(char *name)
 	if ((fp = cupsTempFile2(buffer, (int)bufsize)) == NULL)
 	{
 		LOG(log_error, logtype_papd, strerror(errno));
+                ippDelete(response);
+                httpClose(http);
+		cupsFreeDests(num_dests,dests);
 		return (0);
 	}
 
