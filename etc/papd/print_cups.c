@@ -37,12 +37,6 @@
 
 #ifdef HAVE_CUPS
 
-/*
- * Do not error out on deprecation messages
- * -- darktable does this in their "src/common/cups_print.c"
- */
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
 #include <cups/ipp.h>
 #include <cups/cups.h>
 #include <cups/language.h>
