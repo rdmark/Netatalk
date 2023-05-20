@@ -76,7 +76,7 @@ endif
 
 uninstall-startup:
 	-systemctl disable $(service_DATA)
-	rm -f $(addprefix $(DESTDIR)$(servicedir)/, $(service_DATA))
+	rm -f $(DESTDIR)$(servicedir)/{a2boot,afpd,atalkd,cnid,papd,timelord}.service
 	-systemctl daemon-reload
 
 endif

@@ -2,9 +2,9 @@ dnl configure.in for netatalk
 
 # Current syntax as per Automake 1.16.5 documentation.
 # https://www.gnu.org/software/automake/manual/html_node/Public-Macros.html
-AC_INIT([netatalk],[m4_esyscmd([echo -n `cat VERSION`])])
-AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE
+AC_INIT([netatalk],m4_normalize(m4_include([VERSION])))
+AC_CANONICAL_HOST
+AM_INIT_AUTOMAKE([subdir-objects])
 ## End of current syntax
 
 # For legacy Automake versions, use this syntax instead.
@@ -24,8 +24,7 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-_LT_SET_OPTION([LT_INIT],[dlopen])
-LT_INIT
+LT_INIT([dlopen])
 AC_PROG_PERL
 AC_PROG_GREP
 AC_PROG_PS
