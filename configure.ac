@@ -772,6 +772,9 @@ AM_CONDITIONAL(USE_UNDEF, test x$sysv_style = x)
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
 AM_CONDITIONAL(SYSTEMD_START, test x$netatalk_systemd_start = xyes)
 
+dnl Enable silent Automake rules if present
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+
 dnl --------------------- generate files
 
 AC_CONFIG_FILES([Makefile
