@@ -499,6 +499,13 @@ int cq_feature(struct papfile *in, struct papfile *out)
 			while (*p == ' ') {
 				p++;
 			}
+			
+			/* handle the '?' at the beginning of LW8's Resolution Query */
+                        if (*p == '*' && *(p + 1) == '?')
+                        {
+                                p++;
+                                *p = '*';
+                        }
 
 			if ((pfe = ppd_feature(p, stop - p)) == NULL) {
 				if (comswitch(queries, cq_default) < 0) {
