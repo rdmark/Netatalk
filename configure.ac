@@ -28,8 +28,8 @@ LT_INIT([dlopen])
 AC_PROG_PERL
 AC_PROG_GREP
 AC_PROG_PS
+
 AM_PROG_CC_C_O
-AC_C_BIGENDIAN
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
