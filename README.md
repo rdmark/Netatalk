@@ -50,7 +50,7 @@ The general installation flow follows that of most traditional *NIX software: Ru
 **For Debian Linux (and derivates), there is an [automated installation script](https://github.com/rdmark/Netatalk-2.x/blob/branch-netatalk-2-x/contrib/shell_utils/debian_install.sh) that configures and installs the universal Netatalk setup described below.**
 
 ```
-$ apt install libssl-dev libdb-dev autotools-dev automake libtool pkg-config
+$ apt install libssl-dev libdb-dev autotools-dev automake libtool libtool-bin pkg-config
 ```
 
 For *papd* printer server support, install CUPS packages.
