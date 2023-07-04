@@ -1,3 +1,26 @@
+Changes in 2.x v230701
+======================
+* FIX: papd: Fix printing to Avahi discovered "driverless" printers
+* FIX: papd: Fix a potential memory leak
+* FIX: papd: Remove unneeded server connection that triggered error
+* FIX: papd: Remove CUPS PPD API dependency, which is getting deprecated in CUPS 3.0
+* FIX: papd: Return a printer resolution with LaserWriter 8 driver
+* FIX: initscripts: Update atalkd.service to be consistent with other init scripts.
+       The original init scripts for atalkd registered the NBP entries
+       of "Workstation" and "netatalk".
+* UPD: macusers: Restore the original Pearl script
+* FIX: macusers: Fix output for long usernames
+* FIX: macusers: account for usernames with non-word characters
+* FIX: macusers: Support NetBSD
+* FIX: macusers: hide root user. Bug #495
+* NEW: bootstrap: Add checks for required packages
+* UPD: bootstrap: Modernize autotools syntax and use autoreconf for bootstrapping
+* UPD: bootstrap: Enable silent Automake rules if present
+* FIX: macros: Correctly modernize largefile check
+* FIX: macros: Use noninteractive PAM config on Debian and SUSE
+* FIX: Add libtools-bin Debian package requirement to README and debian-install.sh
+* NEW: Add a GitHub CI workflow for building and testing
+
 Changes in 2.x v230302
 ======================
 * FIX: CVE-2022-45188: fixes the heap-based buffer overflow in afp_getappl()
