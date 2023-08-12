@@ -1,8 +1,10 @@
 # Netatalk
-Netatalk is an implementation of "AFP over TCP".
-Netatalk also support the AppleTalk Protocol Suite for legacy Macs.
+Netatalk is an implementation of AFP over TCP, also known as AppleShare IP (ASIP).
+
+Netatalk also supports the AppleTalk Protocol Suite for legacy Macs.
 The current release contains support for EtherTalk Phase I and II, 
 DDP, RTMP, NBP, ZIP, AEP, ATP, PAP, ASP, AFP and DSI.
+
 The complete stack looks like this on a BSD-derived system:
 
 ```
@@ -24,6 +26,7 @@ The complete stack looks like this on a BSD-derived system:
 ```
 
 DSI is a session layer used to carry AFP over TCP.
+
 DDP is in the kernel.  "atalkd" implements RTMP, NBP, ZIP, and AEP.  It
 is the AppleTalk equivalent of Unix "routed".  There is also a
 client-stub library for NBP.  ATP and ASP are implemented as
