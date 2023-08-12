@@ -41,7 +41,7 @@ operational information.
 # Netatalk 2.x
 Netatalk 2.x is a fork of the Netatalk 2.2 codebase which aims to be clean, safe and easy to set up on modern systems. It has also aggressively deprecated broken or long outdated features.
 
-Actively supported platforms are Debian Linux, NetBSD and Solaris.
+Actively supported platforms are Linux, NetBSD and Illumos.
 
 # Installation
 Follow the [installation instructions in the wiki](https://github.com/rdmark/Netatalk-2.x/wiki/Chapter-2.-Installation) to configure and install Netatalk.
