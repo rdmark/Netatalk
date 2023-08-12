@@ -25,18 +25,16 @@ The complete stack looks like this on a BSD-derived system:
     +---------------------------------------------------+
 ```
 
-DSI is a session layer used to carry AFP over TCP.
+- DSI is a session layer used to carry AFP over TCP.
+- DDP is implemented as a kernel module.
+- **afpd** provides Macs with an interface to the Unix file system.
+- **atalkd** implements RTMP, NBP, ZIP, and AEP.  It is the AppleTalk equivalent of Unix **routed**.  There is also a client-stub library for NBP.
+- ATP and ASP are implemented as libraries.
+- **papd** allows Macs to spool to **lpd**, and **pap** allows Unix machines to print to AppleTalk connected printers.
+- **psf** is a PostScript printer filter for **lpd**, designed to use **pap**.
+- **psorder** is a PostScript reverser, called by **psf** to reverse pages printed to face-up stacking printers.
 
-DDP is in the kernel.  "atalkd" implements RTMP, NBP, ZIP, and AEP.  It
-is the AppleTalk equivalent of Unix "routed".  There is also a
-client-stub library for NBP.  ATP and ASP are implemented as
-libraries.  "papd" allows Macs to spool to "lpd", and "pap" allows Unix
-machines to print to AppleTalk connected printers.  "psf" is a
-PostScript printer filter for "lpd", designed to use "pap".  "psorder"
-is a PostScript reverser, called by "psf" to reverse pages printed to
-face-up stacking printers.  "afpd" provides Macs with an interface to
-the Unix file system.  Refer to the appropriate man pages for
-operational information.
+Refer to the appropriate man pages for operational information.
 
 # Netatalk 2.x
 Netatalk 2.x is a fork of the Netatalk 2.2 codebase which aims to be clean, safe and easy to set up on modern systems. It has also aggressively deprecated broken or long outdated features.
