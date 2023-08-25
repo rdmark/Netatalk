@@ -283,17 +283,23 @@ AC_ARG_ENABLE(gentoo,
 )
 
 AC_ARG_ENABLE(netbsd,
-	[  --enable-netbsd         use NetBSD-style rc.d configuration ],
+	[  --enable-netbsd         use NetBSD-style rc.d configuration ],[
 	if test "x$enableval" = "xyes"; then
 		sysv_style=netbsd
 	fi
 	AC_MSG_RESULT([enabling NetBSD-style rc.d support])
+	]
 )
 
 AC_ARG_ENABLE(systemd,
-	[  --enable-systemd        use general systemd configuration],[
+	[  --enable-systemd        use systemd configuration           ],[
 	if test "$enableval" = "yes"; then
 		sysv_style=systemd
+		if test -d "/lib/systemd"; then
+			SYSTEMD_PREFIX=/lib
+		else
+			SYSTEMD_PREFIX=/usr/lib
+		fi
 	fi
 	AC_MSG_RESULT([enabling cross-platform systemd support])
 	]
@@ -310,6 +316,21 @@ AC_ARG_ENABLE(systemd-start,
 		AC_MSG_RESULT([no])
 	]
 )
+
+AC_ARG_WITH(systemd-prefix,
+	    [  --with-systemd-prefix=DIR   systemd unit files in DIR
+		  [[/usr/lib]]],
+	[
+		if test "x$withval" != "x"; then
+			SYSTEMD_PREFIX="$withval"
+			sysv_style=systemd
+			AC_MSG_RESULT([enabling systemd support with prefix $SYSTEMD_PREFIX])
+		fi
+	], [SYSTEMD_PREFIX=/usr/lib]
+)
+
+SYSTEMDDIR=${SYSTEMD_PREFIX}/systemd/system
+AC_SUBST(SYSTEMDDIR)
 
 dnl ----- timelord compilation (enabled by default)
 AC_MSG_CHECKING([whether timelord should be compiled])

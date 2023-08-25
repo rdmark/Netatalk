@@ -3,6 +3,7 @@
 SUFFIXES = .tmpl .
 
 pkgconfdir = @PKGCONFDIR@
+systemddir = @SYSTEMDDIR@
 
 #
 # Template Generation
@@ -63,9 +64,8 @@ uninstall: uninstall-startup
 
 if USE_SYSTEMD
 
-servicedir = /lib/systemd/system
-
-service_DATA = a2boot.service afpd.service atalkd.service cnid.service papd.service timelord.service
+servicedir	= $(systemddir)
+service_DATA	= a2boot.service afpd.service atalkd.service cnid.service papd.service timelord.service
 
 install-data-hook:
 	-systemctl daemon-reload
