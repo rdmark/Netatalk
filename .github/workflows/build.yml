@@ -1,5 +1,9 @@
 name: Build and Test
 on:
+  push:
+    branches:
+      - main
+      - branch-*
   pull_request:
     types:
       - opened
