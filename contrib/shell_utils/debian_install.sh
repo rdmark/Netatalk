@@ -92,10 +92,10 @@ function installNetatalk() {
         if [ -d "$AFP_SHARE_PATH" ]; then
             echo "Found a $AFP_SHARE_PATH directory; will use it for file sharing."
         else
-            echo "Creating the $AFP_SHARE_PATH directory and granting read/write permissions to all users..."
+            echo "Creating the $AFP_SHARE_PATH directory and granting read/write permissions to current user..."
             sudo mkdir -p "$AFP_SHARE_PATH"
             sudo chown -R "$USER:$USER" "$AFP_SHARE_PATH"
-            chmod -R 2775 "$AFP_SHARE_PATH"
+            chmod -R 775 "$AFP_SHARE_PATH"
         fi
     fi
 
