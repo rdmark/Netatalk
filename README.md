@@ -1,3 +1,6 @@
+# Please Use Netatalk 2.2
+This fork is now deprecated in favor of upstream Netatalk 2.2. No further development will take place.
+
 # Netatalk
 Netatalk is an implementation of AFP over TCP, also known as AppleShare IP (ASIP).
 
